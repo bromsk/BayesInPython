@@ -1,0 +1,1776 @@
+---
+title: "Python, Bambi, and PyMC, and GLMMs"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  bookdown::html_document2:
+    fig_caption: yes
+    fig_height: 4
+    fig_width: 6
+    highlight: tango
+    number_sections: yes
+    theme: cerulean
+    toc: yes
+    toc_float: true
+    code_folding: hide
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setwd, eval = F, echo = F}
+setwd("analysis")
+```
+```{r setup, include=FALSE, message=F, warning=FALSE, results = "hide", echo=F}
+knitr::opts_chunk$set(cache = T, message =F, warning = F, echo=F,
+                      # dpi = 36, out.width="600px", out.height="600px")
+  fig.width = 8,
+  fig.height = 5,
+  out.width = '100%')
+
+# R libraries:
+library(MASS)
+library(lme4)
+library(magrittr)
+library(tidyverse)
+library(ggmap)
+register_google(key = "AIzaSyBaIUCduIbWFO5VlvdKetuMMw2qzUYFmi0")
+
+# library to use Python within R:
+library(reticulate)
+# py_install("pandas")
+
+## Set colors:
+# library(RColorBrewer)
+# display.brewer.pal(11, "Spectral")
+# brewer.pal(11, "Spectral")
+mycolors =  c("#9E0142", "#762A83","#9970AB",  # "#5E4FA2",
+              "#3288BD","#66C2A5", "#ABDDA4", "#D53E4F")
+visualcols = c( "#D7191C", "#FDAE61", "#FFFFBF", "#A6D96A", "#1A9641")
+trialcols = c("#4575B4", "#40004B","#762A83","#9970AB",  "#5AAE61",
+               "#C2A5CF","#74ADD1", "#E7D4E8", "#ABD9E9",   "#00441B" )
+prop_colors = c("#313695", "#ABD9E9", "#FFFFBF", "#FEE090", 
+                 "#FDAE61", "#F46D43","#D73027", "#A50026")
+#
+```
+``` {r functions}
+
+getDR <- function (mod, coefs = -1) {
+  b1 = summary(mod)$coef[coefs,1]
+  seb1 = summary(mod)$coef[coefs,2]
+  (DR = round(100 * (1- exp(b1)),1))  ## 69.9
+  (higher = round(100 * (1 - exp(b1 - 1.96*seb1)),1)) ## 78.8
+  (lower = round(100 * (1 - exp(b1 + 1.96*seb1)),1)) ## 57.0
+  if (is.null(names(DR))) {
+   data.frame(#Treatment = names(DR),
+             DR = as.numeric(DR), 
+             lowerCI = as.numeric(lower),
+             upperCI = as.numeric(higher))   
+  } else {
+  data.frame(Treatment = names(DR),
+             DR = as.numeric(DR), 
+             lowerCI = as.numeric(lower),
+             upperCI = as.numeric(higher))
+  }
+}
+
+## NA = 0 in sum
+`%+%` <- function(x, y)  mapply(sum, x, y, MoreArgs = list(na.rm = TRUE))
+#
+
+
+```
+```{python readdatP}
+
+virtualenv_install("r-reticulate", "pandas")
+pandas <- import("pandas")
+import pandas as pd
+
+# read in the moth data:
+moddat = pd.read_csv("../data/mothsubset.csv", delimiter = ",")
+#
+
+```
+```{r readdatR}
+
+moddatR = read.csv("../data/mothsubset.csv")
+moddatR %<>%
+  mutate(TransplantDate = ymd(TransplantDate),
+         DispInstallDate = ymd(DispInstallDate),
+         TrapInstallDate = ymd(TrapInstallDate),
+         SamplingDate = ymd(SamplingDate)
+         )
+```
+
+# Introduction
+
+I have used R, in conjunction with Rmarkdown documents, in an RStudio GUI for over a decade. It is a beautiful setup, with great work flows and clean coding. It is perfect for non-production level analyses, visualizations, interactive documents and web apps, and reports.
+
+However, the world seems to prefer Python. Perhaps it is because computer programmers rule the world more than statisticians and scientists.
+
+So, in that vein, I am writing this tutorial to fit Bayesian GLMMs and non-linear regression models commonly in Python, Pyton’s Bambi module, and Python’s PyMC module.
+
+The intended audience here is someone who is proficient at fitting statistical models in R, but would like to fit those same models in Python instead. In particular, fitting complex Bayesian hierarchical models.
+
+I have two purposes:
+
+1. To learn if I can fit complex non-linear Bayesian models with multi-dimensional Gaussian Processes in Python. I currently have custom algorithms written in Matlab for these models, and I want to fit the same models in Python.
+
+2. To get better acquainted with Python.
+
+All models are written mathematically and fit in both R and Python. Frequentist versions are fit when available as well as Bayesian versions.
+
+## Outline
+
+
+* Getting started with Python-- because it is more complicated than R.
+
+* Introduce the data to be used throughout the tutorial.
+
+* Fit generalized linear models (GLMs, here Poisson regressions).
+
+* Fit generalized linear models with random effects (GLMMs).
+
+
+# Getting started with Python
+
+Python is a lot more complicated than R!
+
+1. Download Python.
+
+2. Decide how you want to interact with Python. Yes, you can technically use the terminal and use Python directly, but a GUI is preferable so that it is easier to run the code, add comments, view the output, etc. This is even more true for Python than it is for R. 
+
+Originally, I downloaded Jupyter Notebook directly, but I didn't like the way things loaded. So, I downloaded "Anaconda" and then accessed Jupyter from there. However, I still don't love Jupyter-- the notebooks don't optimize the screen's size like RStudio does. In RStudio, I love having my code on one side of the screen, and my outputs on the other. Screens are wide, not long. 
+
+Soon, I came across the "reticulate" package, which allows for Python coding in an Rmarkdown script! So far, awesome and it is how I run the all the analyses. Here, I switch between R and Python code chunks, but the package also allows objects to be used within both languages. Pretty cool.
+
+To interact with Python via RMarkdowns in RStudio, check out the "reticulate" package website to get started: 
+
+R Markdown Python Engine (aka the "reticulate" package):
+https://rstudio.github.io/reticulate/articles/r_markdown.html
+
+
+3. Set up a Python environment for your work.  Here is why that is important:
+
+Python environments:
+"When installing Python packages it’s best practice to isolate them within a Python environment (a named Python installation that exists for a specific project or purpose). This provides a measure of isolation, so that updating a Python package for one project doesn’t impact other projects. The risk for package incompatibilities is significantly higher with Python packages than it is with R packages, because unlike CRAN, PyPI does not enforce, or even check, if the current versions of packages currently available are compatible."
+https://rstudio.github.io/reticulate/articles/python_packages.html
+
+(Anaconda and reticulate both help the user keep specific environments for each Python "project" that one may be working on.)
+
+Here is another helpful link:
+
+Primer on Python for R users:
+https://rstudio.github.io/reticulate/articles/python_primer.html
+
+
+```{r PythonEnvSetup}
+# A Python virtual environment is a basic tool to isolate project dependencies within a Python installation, while a Conda environment is a more comprehensive package manager that not only creates isolated environments but also allows for managing complex dependencies across different programming languages
+
+## Uncomment the code below and run once, the first time you work through the tutorial:
+
+# # create a new environment
+virtualenv_create("r-reticulate-BayesInPython")
+# 
+# # install SciPy
+# virtualenv_install("r-reticulate", "scipy")
+# 
+# # import SciPy (it will be automatically discovered in "r-reticulate")
+# scipy <- import("scipy")
+# 
+# # indicate that we want to use a specific virtualenv
+# use_virtualenv("r-reticulate")
+# 
+# # import SciPy (will use "r-reticulate" as per call to use_virtualenv)
+# scipy <- import("scipy")
+
+## (Uncomment this code instead if you prefer a Conda environment) 
+# # create a new environment 
+# conda_create("r-reticulate")
+# 
+# # install SciPy
+# conda_install("r-reticulate", "scipy")
+# 
+# # import SciPy (it will be automatically discovered in "r-reticulate")
+# scipy <- import("scipy")
+# 
+# # indicate that we want to use a specific condaenv
+# use_condaenv("r-reticulate")
+# 
+# # import SciPy (will use "r-reticulate" as per call to use_condaenv)
+# scipy <- import("scipy")
+# 
+
+# reticulate::repl_python()
+
+```
+
+
+## Python modules
+
+Python libraries or packages are called modules. To use them with reticulate, you first have to import them. The lines in the code chunk below must be called exactly once each for each new python environment (MODULE?); it does not need to re-run.
+
+```{python, eval = F}
+# You may have to install the packages:
+!pip install pandas
+
+```
+```{r, eval = F}
+# 
+# # install packages for new environment
+virtualenv_install("r-reticulate-BayesInPython", "pandas")
+# 
+# 
+# # indicate that we want to use a specific virtualenv
+use_virtualenv("r-reticulate-BayesInPython")
+# 
+# # import the modules (will use "r-reticulate" as per call to use_virtualenv)
+pandas <- import("pandas")
+
+```
+
+
+# Data Exploration
+
+We are analyzing moth count data collected from traps from rice fields in Indonesia. There are a total of 10 locations. At each location, there is one treatment (PFP) field with 4 traps and one control field with 4 traps. These traps are sampled and reset approximately every 10 days for the entire growing season, but sometimes that interval varies.
+
+It is expected that the PFP will catch fewer moths than the control fields. The research questions are: how much fewer moths are caught, i.e., what is the trapping reduction associated with the PFP traps? and, is the same trapping reduction observed for the entire season?
+
+These data have a spatial and temporal component. Temporally, the same traps are sampled over time. Spatially, the traps have a certain proximity to each other within a location, and the locations may be clumped across the landscape.
+
+These data are based on the data from Iqbal et al. (2023) (link: https://jurnal.pei-pusat.org/index.php/jei/article/view/783), but have been heavily manipulated in terms of locations and counts to preserve privacy rights.
+
+Full citation:
+Iqbal, M., Marman, M., Arintya, F., Broms, K. ., Clark, T., & Srigiriraju, L. . (2023). Mating disruption technology: An innovative tool for managing yellow stem borer (Scirpophaga incertulas Walker) of rice in Indonesia: Teknologi gangguan kawin: Inovasi untuk pengendalian penggerek batang kuning (Scirpophaga incertulas Walker) pada padi di Indonesia. Jurnal Entomologi Indonesia, 20(2), 129. https://doi.org/10.5994/jei.20.2.129.
+
+## Trap locations
+
+(Because I am plotting coordinates, I set the aspect ratio to be 1, which creates square plots to better mimic the actual locations of the traps.)
+
+Treatment traps have a slightly different alignment at each location:
+
+```{r}
+
+ggplot(moddatR) +
+  geom_point(aes(Longitude, Latitude, color = Details)) +
+  facet_wrap(~Location, scales = "free") +
+  theme(aspect.ratio=1, x.axis = F)
+
+```
+
+Trial locations in relation to each other. Some trial locations are closer to each other than others.
+
+```{r}
+
+basemap <- get_googlemap(c(lon = mean(moddatR$Longitude, na.rm = T),
+                           lat = mean(moddatR$Latitude, na.rm = T)),
+                         color = "bw",
+                         zoom = 4)
+ggmap(basemap) +
+  geom_point(data = moddatR,
+             aes(Longitude, Latitude, color = Location), size = 2) +
+  labs(title = "Trial locations") +
+  scale_color_brewer(palette = "PuOr") 
+
+```
+
+## Spatial component-- Python
+
+Here, I create the same figure using Python. Except Python has borrowed A LOT from R. Thereofre, I use a version of ggplot in both languages! Notice the subtle differences between these code chunks and the R ones. 
+
+Online help for the 'plotnine' module is great, so I'm not repeating much here. Just want to point out that there are actually MANY ways to code Python within R. In this tutorial, I am stick as close as possible to the code I would use in a Jupyter notebook.
+
+Install packages as needed using this code chunk:
+
+```{python, eval = F}
+!pip install seaborn
+```
+
+```{python}
+from plotnine import * # using ggplot in Python
+
+# import patsy
+# import matplotlib.pyplot as plt # basically always need for plotting
+# 
+# import matplotlib
+# matplotlib.use('tkAgg')
+
+p1 = (
+  ggplot(moddat) +
+    geom_point(aes('Latitude', 'Longitude', color = 'DetailsF')) +
+    facet_wrap(['Location'], scales = "free") +
+    labs(title = "Trap locations within each trial location") +
+    scale_color_manual(values = ["#9E0142", "#66C2A5"])
+)
+p1.draw(True)
+```
+
+
+Trial locations in relation to each other. The locations also have a spatial component, it might be important to recognize that some trials are closer than others.
+
+I don't love this visualization (map is too large, but it works for our purposes.
+
+```{python, eval = F}
+!pip install plotly
+```
+```{python}
+import plotly.express as px
+import seaborn as sns
+from matplotlib.colors import to_hex
+
+# Create the scatter plot on map
+lon = moddat["Longitude"].mean()
+lat = moddat["Latitude"].mean()
+fig = px.scatter_mapbox(moddat, lat="Latitude", lon="Longitude", hover_name="Location", color = "Location", 
+color_discrete_sequence=[to_hex(c) for c in sns.color_palette("bright", 10)],
+                        zoom=4, center={"lat": lat, "lon": lon}, title = "Trial locations")
+
+# Update the layout to use Mapbox
+fig.update_layout(mapbox_style="open-street-map");
+# Make larger points to see more easily:
+fig.update_traces(marker={'size': 10});
+# Show the plot
+fig.show()
+##opens in web browser
+
+```
+
+
+## Timeline
+
+```{r timeline, results="hide", fig.width = 7}
+
+dates <- moddatR %>%
+  group_by(Location, TransplantDate, TrapInstallDate) %>%
+  summarize(mindate = min(SamplingDate, na.rm = T),
+            maxdate = max(SamplingDate, na.rm = T)) %>%
+  ungroup() %>%
+  arrange(desc(mindate), Location)
+dates$Location <- factor(dates$Location, levels = unique(dates$Location))
+
+ggplot(dates) +
+  geom_errorbarh(aes(xmin = mindate, xmax = maxdate, 
+                     y = Location, color = Location),
+                 height = 0.5, linewidth = 1.25) +
+  geom_jitter(aes(TransplantDate, y = Location), width = 0, height = 0.1, size = 1.25) +
+  geom_jitter(aes(TrapInstallDate, y = Location), width = 0, height = 0.1, 
+              size = 1.25, color = gray(0.6)) +
+  labs(y = "Location",
+       x = "Date range of moths data collection (2023)",
+       title = "Trapping date ranges of each location",
+       caption = "Black points are transplant dates \n
+       Grey points are installation dates") +
+  scale_color_viridis_d() 
+```
+
+## Timeline-- Python
+
+```{python timeline, results="hide", fig.width = 7}
+
+dates <- moddat %>%
+  group_by(Location, TransplantDate, TrapInstallDate) %>%
+  summarize(mindate = min(SamplingDate, na.rm = T),
+            maxdate = max(SamplingDate, na.rm = T)) %>%
+  ungroup() %>%
+  arrange(desc(mindate), TrialID)
+dates$Location <- factor(dates$Location, levels = unique(dates$Location))
+
+ggplot(dates) +
+  geom_errorbarh(aes(xmin = mindate, xmax = maxdate, 
+                     y = Location, color = Location),
+                 height = 0.5, linewidth = 1.25) +
+  geom_jitter(aes(TransplantDate, y = Location), width = 0, height = 0.1, size = 1.25) +
+  geom_jitter(aes(TrapInstallDate, y = Location), width = 0, height = 0.1, 
+              size = 1.25, color = gray(0.6)) +
+  labs(y = "Location",
+       x = "Date range of moths data collection (2023)",
+       title = "Trapping date ranges of each location",
+       caption = "Black points are transplant dates \n
+       Grey points are installation dates") +
+  scale_color_viridis_d() 
+```
+
+
+
+## Moth counts
+
+```{r plotMoths, fig.width = 8, fig.height = 6}
+mean_cts <- moddatR %>%
+  group_by(Location, Treatment, Details,
+           AssessmentNumber,
+           SamplingDate, DATI) %>%
+  summarize(mean_cts = mean(nYSB, na.rm = T),
+            mean_mothsperday = mean(mothsperday)) %>%
+  ungroup()
+ggplot(moddatR,
+       aes(DATI, mothsperday, color = Details)) +
+  geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
+  # geom_line(data = mean_cts,
+      # aes(DATI, mean_mothsperday, color = Details), size = 1.1) +
+  geom_smooth(se=F) +
+  facet_wrap(~Location, scales = "free_y") + 
+  scale_color_manual(values = mycolors[]) +
+  # scale_color_viridis_d() +
+  # scale_y_sqrt() +
+  labs(title = "Male YSB moth counts for each location and trap",
+       y = "Moth counts per trap per day",
+       x = "DAI",
+       color = "Treatment")
+#
+```
+
+## Moth counts-- Python
+
+```{python}
+from plotnine import * # using ggplot in Python
+
+pmoths = (ggplot(moddat, aes(x = 'DATI', y='mothsperday', color = 'DetailsF')) +
+        geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
+        geom_smooth(se=False) +
+        facet_wrap(['Location'], scales = "free_y") +
+        scale_color_manual(values = ["#9E0142", "#66C2A5"]) +
+        labs(title = "Male YSB moth counts for each location and trap",
+             y = "Moth counts per trap per day",
+             x = "DAI",
+             color = "Treatment"))
+pmoths.draw(True)
+```
+
+
+# Basic GLM models
+
+To start, we ignore all the spatial and temporal relations and assume each data point is independent and identically distributed (iid). **This is not a good model for the data!** It is just our starting off point.
+
+These models are known as generalize linear models (GLMs).
+
+## Mathematical model
+
+We start with a poisson version of our regression model:
+
+$$
+y_i \sim Pois(\lambda_i) \\
+log(\lambda_i ) = \beta_0 + \beta_1 x_{A,i} + \mbox{ln} \left(DaysOfCatch_i\right)
+$$
+
+where
+
+$y_i$ is moth count $i$,
+
+$\lambda_i$ is the expected moth count for sample $i$,
+
+$\beta_0$ is the intercept of the model. Here, it is the basis for the expected moth count for our control treatment.
+
+$\beta_1$ is the expected difference in moth counts between the control group and the 'trt A' group, 
+
+$x_{A,i}$ is an indicator variable that equals 1 if sample $i$ is from a "trt A" field and equals 0 otherwise, and
+
+$\left(DaysOfCatch_i\right)$ is the offset to account for the varying time itnerval between samples. This is necessary because with a longer time interval, more moths will fly into the trap.
+
+However, in ecology, there is always additional variability in our data than what the Poisson distribution allows. To account for the additional variability in our model, we switch to a negative binomial distribution:
+
+$$
+y_i \sim NegBinom(\lambda_i, \phi) \\
+log(\lambda_i ) = \beta_0 + \beta_1 x_{A,i} + \mbox{ln} \left(DaysOfCatch_i\right)
+$$
+
+"Negative binomial regression is used to model count data for which the variance is higher than the mean." (https://www.pymc.io/projects/examples/en/latest/generalized_linear_models/GLM-negative-binomial-regression.html)
+
+For the negative binomial regression, all variables and parameters are defined as before, but the model has an additional parameter, $\phi$, that allows for the additional variation. The negative binomial distribution and regression model can be written in many ways. In our models, $\phi$ is defined through the following formula where the variance associated with an expected moth count, $\lambda$, is:
+
+$$
+Var(\lambda) = \lambda + \phi \cdot\lambda^2
+$$
+
+(For a Poisson distribution, $Var(\lambda) = \lambda$.)
+
+### Bayesian regression models
+
+I also fit these models uing a Bayesian framework, again to build our foundation for our more complex models that come later.
+
+For the Bayesian models, I only show the more complex negative binomial version.
+
+To make our models Bayesian, we add priors to our parameters:
+
+$$
+y_i \sim NegBinom(\lambda_i, \phi) \\
+log(\lambda_i ) = \beta_0 + \beta_1 x_{i} + \mbox{ln} \left(DaysOfCatch_i\right) \\
+\beta_0 \sim Normal(0, 2) \\
+\beta_1 \sim Normal(0, 2) \\
+\phi \sim HalfCauchy(0,1)
+$$
+
+The models use slightly informative priors. When working on a log-scale (e.g., with Poisson or negative binomial distributions), this often becomes essential to avoid parameter estimates on the boundaries. (See Hooten and Hobbs for a good discussion on this issue.)
+
+### Trapping reduction defined
+
+The primary metric of interest from these models is a derived parameter that we call trapping reduction (TR):
+
+$$
+TR = 100 - 100 e ^{(-\beta_1)}
+$$
+
+To obtain a 95% confidence interval for TR (for the frequentist version of our model), we use the following approximation:
+
+$$
+TR = 100 - 100 e ^{(-\beta_1 \pm 2 \cdot SE(\beta_1))}
+$$
+
+
+## Frequentist models
+
+Note: when I predict for new data, I set DaysOfCatch = 1, and then I compare to the moths per day variable (mothsperday = nYSB / DaysOfCatch). I want to exclude any patterns related to the varying time intervals.
+
+```{r pois1}
+
+mod1p <- glm(nYSB ~ DetailsF, 
+             offset = log(DaysOfCatch),
+             family = poisson,
+             data = moddatR)
+summary(mod1p)
+getDR(mod1p)
+tmp = predict(mod1p, se = T, link = F,
+              newdata= moddatR  %>% mutate(DaysOfCatch = 7))
+# str(tmp)
+preds1p <- data.frame(moddatR, 
+                      preds = tmp$fit,
+                      lowerCI = tmp$fit + 2*tmp$se.fit,
+                      upperCI = tmp$fit - 2*tmp$se.fit)
+# preds1p %<>%
+#   mutate(preds = exp(preds),
+#          lowerCI = exp(lowerCI),
+#          upperCI = exp(upperCI))
+# str(preds1p)
+
+ggplot(preds1p,
+       aes(DATI, preds, color = DetailsF)) +
+  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = DetailsF),
+              alpha = 0.3) + 
+  geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
+  # geom_line(data = mean_cts,
+      # aes(DATI, mean_mothsperday, color = Details), size = 1.1) +
+  geom_smooth(se=F) +
+  facet_wrap(~Location, scales = "free_y") + 
+  scale_color_manual(values = mycolors[]) +
+  scale_fill_manual(values = mycolors[]) 
+
+  
+```
+```{r nb1}
+
+mod1nb <- glm.nb(nYSB ~ DetailsF + 
+             offset(log(DaysOfCatch)),
+             data = moddatR)
+summary(mod1nb)
+getDR(mod1nb)
+tmp = predict(mod1nb, se = T, link = T,
+              newdata= moddatR  %>% mutate(DaysOfCatch = 1))
+# str(tmp)
+preds1nb <- data.frame(moddatR, 
+                      preds = tmp$fit,
+                      lowerCI = tmp$fit - 2*tmp$se.fit,
+                      upperCI = tmp$fit + 2*tmp$se.fit)
+preds1nb %<>%
+  mutate(preds = exp(preds),
+         lowerCI = exp(lowerCI),
+         upperCI = exp(upperCI))
+# str(preds1nb)
+
+ggplot(preds1nb,
+       aes(DATI, preds, color = DetailsF)) +
+  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = DetailsF),
+              alpha = 0.3) + 
+  geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
+  geom_point(
+      aes(DATI, mothsperday, color = DetailsF), size = 1.1) +
+  geom_smooth(se=F) +
+  facet_wrap(~Location, scales = "free_y") + 
+  scale_color_manual(values = mycolors[]) +
+  scale_fill_manual(values = mycolors[]) 
+
+  
+```
+
+## Frequentist models-- Python
+
+Is this the easiest way? Probably not, but its based on the first simple tutorial I found.
+
+```{python pois1py}
+
+import numpy as np
+from patsy import dmatrices # for dmatrices function
+import statsmodels.api as sm # for regressions
+import math
+
+# POISSON regression
+form = """ nYSB ~ DetailsF"""
+# X = moths["DetailsF"]
+# y = moths["nYSB"]
+y, X = dmatrices(form, moddat, return_type = 'dataframe')
+modp = sm.GLM(y, X, 
+              offset=np.log(moddat["DaysOfCatch"]),
+              family = sm.families.Poisson())
+resultsp = modp.fit()
+print(resultsp.summary())
+
+
+# predict from poisson regression:
+poisson_predictions = resultsp.get_prediction(X)
+#summary_frame() returns a pandas DataFrame
+predictions_summary_frame = poisson_predictions.summary_frame()
+# predictions_summary_frame.info()
+# print(math.exp(predictions_summary_frame[['mean']]))
+predsDF = moddat
+predsDF['exp_values'] = predictions_summary_frame['mean'].apply(math.exp)
+
+## plot predicted and actual:
+ppois = (ggplot(predsDF, aes(x = 'DATI', y='exp_values', color = 'DetailsF')) +
+        geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
+        geom_smooth(se=False) +
+        facet_wrap(['Location'], scales = "free_y") +
+        scale_color_manual(values = ["#9E0142", "#66C2A5"]) +
+        labs(title = "Male YSB moth counts for each location and trap",
+             y = "Moth counts per trap per day",
+             x = "DAI",
+             color = "Treatment"))
+ppois.draw(True)
+  
+```
+```{python nb1py}
+
+from scipy.stats import nbinom
+
+form = """ nYSB ~ DetailsF"""
+y, X = dmatrices(form, moddat, return_type = 'dataframe')
+modnb = sm.NegativeBinomial(y,X, offset=np.log(moddat["DaysOfCatch"]))
+resultsnb = modnb.fit()
+print(resultsnb.summary())
+
+# predict from NB regression:
+nb_predictions = resultsnb.get_prediction(X)
+predictions_summary_frame = nb_predictions.summary_frame()
+# print(predictions_summary_frame)
+predsDF = moddat
+predsDF['exp_values'] = predictions_summary_frame['predicted'].apply(math.exp)
+
+## plot predicted and actual:
+pnb = (ggplot(predsDF, aes(x = 'DATI', y='exp_values', color = 'DetailsF')) +
+        geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
+        geom_smooth(se=False) +
+        facet_wrap(['Location'], scales = "free_y") +
+        scale_color_manual(values = ["#9E0142", "#66C2A5" ]) +
+        labs(title = "Male YSB moth counts for each location and trap",
+             y = "Moth counts per trap per day",
+             x = "DAI",
+             color = "Treatment"))  
+pnb.draw(True)
+```
+
+## Bayesian (brms) models
+
+In R, I fit the Bayesian models using the "brms" package. I find this package very intuitive and it has fast, efficient algorithms based on Stan.
+
+The prior_summary coomand is helpful if you so not know what a parameter is called in 'brms'. Here, I used the command to find out what they called their $\phi$ parameter, and then I re-ran the model with my slightly informative prior.
+
+```{r}
+library(brms)
+nCores = 6 # nCores -2
+# 
+
+brm1nb <- brm(formula = nYSB ~ DetailsF + offset(logDaysOfCatch),
+              data = moddatR, 
+              family = negbinomial, #log-link is default
+              prior = c(set_prior("normal(0,2)", class = "b"),
+                        set_prior("normal(0,2)", class = "Intercept"),
+                        set_prior("cauchy(0,1)", class = "shape")),
+              warmup = 500, iter = 2000, 
+              chains = nCores, cores = nCores) 
+saveRDS(brm1nb, "../output/brm1nb.RDS")
+summary(brm1nb)
+bayes_R2(brm1nb)
+
+prior_summary(brm1nb)
+# 
+```
+
+
+## Bayesian (bambi) models-- Python
+
+"Bambi" is the Python module that is *very* similar to "brms" package in R. I'm pretty sure the defaults use different algorithms though (which may affect your results), so be sure to read up on the details of both!
+
+```{python, eval = F}
+!pip install bambi
+```
+
+```{python nbBambi}
+# https://bambinos.github.io/bambi/notebooks/negative_binomial.html
+import bambi as bmb
+model_nb = bmb.Model("nYSB ~ DetailsF + offset(log(DaysOfCatch))", moddat, family="negativebinomial",
+                    priors = {
+                        "Intercept": bmb.Prior("Normal", mu = 0, sigma = 2),
+                        "DetailsF": bmb.Prior("Normal", mu = 0, sigma = 2),
+                        "alpha": bmb.Prior("HalfCauchy", beta = 1)
+                    })
+results_nb = model_nb.fit()
+# 
+```
+
+```{python nbBambiOutput}
+import arviz as az
+import matplotlib.pyplot as plt 
+
+# summary stats
+print(az.summary(results_nb))
+
+# quick diagnostics
+az.plot_trace(results_nb, backend_kwargs={"layout": "constrained"}, legend=True)
+plt.show()
+
+# predictions
+# fig, ax = plt.subplots(figsize=(7, 3), dpi=120)
+# bmb.interpret.plot_predictions(model_nb, results_nb, average_by = ["DetailsF"]); #,"Village"]);
+
+```
+
+## Bayesian (PyMC) models-- Python
+
+For most needs, the "bambi" module shoudl suffice. However, when I want to build my complicated non-linear function with multi-dimensional Gaussian Processes, I am going to need a more basic module-- PyMC. Therefore, I will also build all models using this module.
+
+```{python nbPyMC}
+# NB Bayes:
+#https://discourse.pymc.io/t/biased-results-from-poisson-regression-model/4349/5
+# moths['DetailsF'].value_counts()
+import numpy as np
+import pandas as pd
+
+from formulae import design_matrices
+import pymc as pm
+# Create the design matrix using formulae
+# Wrapping the variable in 'C()' enforces categorical values, with the first entry as the reference
+dm = design_matrices('nYSB ~ C(DetailsF)', data=moddat, na_action='error')
+# print(dm.common.as_dataframe().head())
+
+# Expand out into X and y
+X = dm.common.as_dataframe()
+y = dm.response.as_dataframe().squeeze() # This ensures y is 1-dimensional. 
+
+DaysOfCatch = moddat['DaysOfCatch']
+
+# Create labelled coords which help the model keep track of everything(i.e., use factor names)
+c = {'predictors': X.columns, # Model now aware of number of and labels of predictors
+     'N': range(len(y))} # and number of observations
+
+with pm.Model(coords = c) as model_pymc:
+    # Set the data, and convert to NumPy arrays (to use matrix multiplication
+    Xdata = pm.Data('Xdata', X.to_numpy())
+    Ydata = pm.Data('Ydata', y.to_numpy())
+    
+    # priors
+    # factor_coefs = pm.Normal('factor_coefs', mu=0, sigma=2, shape=len(X.columns))    
+    beta = pm.Normal('beta', mu=0, sigma=2, dims = 'predictors')
+    alpha = pm.HalfCauchy('alpha', beta = 1)
+
+    # likelihood:
+    mu = pm.math.exp(Xdata @ beta + # pm.math.dot(X, factor_coefs) + #@ operator is for matrix multiplication 
+                     np.log(DaysOfCatch)) 
+    pm.NegativeBinomial('y', mu=mu, alpha = alpha, observed=Ydata)
+    
+    # Sample according to your specifications, but tune for longer and take fewer draws
+    trace = pm.sample(draws=1000, tune=3000, cores=4, random_seed=45, step=pm.NUTS())#Metropolis())
+
+```
+
+```{python nbPyMCOutput}
+# summary stats
+print(az.summary(trace))
+
+# quick diagnostics
+az.plot_trace(trace, backend_kwargs={"layout": "constrained"}, legend=True)
+plt.show()
+
+```
+
+# GLMM: Random effect for location
+
+The first fix we make to the model is acknowledging that overall average  moth pressure varies from location to location. To make this fix we had a location random effect (RE) and our model becomes a generalized linear mixed-effects model (GLMM or GLMER).
+
+We also want to acknowledge that the treatment effect may vary from location to location-- sometimes we see a big different in moth counts between control and treatment fields, and sometimes the difference is smaller. For inference though, we are only interested in the larger picture, which is the overall trapping reduction. Therefore, we also add a treatment random effect.
+
+## GLMM mathematical model
+
+I only show the Poisson version of the model, the NB version is a straightforward extension.
+
+$$
+y_{ik} \sim Pois(\lambda_{ik}) \\
+log(\lambda_{ik} ) = \beta_0 + \beta_1 x_{A,i} + \gamma_{0k} x_{ik}  + \gamma_{1k} x_{A,i} x_{ik} + \mbox{ln} \left(DaysOfCatch_i\right) \\
+\gamma_{0k} \sim Normal(0, \sigma^2_{0}) \\
+\gamma_{1k} \sim Normal(0, \sigma^2_{1}) \\
+$$
+
+where,in addition to the variables and parameters defined for the GLM, we have
+
+$y_{ik}$ is moth count $i$ from location $k$,
+
+$\lambda_{ik}$ is the expected moth count for sample $i$  from location $k$,
+
+$\beta_0$ is the expected moth count for our control treatment for a new location,
+
+$\beta_1$ is the expected difference in moth counts between the control group and the 'trt A' group for a new location, 
+
+$\gamma_{0k}$ is the random intercept associated with location $k$, which leads to different background moth pressures at each location. All $\gamma_{0k}$ come from an iid Normal distribution.
+
+$\gamma_{1k}$ is the random slope associated with location $k$, which leads to different treatment effects at each location. All $\gamma_{1k}$ come from an iid Normal distribution, and
+
+$x_{ik}$ is an indicator variable that equals 1 if moth count $i$ is associated with location $k$ and 0 otherwise.
+
+OK, technically I should be introducing matrices here because $k = 1,..., 10$ locations, so we need a new indicator variable for each location, but I'm going to be lazy and right it like this for now.
+
+$\left(DaysOfCatch_i\right)$ is the offset to account for the varying time itnerval between samples. This is necessary because with a longer time interval, more moths will fly into the trap.
+
+
+### Bayesian GLMM
+
+Here is the same model with a Bayesian framework and using a negative binomial regression:
+
+To make our models Bayesian, we add priors to our parameters:
+
+$$
+y_{ik}\sim NegBinom(\lambda_{ik}, \phi) \\
+log(\lambda_{ik} ) = \beta_0 + \beta_1 x_{A,i} + \gamma_{0k} x_{ik}  + \gamma_{1k} x_{A,i} x_{ik} + \mbox{ln} \left(DaysOfCatch_i\right) \\
+\gamma_{0k} \sim Normal(0, \sigma^2_{0}) \\
+\gamma_{1k} \sim Normal(0, \sigma^2_{1}) \\
+
+\beta_0 \sim Normal(0, 2) \\
+\beta_1 \sim Normal(0, 2) \\
+\sigma^2_{0} \sim HalfCauchy(0,1) \\
+\sigma^2_{1} \sim HalfCauchy(0,1) \\
+\phi \sim HalfCauchy(0,1)
+$$
+
+### Bayesian GLMM -- Matrix version
+
+Written in matrix form, which better matches the coding (and is more correct given the need for a 10x10 $Z$ desgin matrix):
+
+$$
+\mathbf{Y} \sim NegBinom(\boldsymbol\lambda, \phi) \\
+log(\boldsymbol\lambda) = \mathbf{X}\boldsymbol\beta + \mathbf{Z}\boldsymbol\gamma  + \mbox{ln} \left(\bf{DaysOfCatch}\right) \\
+\boldsymbol\beta \sim Normal(\mathbf{0}, 2\mathbf{I}) \\
+\boldsymbol\gamma \sim Normal(\mathbf{0}, \boldsymbol\sigma^2 \mathbf{I}) \\
+\boldsymbol\sigma^2 \sim HalfCauchy(\mathbf{0}, 1\mathbf{I})) \\
+\phi \sim HalfCauchy(0,1)
+$$
+
+
+## GLMM frequentist version
+
+A couple of notes here. R always gets mad when you ask for SE's for predictions from a GLMM. Technically, you need to run simulations to get them and then they still come with an asterisk related to their reliability. (This is a reason to use the Bayesian model-- credible intervals are never based on apprioximations!)
+
+When we plot our predictions, we see that we now have better estimates for the overall mean at each location, and we see how much they vary from location to location, but there is a strong temporal pattern at each location that we are missing.
+
+```{r pois2}
+modp2 <- glmer(nYSB ~ DetailsF + (1 + DetailsF|Location), 
+             offset = log(DaysOfCatch),
+             family = poisson,
+             data = moddatR)
+summary(modp2)
+getDR(modp2)
+tmp = predict(modp2, se = T, 
+              newdata=moddatR %>% mutate(DaysOfCatch = 1))
+# str(tmp)
+predsp2 <- data.frame(moddatR %>% mutate(DaysOfCatch = 1), 
+                      preds = tmp$fit,
+                      lowerCI = tmp$fit + 2*tmp$se.fit,
+                      upperCI = tmp$fit - 2*tmp$se.fit)
+predsp2 %<>%
+  mutate(preds = exp(preds),
+         lowerCI = exp(lowerCI),
+         upperCI = exp(upperCI))
+# str(predsp2)
+ggplot(predsp2,
+       aes(DATI, preds, color = DetailsF)) +
+  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = DetailsF),
+              alpha = 0.3) + 
+  # geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
+  geom_point(aes(DATI, mothsperday, color = DetailsF), size = 1.1) +
+  # geom_smooth(se=F) +
+  facet_wrap(~Location, scales = "free_y") + 
+  scale_color_manual(values = mycolors[]) +
+  scale_fill_manual(values = mycolors[]) 
+
+```
+```{r nb2}
+modnb2 <- glmer.nb(nYSB ~ DetailsF + (1 + DetailsF|Location), 
+             offset = log(DaysOfCatch),
+             data = moddatR)
+summary(modnb2)
+getDR(modnb2)
+tmp = predict(modnb2, se = T, 
+              newdata=moddatR %>% mutate(DaysOfCatch = 1))
+# str(tmp)
+predsnb2 <- data.frame(moddatR, 
+                      preds = tmp$fit,
+                      lowerCI = tmp$fit + 2*tmp$se.fit,
+                      upperCI = tmp$fit - 2*tmp$se.fit)
+predsnb2 %<>%
+  mutate(preds = exp(preds),
+         lowerCI = exp(lowerCI),
+         upperCI = exp(upperCI))
+# str(predsnb2)
+ggplot(predsnb2,
+       aes(DATI, preds, color = DetailsF)) +
+  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = DetailsF),
+              alpha = 0.3) + 
+  # geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
+  geom_point(aes(DATI, mothsperday, color = DetailsF), size = 1.1) +
+  geom_smooth(se=F) +
+  facet_wrap(~Location, scales = "free_y") + 
+  scale_color_manual(values = mycolors[]) +
+  scale_fill_manual(values = mycolors[]) 
+
+```
+
+## GLMM frequentist version-- Python
+
+To me, Python is a little disappointing here. We use "pymer4" module which is just a wrapper to the R library "lme4". This is awkward here-- we are wrapping Python code inside R, and the Python code is a wrapper back to R. So, I get a warning. I am including the code here anyways for anyone working outside of reticulate and RStudio.
+
+(If we only have random intercepts, you can also use the "statsmodels" module, but it cannot accommodate random intercepts and slopes.)
+
+I guess you can also use the "GPBoost" module, but it is overly complicated for our small data set.
+
+```{python, eval = F}
+!pip install pymer4
+```
+```{python poisPy}
+
+from pymer4 import Lmer
+from plotnine import *
+modp2 = Lmer('nYSB ~ DetailsF + (DetailsF|Location) + offset(log(DaysOfCatch))', moddat, family = "poisson")
+modp2.fit()
+print(modp2.summary())
+
+# predict from poisson regression:
+# poisson_predictions = modp2.predict(moths, skip_data_checks=True, verify_predictions=False)
+
+predsDF = moddat
+predsDF['exp_values'] = modp2.data['fits'] # poisson_predictions # 
+
+## plot predicted and actual:
+pnbRE = (ggplot(predsDF, aes(x = 'DATI', y='exp_values', color = 'DetailsF')) +
+        geom_point(aes(x = 'DATI', y = 'nYSB', color = 'DetailsF')) +
+        geom_smooth(se=False) +
+        facet_wrap(['Location'], scales = "free_y") +
+        scale_color_manual(values = ["#9E0142", "#66C2A5"]) +
+        labs(title = "Male YSB moth counts for each location and trap",
+             y = "Moth counts per trap per day",
+             x = "DAI",
+             color = "Treatment"))
+
+pnbRE.draw(True)
+
+# Actual versus predicted:
+# sns.regplot(x="fits", y="nYSB", data=modp2.data, fit_reg=True)
+# plt.show()
+
+# another way to view output:
+# modp2.plot_summary()
+# plt.show()
+
+```
+
+Google's Gemini AI is convinced that a negative binomial regression with random slopes and intercepts is possible in Python, but:
+
+* the Lmer function does not allow for neg binomial regression models. 
+
+* "statsmodels" similarly only supports binomial and Poisson models using Bayesian methods. 
+
+Therefore, we only fit the negative binomial regresion model within the Bayesian framework. This is a category where R takes the win over Python!
+
+
+## GLMM Bayes (brms) version
+
+By default, the prior distributions of random slopes and intercepts are correlated in "brm". The first time I ran this model, I allowed them to be correlated, but their correlation was highly nonsignificant, so I changed the random effects term from "(1 + DetailsF|Location)" to " (1 + DetailsF||Location)" (has an extra vertical line), which makes them independent and matches our models from R more readily. However, you'll notice that the estimates are slightly different-- the more complicated your model is, the more liely you will fin dthis is true with slightly different versions of your model (here, adding priors and fitting with a different algorithm). 
+
+```{r}
+library(brms)
+nCores = 6 # nCores -2
+brm2nb <- brm(formula = nYSB ~ DetailsF + offset(logDaysOfCatch) + 
+                    (1 + DetailsF||Location),
+              data = moddatR, 
+              family = negbinomial,
+              prior = c(set_prior("normal(0,2)", class = "b"),
+                        # below is == half-cauchy
+                        set_prior("cauchy(0,1)", class = "shape"), 
+                            set_prior("normal(0,2)", class = "Intercept"),
+                            set_prior("cauchy(0,1)", class = "sd")),
+              warmup = 500, iter = 2000, 
+              chains = nCores, cores = nCores) 
+saveRDS(brm2nb, "../output/brm2nb.RDS")
+```
+```{r}
+summary(brm2nb)
+
+# prior_summary(brm2nb)
+# 
+```
+
+## GLMM Bayesian (bambi) models-- Python
+
+Again, notice the subtle differences between "brms" and "bambi".
+
+```{python nbBambiRE}
+# https://bambinos.github.io/bambi/notebooks/negative_binomial.html
+import bambi as bmb
+model_nbRE = bmb.Model("nYSB ~ DetailsF + (DetailsF|Location) + offset(log(DaysOfCatch))", 
+moddat, family="negativebinomial",
+                    priors = {
+                        "Intercept": bmb.Prior("Normal", mu = 0, sigma = 2),
+                        "DetailsF": bmb.Prior("Normal", mu = 0, sigma = 2),
+                        "alpha": bmb.Prior("HalfCauchy", beta = 1),
+                        "1|Location": bmb.Prior("Normal", mu = 0, sigma = bmb.Prior("HalfCauchy", beta = 1)),
+                        "DetailsF|Location": bmb.Prior("Normal", mu = 0, sigma = bmb.Prior("HalfCauchy", beta = 1)),
+                        # "sigma": bmb.Prior("HalfCauchy", beta = 1)
+                    })
+results_nbRE = model_nbRE.fit(target_accept = 0.90)
+# 
+```
+
+```{python nbBambiOutput}
+import arviz as az
+import matplotlib.pyplot as plt 
+# to see priors:
+print(model_nbRE)
+
+# summary stats
+print(az.summary(results_nbRE,  # kind="stats"))
+                 var_names=["Intercept", "DetailsF", "alpha", "1|Location_sigma", "DetailsF|Location_sigma"]))
+
+# quick diagnostics
+az.plot_trace(results_nbRE, backend_kwargs={"layout": "constrained"}, legend=True,
+var_names = ["Intercept", "DetailsF", "alpha", "1|Location_sigma", "DetailsF|Location_sigma"]);
+plt.show()
+
+
+# quick diagnostics
+az.plot_trace(results_nbRE, backend_kwargs={"layout": "constrained"}, legend=True, var_names = ["1|Location", "DetailsF|Location"]);
+plt.show()
+```
+
+## GLMM Bayesian (PyMC) models-- Python
+
+Notice that my model framework is different from the tutotiral within PyMC. In PyM tutorial, our beta's are the means of the random intercept and slope. Here, I explicitly keep them as separate parameters. Is their way faster than mine? Perhaps that is why they do it that way? I'm sticking with this way because this is how I have always built the more complicated models that are forthcoming. Alkso, it is helpful to see similar models coded in different ways-- helps you become mroe familiar with the programming and betters your understanding of the model itself.
+
+```{python nbPyMCsetup}
+# NB Bayes:
+#https://discourse.pymc.io/t/biased-results-from-poisson-regression-model/4349/5
+# moths['DetailsF'].value_counts()
+import numpy as np
+import pandas as pd
+import patsy # for dmatrix function
+
+from formulae import design_matrices
+import pymc as pm
+# Create the design matrix using formulae
+# Wrapping the variable in 'C()' enforces categorical values, with the first entry as the reference
+dm = design_matrices('nYSB ~ C(DetailsF)', data=moddat, na_action='error')
+# print(dm.common.as_dataframe().head())
+
+# Expand out into X and y
+X = dm.common.as_dataframe()
+y = dm.response.as_dataframe().squeeze() # This ensures y is 1-dimensional. 
+
+# https://github.com/JackCaster/GLM_with_PyMC3/blob/master/notebooks/LME%20-%20Sleep%20study.ipynb
+Z = patsy.dmatrix('1 + Location', data=moddat, return_type='dataframe')
+Z.intercept = 0 # to match our model!
+# Z = np.asarray(Z)
+# print(Z)
+
+n_obs = moddat.shape[0]
+nlocs = Z.shape[1]
+
+DaysOfCatch = moddat['DaysOfCatch']
+
+# Create labelled coords which help the model keep track of everything(i.e., use factor names)
+c = {'predictors': X.columns, 
+     # 'nlocs': Z.shape[1],
+     # 'n_obs': moddat.shape[0],
+     'N': range(len(y))}
+```
+
+```{python nbPyMCrun}
+with pm.Model(coords = c) as model_pymcRE:
+    # priors
+    sigma0 = pm.HalfCauchy('sigma0', beta = 1)
+    gamma0 = pm.Normal('gamma0', mu=0, sigma = sigma0, shape = len(Z.columns))
+    sigma1 = pm.HalfCauchy('sigma1', beta = 1)
+    gamma1 = pm.Normal('gamma1', mu=0, sigma = sigma1, shape = len(Z.columns))
+    beta_coefs = pm.Normal('beta_coefs', mu=0, sigma=2, shape=len(X.columns))
+   
+    alpha = pm.HalfCauchy('alpha', beta = 1)
+
+    # likelihood:
+    mu = pm.Deterministic(
+        'mu',
+        pm.math.dot(X, beta_coefs) + 
+        pm.math.dot(Z, gamma0) +
+        pm.math.dot(Z, gamma1) +
+        np.log(DaysOfCatch)
+    )
+
+    # This set-up would be an over-dispersed poisson:
+    # log_rate = pm.Normal('log_rate', mu=mu, sigma=alpha, shape=n_obs)
+    # predy = pm.Poisson('predy', mu=pm.math.exp(log_rate), observed=y)
+
+    # This is the neg binomial set-up:
+    pm.NegativeBinomial('predy', mu=pm.math.exp(mu), alpha = alpha, observed=y)
+    
+    modelfit = pm.sample(nuts={'target_accept':0.9})
+
+```
+
+```{python}
+# Get radon data
+path = "https://raw.githubusercontent.com/pymc-devs/pymc-examples/main/examples/data/srrs2.dat"
+radon_df = pd.read_csv(path)
+
+# Get city data
+city_df = pd.read_csv(pm.get_data("cty.dat"))
+
+radon_df.head()
+print(radon_df.shape[0])
+
+
+radon_df["fips"] = radon_df.stfips * 1000 + radon_df.cntyfips
+cty_mn = city_df[city_df.st == "MN"].copy()
+cty_mn["fips"] = 1000 * cty_mn.stfips + cty_mn.ctfips
+srrs_mn = radon_df
+
+srrs_mn = srrs_mn.merge(cty_mn[["fips", "Uppm"]], on="fips")
+srrs_mn = srrs_mn.drop_duplicates(subset="idnum")
+u = np.log(srrs_mn.Uppm).unique()
+
+n = len(srrs_mn)
+
+srrs_mn.county = srrs_mn.county.map(str.strip)
+county, mn_counties = srrs_mn.county.factorize()
+srrs_mn["county_code"] = county
+radon = srrs_mn.activity
+srrs_mn["log_radon"] = log_radon = np.log(radon + 0.1).values
+floor_measure = srrs_mn.floor.values
+
+```
+
+```{python nbPyMCrunV2}
+
+moddat['loc_idx'] = moddat['Location'].astype('category').cat.codes + 1
+tmp = moddat['Details'].astype('category').cat.codes + 1
+# moddat['trt_idx'].unique()
+# # loc_idx = moddat['Location'].astype('category').cat.codes + 1
+# # trt_idx = moddat['Details'].astype('category').cat.codes + 1
+# 
+locations = moddat.loc_idx.values
+treatments = tmp.values
+# treatments
+nlocs = len(moddat['loc_idx'].unique())
+
+location, trial_locations = moddat.Location.factorize()
+treatment, trial_treatments = moddat.Details.factorize(sort = True)
+# moddat['Location'].unique() 
+c = {'predictors': X.columns, 
+     'nlocs': trial_locations, 
+     # 'n_obs': moddat.shape[0],
+     'N': range(len(y))}
+     
+with pm.Model(coords = c) as model_pymcREv2:
+    trt_idx = pm.Data("trt_idx", treatment, dims = "n_obs")
+    loc_idx = pm.Data("loc_idx", location, dims = "n_obs")
+
+    # Priors
+    mu_a = pm.Normal("mu_a", mu=0.0, sigma=2.0)
+    sigma_a = pm.HalfCauchy("sigma_a", beta = 1.0)
+
+    mu_b = pm.Normal("mu_b", mu=0.0, sigma=2.0)
+    sigma_b = pm.HalfCauchy("sigma_b", beta = 1.0)
+
+    # random intercepts
+    alpha = pm.Normal('alpha', mu=mu_a, sigma = sigma_a, dims = "nlocs")
+    
+    # random slopes:
+    beta = pm.Normal('beta', mu=mu_b, sigma=sigma_b, dims = "nlocs")
+   
+    # model error
+    phi = pm.HalfCauchy('phi', beta = 1)
+
+    # expected value:
+    mu = alpha[loc_idx] + beta[loc_idx] * trt_idx + np.log(DaysOfCatch)
+
+    # likelihood:
+    pm.NegativeBinomial('predy', mu=pm.math.exp(mu), alpha = phi, observed=y, dims = "n_obs")
+    
+    modelfitV2 = pm.sample(nuts={'target_accept':0.9})
+
+```
+
+```{python nbPyMCOutputV2}
+
+print(model_pymcREv2) # shows prior distributions
+print(modelfitV2.posterior.data_vars) # shows variable names
+
+
+# summary stats
+print(az.summary(modelfitV2, var_names=["mu_a", "mu_b", "phi", "sigma_a", "sigma_b"])) 
+
+# quick diagnostics
+az.plot_trace(modelfitV2, backend_kwargs={"layout": "constrained"}, legend=True, var_names=["mu_a", "mu_b", "phi", "sigma_a", "sigma_b"])
+plt.show()
+
+
+az.plot_trace(modelfitV2, backend_kwargs={"layout": "constrained"}, legend=True, var_names=["alpha", "beta"])
+plt.show()
+```
+
+
+Starting with these models, I specify which variables for which I want to see the posteriors and summary statistics. In general, we don't usually want the output for any latent variables as that would overwhelm our screens and are not the parameters of most interest right now.
+
+```{python nbPyMCOutput}
+
+print(model_pymcRE) # shows prior distributions
+print(modelfit.posterior.data_vars) # shows variable names
+
+
+# summary stats
+print(az.summary(modelfit, var_names=["beta_coefs", "alpha", "sigma0", "sigma1"])) 
+
+# quick diagnostics
+az.plot_trace(modelfit, backend_kwargs={"layout": "constrained"}, legend=True, var_names=["beta_coefs", "alpha", "sigma0", "sigma1"])
+plt.show()
+
+```
+
+
+
+# RE for Trial, nested SamplingDate
+
+## Frequentist version
+
+```{r pois3, results = "hide", eval = F}
+modp3 <- glmer(nYSB ~ DetailsF  +
+                     (1+DetailsF|Village:SamplingDateC), 
+             offset = log(DaysOfCatch),
+             family = poisson,
+             data = moddat)
+summary(modp3)
+getDR(modp3)
+tmp = predict(modp3, se = T, link = T)
+# str(tmp)
+predsp3 <- data.frame(moddat, 
+                      preds = tmp$fit,
+                      lowerCI = tmp$fit + 2*tmp$se.fit,
+                      upperCI = tmp$fit - 2*tmp$se.fit)
+predsp3 %<>%
+  mutate(preds = exp(preds),
+         lowerCI = exp(lowerCI),
+         upperCI = exp(upperCI))
+# str(predsp3)
+ggplot(predsp3,
+       aes(DATI, preds, color = DetailsF)) +
+  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = DetailsF),
+              alpha = 0.3) + 
+  # geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
+  geom_point(aes(DATI, nYSB, color = DetailsF), size = 1.1) +
+  geom_smooth(se=F) +
+  facet_wrap(~Country + Region + Village, scales = "free_y") + 
+  scale_color_manual(values = mycolors[]) +
+  scale_fill_manual(values = mycolors[]) 
+
+```
+```{r nb3, results = "hide", eval = F}
+# too slow!
+# modnb3 <- glmer.nb(nYSB ~ DetailsF  +
+#                      (1+DetailsF|Village:SamplingDateC), 
+#              offset = log(DaysOfCatch),
+#              # family = poisson,
+#              data = moddat)
+# summary(modnb3)
+# getDR(modnb3)
+# tmp = predict(modnb3, se = T, link = T)
+# # str(tmp)
+# predsnb3 <- data.frame(moddat, 
+#                       preds = tmp$fit,
+#                       lowerCI = tmp$fit + 2*tmp$se.fit,
+#                       upperCI = tmp$fit - 2*tmp$se.fit)
+# predsnb3 %<>%
+#   mutate(preds = exp(preds),
+#          lowerCI = exp(lowerCI),
+#          upperCI = exp(upperCI))
+# # str(predsnb2)
+# ggplot(predsnb3,
+#        aes(DATI, preds, color = DetailsF)) +
+#   geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = DetailsF),
+#               alpha = 0.3) + 
+#   # geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
+#   geom_point(aes(DATI, nYSB, color = DetailsF), size = 1.1) +
+#   geom_smooth(se=F) +
+#   facet_wrap(~Country + Region + Village, scales = "free_y") + 
+#   scale_color_manual(values = mycolors[]) +
+#   scale_fill_manual(values = mycolors[]) 
+
+```
+
+## Bayes (brms) version
+
+```{r}
+library(brms)
+nCores = 6 # nCores -2
+
+# summary(moddat$numericDate) # check max before fitting
+# brm3p <- brm(formula = nYSB ~ DetailsF + offset(logDaysOfCatch) + 
+#                     (1 + DetailsF||TrialID:SamplingDateC),
+#                     # gp(numericDate, by =TrialID), 
+#                   # control = list(adapt_delta = 0.9),
+#                   data = moddat, 
+#              family = poisson,
+#                   prior = c(set_prior("normal(0,2)", class = "b"),
+#                             set_prior("normal(0,2)", class = "Intercept"),
+#                             set_prior("cauchy(0,2)", class = "sd")),
+#                             # set_prior("half-N(0,1)", class = "lscale"),
+#                             # set_prior("normal(0,2)", class = "sdgp"),
+#                             # set_prior("lkj(2)", class = "cor")),
+#                   # sample_prior = TRUE,
+#                   warmup = 500, iter = 2000, 
+#                   chains = nCores, cores = nCores) 
+# saveRDS(brm3p, "../output/brm3p.RDS")
+# summary(brm3p)
+# bayes_R2(brm3p) 
+# 
+
+brm3nb <- brm(formula = nYSB ~ DetailsF + offset(logDaysOfCatch) + 
+                    (1 + DetailsF||TrialID:SamplingDateC),
+              data = moddat, 
+              family = negbinomial,
+              prior = c(set_prior("normal(0,2)", class = "b"),
+                        set_prior("cauchy(0,1)", class = "shape"), # == half-cauchy
+                            set_prior("normal(0,2)", class = "Intercept"),
+                            set_prior("cauchy(0,2)", class = "sd")),
+              warmup = 500, iter = 2000, 
+              chains = nCores, cores = nCores) 
+saveRDS(brm3nb, "../output/brm2nb.RDS")
+summary(brm3nb)
+bayes_R2(brm3nb)
+
+prior_summary(brm3nb)
+# prior_summary(brm3nb, all = FALSE)
+# print(prior_summary(brm3nb, all = FALSE), show_df = FALSE)
+
+# 
+```
+
+# RE for Trial, GP for Date
+
+## Bayes (brms) version
+
+```{r}
+library(brms)
+nCores = 6 # nCores -2
+
+summary(moddat$numericDate) # check max before fitting
+brm4nb <- brm(formula = nYSB ~ DetailsF + offset(logDaysOfCatch) + 
+                    (1 + DetailsF||Village) + 
+              gp(numericDate, by =Village), 
+                  # control = list(adapt_delta = 0.9),
+              data = moddat, 
+              family = negbinomial,
+              prior = c(set_prior("normal(0,2)", class = "b"),
+                        set_prior("cauchy(0,1)", class = "shape"), # == half-cauchy
+                            set_prior("normal(0,2)", class = "Intercept"),
+                            set_prior("cauchy(0,2)", class = "sd")),
+                            # set_prior("half-N(0,1)", class = "lscale"),
+                            # set_prior("normal(0,2)", class = "sdgp"),
+                            # set_prior("lkj(2)", class = "cor")),
+              warmup = 500, iter = 2000, 
+              chains = nCores, cores = nCores) 
+saveRDS(brm4nb, "../output/brm2nb.RDS")
+summary(brm4nb)
+bayes_R2(brm4nb)
+
+prior_summary(brm4nb)
+# prior_summary(brm4nb, all = FALSE)
+# print(prior_summary(brm4nb, all = FALSE), show_df = FALSE)
+
+# 
+```
+
+
+# No RE models
+
+## Frequentist version
+
+```{r pois1}
+
+mod1p <- glm(nYSB ~ DetailsF, 
+             offset = log(DaysOfCatch),
+             family = poisson,
+             data = moddat)
+summary(mod1p)
+getDR(mod1p)
+tmp = predict(mod1p, se = T, link = T,
+              newdata= moddat  %>% mutate(DaysOfCatch = 7))
+# str(tmp)
+preds1p <- data.frame(moddat, 
+                      preds = tmp$fit,
+                      lowerCI = tmp$fit + 2*tmp$se.fit,
+                      upperCI = tmp$fit - 2*tmp$se.fit)
+# preds1p %<>%
+#   mutate(preds = exp(preds),
+#          lowerCI = exp(lowerCI),
+#          upperCI = exp(upperCI))
+# str(preds1p)
+
+ggplot(preds1p,
+       aes(DATI, preds, color = DetailsF)) +
+  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = DetailsF),
+              alpha = 0.3) + 
+  geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
+  # geom_line(data = mean_cts,
+      # aes(DATI, mean_mothsperday, color = Details), size = 1.1) +
+  geom_smooth(se=F) +
+  facet_wrap(~Country + Region + Village, scales = "free_y") + 
+  scale_color_manual(values = mycolors[]) +
+  scale_fill_manual(values = mycolors[]) 
+
+  
+```
+```{r nb1}
+
+mod1nb <- glm.nb(nYSB ~ DetailsF + 
+             offset(log(DaysOfCatch)),
+             # family = poisson,
+             data = moddat)
+summary(mod1nb)
+getDR(mod1nb)
+tmp = predict(mod1nb, se = T, link = T,
+              newdata= moddat  %>% mutate(DaysOfCatch = 1))
+# str(tmp)
+preds1nb <- data.frame(moddat, 
+                      preds = tmp$fit,
+                      lowerCI = tmp$fit - 2*tmp$se.fit,
+                      upperCI = tmp$fit + 2*tmp$se.fit)
+preds1nb %<>%
+  mutate(preds = exp(preds),
+         lowerCI = exp(lowerCI),
+         upperCI = exp(upperCI))
+# str(preds1nb)
+
+ggplot(preds1nb,
+       aes(DATI, preds, color = DetailsF)) +
+  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = DetailsF),
+              alpha = 0.3) + 
+  geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
+  geom_point(
+      aes(DATI, mothsperday, color = DetailsF), size = 1.1) +
+  geom_smooth(se=F) +
+  facet_wrap(~Country + Region + Village, scales = "free_y") + 
+  scale_color_manual(values = mycolors[]) +
+  scale_fill_manual(values = mycolors[]) 
+
+  
+```
+
+## Bayes (brms) version
+
+```{r}
+library(brms)
+nCores = 6 # nCores -2
+
+summary(moddat$numericDate) # check max before fitting
+brm1p <- brm(formula = nYSB ~ DetailsF + offset(logDaysOfCatch),
+                    # (1 + DetailsF|TrialID) +   
+                    # gp(numericDate, by =TrialID), 
+                  # control = list(adapt_delta = 0.9),
+                  data = moddat, 
+             family = poisson,
+                  prior = c(set_prior("normal(0,2)", class = "b"),
+                            set_prior("normal(0,2)", class = "Intercept")),
+                            # set_prior("cauchy(0,2)", class = "sd"),
+                            # set_prior("half-N(0,1)", class = "lscale"),
+                            # set_prior("normal(0,2)", class = "sdgp"),
+                            # set_prior("lkj(2)", class = "cor")),
+                  # sample_prior = TRUE,
+                  warmup = 500, iter = 2000, 
+                  chains = nCores, cores = nCores) 
+saveRDS(brm1p, "../output/brm1p.RDS")
+summary(brm1p)
+bayes_R2(brm1p) 
+# 
+
+brm1nb <- brm(formula = nYSB ~ DetailsF + offset(logDaysOfCatch),
+              data = moddat, 
+              family = negbinomial,
+              prior = c(set_prior("normal(0,2)", class = "b"),
+                            set_prior("normal(0,2)", class = "Intercept")),
+              warmup = 500, iter = 2000, 
+              chains = nCores, cores = nCores) 
+saveRDS(brm1nb, "../output/brm1nb.RDS")
+summary(brm1nb)
+bayes_R2(brm1nb)
+# 
+```
+
+# RE for Trial ID
+## Frequentist version
+
+```{r pois2, results = "hide", eval = F}
+modp2 <- glmer(nYSB ~ DetailsF + (1 + DetailsF|Village), 
+             offset = log(DaysOfCatch),
+             family = poisson,
+             data = moddat)
+summary(modp2)
+getDR(modp2)
+tmp = predict(modp2, se = T, link = T)
+# str(tmp)
+predsp2 <- data.frame(moddat, 
+                      preds = tmp$fit,
+                      lowerCI = tmp$fit + 2*tmp$se.fit,
+                      upperCI = tmp$fit - 2*tmp$se.fit)
+predsp2 %<>%
+  mutate(preds = exp(preds),
+         lowerCI = exp(lowerCI),
+         upperCI = exp(upperCI))
+# str(predsp2)
+ggplot(predsp2,
+       aes(DATI, preds, color = DetailsF)) +
+  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = DetailsF),
+              alpha = 0.3) + 
+  # geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
+  geom_point(aes(DATI, nYSB, color = DetailsF), size = 1.1) +
+  geom_smooth(se=F) +
+  facet_wrap(~Country + Region + Village, scales = "free_y") + 
+  scale_color_manual(values = mycolors[]) +
+  scale_fill_manual(values = mycolors[]) 
+
+```
+```{r nb2, results = "hide", eval = F}
+modnb2 <- glmer.nb(nYSB ~ DetailsF + (1 + DetailsF|Village), 
+             offset = log(DaysOfCatch),
+             # family = poisson,
+             data = moddat)
+summary(modnb2)
+getDR(modnb2)
+tmp = predict(modnb2, se = T, link = T)
+# str(tmp)
+predsnb2 <- data.frame(moddat, 
+                      preds = tmp$fit,
+                      lowerCI = tmp$fit + 2*tmp$se.fit,
+                      upperCI = tmp$fit - 2*tmp$se.fit)
+predsnb2 %<>%
+  mutate(preds = exp(preds),
+         lowerCI = exp(lowerCI),
+         upperCI = exp(upperCI))
+# str(predsnb2)
+ggplot(predsnb2,
+       aes(DATI, preds, color = DetailsF)) +
+  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = DetailsF),
+              alpha = 0.3) + 
+  # geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
+  geom_point(aes(DATI, nYSB, color = DetailsF), size = 1.1) +
+  geom_smooth(se=F) +
+  facet_wrap(~Country + Region + Village, scales = "free_y") + 
+  scale_color_manual(values = mycolors[]) +
+  scale_fill_manual(values = mycolors[]) 
+
+```
+
+## Bayes (brms) version
+
+```{r}
+library(brms)
+nCores = 6 # nCores -2
+
+summary(moddat$numericDate) # check max before fitting
+brm2p <- brm(formula = nYSB ~ DetailsF + offset(logDaysOfCatch) + 
+                    (1 + DetailsF||TrialID),
+                    # gp(numericDate, by =TrialID), 
+                  # control = list(adapt_delta = 0.9),
+                  data = moddat, 
+             family = poisson,
+                  prior = c(set_prior("normal(0,2)", class = "b"),
+                            set_prior("normal(0,2)", class = "Intercept"),
+                            set_prior("cauchy(0,2)", class = "sd")),
+                            # set_prior("half-N(0,1)", class = "lscale"),
+                            # set_prior("normal(0,2)", class = "sdgp"),
+                            # set_prior("lkj(2)", class = "cor")),
+                  # sample_prior = TRUE,
+                  warmup = 500, iter = 2000, 
+                  chains = nCores, cores = nCores) 
+saveRDS(brm2p, "../output/brm2p.RDS")
+summary(brm2p)
+bayes_R2(brm2p) 
+# 
+
+brm2nb <- brm(formula = nYSB ~ DetailsF + offset(logDaysOfCatch) + 
+                    (1 + DetailsF||TrialID),
+              data = moddat, 
+              family = negbinomial,
+              prior = c(set_prior("normal(0,2)", class = "b"),
+                        set_prior("cauchy(0,1)", class = "shape"), # == half-cauchy
+                            set_prior("normal(0,2)", class = "Intercept"),
+                            set_prior("cauchy(0,2)", class = "sd")),
+              warmup = 500, iter = 2000, 
+              chains = nCores, cores = nCores) 
+saveRDS(brm2nb, "../output/brm2nb.RDS")
+summary(brm2nb)
+bayes_R2(brm2nb)
+
+prior_summary(brm2nb)
+# prior_summary(brm2nb, all = FALSE)
+# print(prior_summary(brm2nb, all = FALSE), show_df = FALSE)
+
+# 
+```
+
+# RE for Trial, nested SamplingDate
+
+## Frequentist version
+
+```{r pois3, results = "hide", eval = F}
+modp3 <- glmer(nYSB ~ DetailsF  +
+                     (1+DetailsF|Village:SamplingDateC), 
+             offset = log(DaysOfCatch),
+             family = poisson,
+             data = moddat)
+summary(modp3)
+getDR(modp3)
+tmp = predict(modp3, se = T, link = T)
+# str(tmp)
+predsp3 <- data.frame(moddat, 
+                      preds = tmp$fit,
+                      lowerCI = tmp$fit + 2*tmp$se.fit,
+                      upperCI = tmp$fit - 2*tmp$se.fit)
+predsp3 %<>%
+  mutate(preds = exp(preds),
+         lowerCI = exp(lowerCI),
+         upperCI = exp(upperCI))
+# str(predsp3)
+ggplot(predsp3,
+       aes(DATI, preds, color = DetailsF)) +
+  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = DetailsF),
+              alpha = 0.3) + 
+  # geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
+  geom_point(aes(DATI, nYSB, color = DetailsF), size = 1.1) +
+  geom_smooth(se=F) +
+  facet_wrap(~Country + Region + Village, scales = "free_y") + 
+  scale_color_manual(values = mycolors[]) +
+  scale_fill_manual(values = mycolors[]) 
+
+```
+```{r nb3, results = "hide", eval = F}
+# too slow!
+# modnb3 <- glmer.nb(nYSB ~ DetailsF  +
+#                      (1+DetailsF|Village:SamplingDateC), 
+#              offset = log(DaysOfCatch),
+#              # family = poisson,
+#              data = moddat)
+# summary(modnb3)
+# getDR(modnb3)
+# tmp = predict(modnb3, se = T, link = T)
+# # str(tmp)
+# predsnb3 <- data.frame(moddat, 
+#                       preds = tmp$fit,
+#                       lowerCI = tmp$fit + 2*tmp$se.fit,
+#                       upperCI = tmp$fit - 2*tmp$se.fit)
+# predsnb3 %<>%
+#   mutate(preds = exp(preds),
+#          lowerCI = exp(lowerCI),
+#          upperCI = exp(upperCI))
+# # str(predsnb2)
+# ggplot(predsnb3,
+#        aes(DATI, preds, color = DetailsF)) +
+#   geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = DetailsF),
+#               alpha = 0.3) + 
+#   # geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
+#   geom_point(aes(DATI, nYSB, color = DetailsF), size = 1.1) +
+#   geom_smooth(se=F) +
+#   facet_wrap(~Country + Region + Village, scales = "free_y") + 
+#   scale_color_manual(values = mycolors[]) +
+#   scale_fill_manual(values = mycolors[]) 
+
+```
+
+## Bayes (brms) version
+
+```{r}
+library(brms)
+nCores = 6 # nCores -2
+
+# summary(moddat$numericDate) # check max before fitting
+# brm3p <- brm(formula = nYSB ~ DetailsF + offset(logDaysOfCatch) + 
+#                     (1 + DetailsF||TrialID:SamplingDateC),
+#                     # gp(numericDate, by =TrialID), 
+#                   # control = list(adapt_delta = 0.9),
+#                   data = moddat, 
+#              family = poisson,
+#                   prior = c(set_prior("normal(0,2)", class = "b"),
+#                             set_prior("normal(0,2)", class = "Intercept"),
+#                             set_prior("cauchy(0,2)", class = "sd")),
+#                             # set_prior("half-N(0,1)", class = "lscale"),
+#                             # set_prior("normal(0,2)", class = "sdgp"),
+#                             # set_prior("lkj(2)", class = "cor")),
+#                   # sample_prior = TRUE,
+#                   warmup = 500, iter = 2000, 
+#                   chains = nCores, cores = nCores) 
+# saveRDS(brm3p, "../output/brm3p.RDS")
+# summary(brm3p)
+# bayes_R2(brm3p) 
+# 
+
+brm3nb <- brm(formula = nYSB ~ DetailsF + offset(logDaysOfCatch) + 
+                    (1 + DetailsF||TrialID:SamplingDateC),
+              data = moddat, 
+              family = negbinomial,
+              prior = c(set_prior("normal(0,2)", class = "b"),
+                        set_prior("cauchy(0,1)", class = "shape"), # == half-cauchy
+                            set_prior("normal(0,2)", class = "Intercept"),
+                            set_prior("cauchy(0,2)", class = "sd")),
+              warmup = 500, iter = 2000, 
+              chains = nCores, cores = nCores) 
+saveRDS(brm3nb, "../output/brm2nb.RDS")
+summary(brm3nb)
+bayes_R2(brm3nb)
+
+prior_summary(brm3nb)
+# prior_summary(brm3nb, all = FALSE)
+# print(prior_summary(brm3nb, all = FALSE), show_df = FALSE)
+
+# 
+```
+
+# RE for Trial, GP for Date
+
+## Bayes (brms) version
+
+```{r}
+library(brms)
+nCores = 6 # nCores -2
+
+summary(moddat$numericDate) # check max before fitting
+brm4nb <- brm(formula = nYSB ~ DetailsF + offset(logDaysOfCatch) + 
+                    (1 + DetailsF||Village) + 
+              gp(numericDate, by =Village), 
+                  # control = list(adapt_delta = 0.9),
+              data = moddat, 
+              family = negbinomial,
+              prior = c(set_prior("normal(0,2)", class = "b"),
+                        set_prior("cauchy(0,1)", class = "shape"), # == half-cauchy
+                            set_prior("normal(0,2)", class = "Intercept"),
+                            set_prior("cauchy(0,2)", class = "sd")),
+                            # set_prior("half-N(0,1)", class = "lscale"),
+                            # set_prior("normal(0,2)", class = "sdgp"),
+                            # set_prior("lkj(2)", class = "cor")),
+              warmup = 500, iter = 2000, 
+              chains = nCores, cores = nCores) 
+saveRDS(brm4nb, "../output/brm2nb.RDS")
+summary(brm4nb)
+bayes_R2(brm4nb)
+
+prior_summary(brm4nb)
+# prior_summary(brm4nb, all = FALSE)
+# print(prior_summary(brm4nb, all = FALSE), show_df = FALSE)
+
+# 
+```
