@@ -32,7 +32,6 @@ library(lme4)
 library(magrittr)
 library(tidyverse)
 library(ggmap)
-register_google(key = "AIzaSyBaIUCduIbWFO5VlvdKetuMMw2qzUYFmi0")
 
 # library to use Python within R:
 library(reticulate)
