@@ -35,6 +35,11 @@ library(ggmap)
 # usethis::edit_r_environ()
 register_google(Sys.getenv("ggmapKey"))
 
+# to run Bayesian models. Set appropriate nCores for your machine
+library(brms)
+nCores = 6 # nCores -2
+
+
 ## Set colors:
 # library(RColorBrewer)
 # display.brewer.pal(11, "Spectral")
@@ -50,20 +55,20 @@ prop_colors = c("#313695", "#ABD9E9", "#FFFFBF", "#FEE090",
 ```
 ``` {r functions}
 
-getDR <- function (mod, coefs = -1) {
+getTR <- function (mod, coefs = -1) {
   b1 = summary(mod)$coef[coefs,1]
   seb1 = summary(mod)$coef[coefs,2]
-  (DR = round(100 * (1- exp(b1)),1))  ## 69.9
+  (TR = round(100 * (1- exp(b1)),1))  ## 69.9
   (higher = round(100 * (1 - exp(b1 - 1.96*seb1)),1)) ## 78.8
   (lower = round(100 * (1 - exp(b1 + 1.96*seb1)),1)) ## 57.0
-  if (is.null(names(DR))) {
-   data.frame(#Treatment = names(DR),
-             DR = as.numeric(DR), 
+  if (is.null(names(TR))) {
+   data.frame(#Treatment = names(TR),
+             TR = as.numeric(TR), 
              lowerCI = as.numeric(lower),
              upperCI = as.numeric(higher))   
   } else {
-  data.frame(Treatment = names(DR),
-             DR = as.numeric(DR), 
+  data.frame(Treatment = names(TR),
+             TR = as.numeric(TR), 
              lowerCI = as.numeric(lower),
              upperCI = as.numeric(higher))
   }
@@ -77,86 +82,151 @@ getDR <- function (mod, coefs = -1) {
 ```
 ```{r readdatR}
 
-moddatR = read.csv("../data/mothsubset.csv")
-moddatR %<>%
-  mutate(TransplantDate = ymd(TransplantDate),
-         DispInstallDate = ymd(DispInstallDate),
-         TrapInstallDate = ymd(TrapInstallDate),
-         SamplingDate = ymd(SamplingDate)
-         )
+datRinit = read.csv("../data/moths.csv")
+datRinit %<>% dplyr::select(-X)
+# (there is a select function in MASS package that sometimes overrides dplyr)
 ```
 
 # Introduction
 
-I have used R, in conjunction with Rmarkdown documents, in an RStudio GUI for over a decade. It is a beautiful setup, with great work flows and clean coding. It is perfect for non-production level analyses, visualizations, interactive documents and web apps, and reports.
+I have used R, in conjunction with Rmarkdown documents, in an RStudio GUI for over a decade. It is a beautiful setup, with great work flows and clean coding. It is perfect for non-production level analyses, visualizations, interactive documents, web apps, and reports.
 
-However, the world seems to prefer Python. Perhaps it is because computer programmers rule the world more than statisticians and scientists.
+However, the world seems to prefer Python. Perhaps it is because computer programmers rule the world more than statisticians and scientists. In that vein, I am writing this tutorial to fit Bayesian GLMM's and non-linear models in Python. 
 
-So, in that vein, I am writing this tutorial to fit Bayesian GLMMs and non-linear regression models commonly in Python, Pyton’s Bambi module, and Python’s PyMC module.
+All models are written mathematically and fit in both R and Python. Frequentist versions are fit when available as well as Bayesian versions. There are four chapters: GLMM's in R; GLMM's in Python; non-linear models in R; and non-linear models in Python.
 
-The intended audience here is someone who is proficient at fitting statistical models in R, but would like to fit those same models in Python instead. In particular, fitting complex Bayesian hierarchical models.
-
-I have two purposes:
-
-1. To learn if I can fit complex non-linear Bayesian models with multi-dimensional Gaussian Processes in Python. I currently have custom algorithms written in Matlab for these models, and I want to fit the same models in Python.
-
-2. To get better acquainted with Python.
-
-All models are written mathematically and fit in both R and Python. Frequentist versions are fit when available as well as Bayesian versions.
+This particular webpage/chapter fits GLMM's in R.
 
 ## Outline
 
-
-* Getting started with Python-- because it is more complicated than R.
-
 * Introduce the data to be used throughout the tutorial.
 
-* Fit generalized linear models (GLMs, here Poisson regressions).
+* Fit generalized linear models (GLMs, here Poisson and negative binomial regressions). Models are fit in both frequentist and Bayesian frameworks to lay the groundwork for the more complicated models.
 
-* Fit generalized linear models with random effects (GLMMs).
+* Fit generalized linear models with random effects (GLMMs) to allow for correlations in space and time. Models are fit in both frequentist and Bayesian frameworks.
 
+# Analysis objectives
+
+How well does the treatment work?
+
+
+At each location, there is one rice field that is a control group and one rice field that is treated with pheromones. **The objective is to determine how good the treatment is at reducing moth populations. This is measured as a reduction of moth counts in the traps in the treatment fields compared to the traps in the control fields.**
+
+The performance metric of interest is trap reduction (TR), which is a derived parameter of the regression coefficient:
+
+$$
+TR = 100 - 100 e ^{(-\beta_1)}
+$$
+
+If trapping reduction were 100%, no moths would ever be caught in the treatment traps. However, some random moths will inevitably land in any trap. Instead, product performance is considered good if 90% trapping reduction is achieved, meaning that 90% fewer moths are caught in the treatment traps. When trapping reduction goes below 0%, the parameter no longer makes sense and cannot be interpreted.
+
+It should also be noted that treatment performance may decline over time. Perhaps there is not enough pheromone to last for the entire season, or the ecosystem may change during the season in a way that somehow lessens product performance (e.g., the pheromones from the plants may change and interact with the product.)
 
 # Data Exploration
 
-We are analyzing moth count data collected from traps from rice fields in Indonesia. There are a total of 10 locations. At each location, there is one treatment (PFP) field with 4 traps and one control field with 4 traps. These traps are sampled and reset approximately every 10 days for the entire growing season, but sometimes that interval varies.
+We are analyzing moth count data collected from traps from rice fields in Indonesia. There are a total of 10 locations that are sampled throughout a field season. At each location, there is one treatment (PFP) field with 4 traps and one control field with 4 traps. These traps are sampled and reset approximately every 10 days for the entire growing season, but sometimes that interval varies.
 
-It is expected that the PFP will catch fewer moths than the control fields. The research questions are: how much fewer moths are caught, i.e., what is the trapping reduction associated with the PFP traps? and, is the same trapping reduction observed for the entire season?
+It is expected that the treatment field (trt A) will catch fewer moths than the control fields. The research questions are: how much fewer moths are caught, i.e., what is the trapping reduction associated with the PFP traps? And, is the same trapping reduction (TR) observed for the entire season?
 
-These data have a spatial and temporal component. Temporally, the same traps are sampled over time. Spatially, the traps have a certain proximity to each other within a location, and the locations may be clumped across the landscape.
+These data have a spatial and temporal component. Spatially, the traps have a certain proximity to each other within a location, and the locations may be clumped across the landscape. Temporally, the same traps are sampled over time. 
 
-These data are based on the data from Iqbal et al. (2023) (link: https://jurnal.pei-pusat.org/index.php/jei/article/view/783), but have been heavily manipulated in terms of locations and counts to preserve privacy rights.
+These data are based on the data from Iqbal et al. (2023) (link: https://jurnal.pei-pusat.org/index.php/jei/article/view/783), but have been heavily manipulated in terms of location coordinates, location names, and trap counts to preserve privacy rights. The results presented in this tutorial are NOT representative of true product performance.
 
 Full citation:
-Iqbal, M., Marman, M., Arintya, F., Broms, K. ., Clark, T., & Srigiriraju, L. . (2023). Mating disruption technology: An innovative tool for managing yellow stem borer (Scirpophaga incertulas Walker) of rice in Indonesia: Teknologi gangguan kawin: Inovasi untuk pengendalian penggerek batang kuning (Scirpophaga incertulas Walker) pada padi di Indonesia. Jurnal Entomologi Indonesia, 20(2), 129. https://doi.org/10.5994/jei.20.2.129.
+Iqbal, M., Marman, M., Arintya, F., Broms, K. ., Clark, T., & Srigiriraju, L. . (2023). Mating disruption technology: An innovative tool for managing yellow stem borer (Scirpophaga incertulas Walker) of rice in Indonesia: Teknologi gangguan kawin: Inovasi untuk pengendalian penggerek batang kuning (Scirpophaga incertulas Walker) pada padi di Indonesia. Jurnal Entomologi Indonesia, 20(2), 129. 
 
-## Trap locations
+## Moth counts
 
-(Because I am plotting coordinates, I set the aspect ratio to be 1, which creates square plots to better mimic the actual locations of the traps.)
-
-Treatment traps have a slightly different alignment at each location:
+Here is what the data look like. Columns: Location, Treatment, TrapID, Longitude, Latitude, AssessmentNumber, and SamplingDate should be self-explanatory... TransplantDate is the date that the rice seedlings were transplanted into the field; DispInstallDate is the treatment installation date; TrapInstallDate is the trap installation date; "nYSB" are the moth counts (number of YSB moths); DaysOfCatch is the number of days since the trap was previously sampled  or the number of days since trap installation if it is assessment number 1; DATI is days after trap installation; DADI is days after dispenser installation; and DAT is days after transplant. Some of these columns will be discussed more later.
 
 ```{r}
+# knitr::kable(head(datRinit, 20))
 
-ggplot(moddatR) +
-  geom_point(aes(Longitude, Latitude, color = Details)) +
-  facet_wrap(~Location, scales = "free") +
-  theme(aspect.ratio=1, x.axis = F)
+# check data values:
+summary(datRinit)
+lapply(datRinit, function(x) {
+  if (is.character(x))
+    unique(x)
+})
+datR <- datRinit %>%
+  mutate(TransplantDate = ymd(TransplantDate),
+         DispInstallDate = ymd(DispInstallDate),
+         TrapInstallDate = ymd(TrapInstallDate),
+         SamplingDate = ymd(SamplingDate)
+         )  %>%
+  mutate(mothsperday = nYSB / DaysOfCatch,
+         TreatmentF = factor(Treatment), # if we need to fix levels in non-alpha order
+         LocationF = as.factor(Location),
+         logDaysOfCatch = log(DaysOfCatch),
+         # DATscaled = as.numeric(scale(DAT)),
+         SamplingDateC = as.character(SamplingDate),
+         numericDate = as.numeric(SamplingDate),
+         numericDate = numericDate - min(numericDate) + 1)
+
 
 ```
+
+The data are the moth counts collected at each trap, within each location and throughout the season. Note how the y-axis changes for each plot in the figure.
+
+```{r plotMoths, fig.width = 8, fig.height = 6}
+mean_cts <- datR %>%
+  group_by(Location, Treatment, TreatmentF,
+           AssessmentNumber,
+           SamplingDate, DATI) %>%
+  summarize(mean_cts = mean(nYSB, na.rm = T),
+            mean_mothsperday = mean(mothsperday)) %>%
+  ungroup()
+ggplot(datR,
+       aes(DATI, mothsperday, color = TreatmentF)) +
+  geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
+  # geom_line(data = mean_cts,
+      # aes(DATI, mean_mothsperday, color = TreatmentF), size = 1.1) +
+  geom_smooth(se=F) +
+  facet_wrap(~Location, scales = "free_y") + 
+  scale_color_manual(values = mycolors[]) +
+  # scale_y_sqrt() +
+  labs(title = "Male YSB moth counts for each location and trap",
+       y = "Moth counts per trap per day",
+       x = "DAI",
+       color = "Treatment")
+#
+```
+
+## Trap locations
 
 Trial locations in relation to each other. Some trial locations are closer to each other than others.
 
 ```{r}
 
-basemap <- get_googlemap(c(lon = mean(moddatR$Longitude, na.rm = T),
-                           lat = mean(moddatR$Latitude, na.rm = T)),
+basemap <- get_googlemap(c(lon = mean(datR$Longitude, na.rm = T),
+                           lat = mean(datR$Latitude, na.rm = T)),
                          color = "bw",
-                         zoom = 4)
+                         zoom = 7)
 ggmap(basemap) +
-  geom_point(data = moddatR,
+  geom_point(data = datR,
              aes(Longitude, Latitude, color = Location), size = 2) +
   labs(title = "Trial locations") +
   scale_color_brewer(palette = "PuOr") 
+#
+```
+
+Within each location, the treatment traps have a slightly different alignment:
+
+```{r}
+coords <- datR %>%
+  dplyr::select(Location, Treatment, TrapID, Latitude, Longitude) %>%
+  unique()
+ggplot(coords,
+       aes(Longitude, Latitude, color = Treatment)) +
+  geom_point() +
+  facet_wrap(~Location, scales = "free") +
+  theme(aspect.ratio=1, 
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank()) +
+  ggrepel::geom_text_repel(aes(label = TrapID), color = "black", size = 3) +
+  scale_x_continuous(expand = c(0.3, 0)) + 
+  scale_y_continuous(expand = c(0.3, 0)) + 
+  labs(title = "Trap ID's at each location")
 
 ```
 
@@ -165,7 +235,7 @@ ggmap(basemap) +
 
 ```{r timeline, results="hide", fig.width = 7}
 
-dates <- moddatR %>%
+dates <- datR %>%
   group_by(Location, TransplantDate, TrapInstallDate) %>%
   summarize(mindate = min(SamplingDate, na.rm = T),
             maxdate = max(SamplingDate, na.rm = T)) %>%
@@ -184,45 +254,25 @@ ggplot(dates) +
        x = "Date range of moths data collection (2023)",
        title = "Trapping date ranges of each location",
        caption = "Black points are transplant dates \n
-       Grey points are installation dates") +
+       Grey points are trap installation dates") +
   scale_color_viridis_d() 
 ```
 
-
-## Moth counts
-
-```{r plotMoths, fig.width = 8, fig.height = 6}
-mean_cts <- moddatR %>%
-  group_by(Location, Treatment, Details,
-           AssessmentNumber,
-           SamplingDate, DATI) %>%
-  summarize(mean_cts = mean(nYSB, na.rm = T),
-            mean_mothsperday = mean(mothsperday)) %>%
-  ungroup()
-ggplot(moddatR,
-       aes(DATI, mothsperday, color = Details)) +
-  geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
-  # geom_line(data = mean_cts,
-      # aes(DATI, mean_mothsperday, color = Details), size = 1.1) +
-  geom_smooth(se=F) +
-  facet_wrap(~Location, scales = "free_y") + 
-  scale_color_manual(values = mycolors[]) +
-  # scale_color_viridis_d() +
-  # scale_y_sqrt() +
-  labs(title = "Male YSB moth counts for each location and trap",
-       y = "Moth counts per trap per day",
-       x = "DAI",
-       color = "Treatment")
-#
-```
+Note that not all traps are installed on exactly the same day; not all locations have rice transplanted on exactly the same day; and not all traps are sampled on exactly the same day.
 
 # Basic GLM models
 
-To start, we ignore all the spatial and temporal relations and assume each data point is independent and identically distributed (iid). **This is not a good model for the data!** It is just our starting off point.
+To start, we ignore all the spatial and temporal relationships in the data and assume each data point is independent and identically distributed (iid). **This is not a good model for the data!** It is just our starting off point.
 
-These models are known as generalize linear models (GLMs).
+When building hierarchical Bayesian models, it is always a good idea to start simple, make sure everything works as expected, and then build up.
 
 ## Mathematical model
+
+Our response variable is a count, therefore we use either a Poisson or negative binomial distribution as the basis for our model. These models are known as generalized linear models (GLMs).
+ 
+The model must also include an offset to account for the varying time intervals between sample. (If the traps are left unchecked for more days, we naturally expect the trap to have more moths. This varying effort is accounted for by the offset.)
+
+### Poisson regression model
 
 We start with a poisson version of our regression model:
 
@@ -231,7 +281,7 @@ y_i \sim Pois(\lambda_i) \\
 log(\lambda_i ) = \beta_0 + \beta_1 x_{A,i} + \mbox{ln} \left(DaysOfCatch_i\right)
 $$
 
-where
+where, for data samples $i = 1, ..., N$, 
 
 $y_i$ is moth count $i$,
 
@@ -239,17 +289,19 @@ $\lambda_i$ is the expected moth count for sample $i$,
 
 $\beta_0$ is the intercept of the model. Here, it is the basis for the expected moth count for our control treatment.
 
-$\beta_1$ is the expected difference in moth counts between the control group and the 'trt A' group, 
+$\beta_1$ is the expected difference in moth counts between the control group and the treatment A group, 
 
-$x_{A,i}$ is an indicator variable that equals 1 if sample $i$ is from a "trt A" field and equals 0 otherwise, and
+$x_{i}$ is an indicator variable that equals 1 if sample $i$ is from a treatment A field and equals 0 otherwise, and
 
-$\left(DaysOfCatch_i\right)$ is the offset to account for the varying time itnerval between samples. This is necessary because with a longer time interval, more moths will fly into the trap.
+$\left(DaysOfCatch_i\right)$ is the offset to account for the varying time interval between samples. This is necessary because with a longer time interval, more moths will fly into the trap.
 
-However, in ecology, there is always additional variability in our data than what the Poisson distribution allows. To account for the additional variability in our model, we switch to a negative binomial distribution:
+### Negative binomial regression model
+
+In ecology, there is always additional variability in our data than what the Poisson distribution allows. To account for the additional variability in our model, we switch to a negative binomial distribution:
 
 $$
 y_i \sim NegBinom(\lambda_i, \phi) \\
-log(\lambda_i ) = \beta_0 + \beta_1 x_{A,i} + \mbox{ln} \left(DaysOfCatch_i\right)
+log(\lambda_i ) = \beta_0 + \beta_1 x_{i} + \mbox{ln} \left(DaysOfCatch_i\right)
 $$
 
 "Negative binomial regression is used to model count data for which the variance is higher than the mean." (https://www.pymc.io/projects/examples/en/latest/generalized_linear_models/GLM-negative-binomial-regression.html)
@@ -262,9 +314,9 @@ $$
 
 (For a Poisson distribution, $Var(\lambda) = \lambda$.)
 
-### Bayesian regression models
+### Bayesian mathematical model
 
-I also fit these models uing a Bayesian framework, again to build our foundation for our more complex models that come later.
+I also fit these models using a Bayesian framework, again to build our foundation for the more complex models that come later.
 
 For the Bayesian models, I only show the more complex negative binomial version.
 
@@ -272,7 +324,7 @@ To make our models Bayesian, we add priors to our parameters:
 
 $$
 y_i \sim NegBinom(\lambda_i, \phi) \\
-log(\lambda_i ) = \beta_0 + \beta_1 x_{i} + \mbox{ln} \left(DaysOfCatch_i\right) \\
+log(\lambda_i ) = \beta_0 + \beta_1 x_{A,i} + \mbox{ln} \left(DaysOfCatch_i\right) \\
 \beta_0 \sim Normal(0, 2) \\
 \beta_1 \sim Normal(0, 2) \\
 \phi \sim HalfCauchy(0,1)
@@ -294,57 +346,65 @@ $$
 TR = 100 - 100 e ^{(-\beta_1 \pm 2 \cdot SE(\beta_1))}
 $$
 
+For the Bayesian version, the derived parameter is sampled as part of the MCMC iterations, and the 95% credible interval is the 2.5%, 97.5% quantiles of its resulting distribution.
 
-## Frequentist models
+## Fitting the frequentist models
 
 Note: when I predict for new data, I set DaysOfCatch = 1, and then I compare to the moths per day variable (mothsperday = nYSB / DaysOfCatch). I want to exclude any patterns related to the varying time intervals.
 
+These models show a very tight confidence intervals for our predictions. But also, the residual deviance is MUCH greater than the degree of freedom, indicating a lack of fit. The plot of the predictions overlaid on the data also demonstrate the lack of fit.
+
 ```{r pois1}
 
-mod1p <- glm(nYSB ~ DetailsF, 
+mod1p <- glm(nYSB ~ TreatmentF, 
              offset = log(DaysOfCatch),
              family = poisson,
-             data = moddatR)
+             data = datR)
 summary(mod1p)
-getDR(mod1p)
-tmp = predict(mod1p, se = T, link = F,
-              newdata= moddatR  %>% mutate(DaysOfCatch = 7))
+getTR(mod1p)
+tmp = predict(mod1p, se = T, type = "link",
+              newdata = datR  %>% mutate(DaysOfCatch = 1))
 # str(tmp)
-preds1p <- data.frame(moddatR, 
+preds1p <- data.frame(datR, 
                       preds = tmp$fit,
                       lowerCI = tmp$fit + 2*tmp$se.fit,
                       upperCI = tmp$fit - 2*tmp$se.fit)
-# preds1p %<>%
-#   mutate(preds = exp(preds),
-#          lowerCI = exp(lowerCI),
-#          upperCI = exp(upperCI))
-# str(preds1p)
+preds1p %<>%
+  mutate(preds = exp(preds),
+         lowerCI = exp(lowerCI),
+         upperCI = exp(upperCI))
 
 ggplot(preds1p,
-       aes(DATI, preds, color = DetailsF)) +
-  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = DetailsF),
+       aes(DATI, preds, color = TreatmentF)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = TreatmentF),
               alpha = 0.3) + 
-  geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
-  # geom_line(data = mean_cts,
-      # aes(DATI, mean_mothsperday, color = Details), size = 1.1) +
+  geom_point(data = mean_cts,
+             aes(DATI, mean_mothsperday, color = TreatmentF), size = 1.1) +
   geom_smooth(se=F) +
   facet_wrap(~Location, scales = "free_y") + 
   scale_color_manual(values = mycolors[]) +
-  scale_fill_manual(values = mycolors[]) 
+  scale_fill_manual(values = mycolors[]) +
+  labs(title = "Poisson GLM predictions",
+       subtitle = "Lines are predictions, points are the data")
 
-  
 ```
+
+The model is such a bad fit to the data, it is hard to even tell what is going on in the plot above.
+
+For the negative binomial model, our confidence intervals are a little wider, but we are still ignoring all the correlations in our data. And the plot of the predictions again indicates the lack of fit.
+
 ```{r nb1}
 
-mod1nb <- glm.nb(nYSB ~ DetailsF + 
+mod1nb <- glm.nb(nYSB ~ TreatmentF + 
              offset(log(DaysOfCatch)),
-             data = moddatR)
+             data = datR)
 summary(mod1nb)
-getDR(mod1nb)
-tmp = predict(mod1nb, se = T, link = T,
-              newdata= moddatR  %>% mutate(DaysOfCatch = 1))
+getTR(mod1nb)
+tmp = predict(mod1nb, se = T, type = "link",
+              newdata= datR  %>% mutate(DaysOfCatch = 1))
 # str(tmp)
-preds1nb <- data.frame(moddatR, 
+preds1nb <- data.frame(datR, 
                       preds = tmp$fit,
                       lowerCI = tmp$fit - 2*tmp$se.fit,
                       upperCI = tmp$fit + 2*tmp$se.fit)
@@ -355,52 +415,67 @@ preds1nb %<>%
 # str(preds1nb)
 
 ggplot(preds1nb,
-       aes(DATI, preds, color = DetailsF)) +
-  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = DetailsF),
+       aes(DATI, preds, color = TreatmentF)) +
+  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = TreatmentF),
               alpha = 0.3) + 
   geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
   geom_point(
-      aes(DATI, mothsperday, color = DetailsF), size = 1.1) +
+      aes(DATI, mothsperday, color = TreatmentF), size = 1.1) +
   geom_smooth(se=F) +
   facet_wrap(~Location, scales = "free_y") + 
   scale_color_manual(values = mycolors[]) +
-  scale_fill_manual(values = mycolors[]) 
+  scale_fill_manual(values = mycolors[]) +
+  labs(title = "Neg. binomial GLM predictions",
+       subtitle = "Lines are predictions, points are the data")
+
 
   
 ```
 
-## Bayesian (brms) models
+## Bayesian (brms) model fit
 
-In R, I fit the Bayesian models using the "brms" package. I find this package very intuitive and it has fast, efficient algorithms based on Stan.
+In R, I fit the Bayesian models using the "brms" package. I find this package very intuitive and it has fast, efficient algorithms based on Stan. 
 
-The prior_summary command is helpful if you so not know what a parameter is called in 'brms'. Here, I used the command to find out what they called their $\phi$ parameter, and then I re-ran the model with my slightly informative prior.
+Because the models take a few minutes to fit, I usually fit them when I am initially running through my code, save them, and then only load the model fit when rendering the Rmarkdown file and creating the resulting figures.
 
-```{r}
-library(brms)
-nCores = 6 # nCores -2
-# 
+The prior_summary command is helpful if you do not know what a parameter is called in 'brms'. Here, I used the command to find out what they called their $\phi$ parameter. (They call it the shape parameter.)
 
-brm1nb <- brm(formula = nYSB ~ DetailsF + offset(logDaysOfCatch),
-              data = moddatR, 
+```{r, eval = F}
+brm1nb <- brm(formula = nYSB3 ~ Treatment + offset(log(DaysOfCatch)),
+              data = tmp, 
               family = negbinomial, #log-link is default
               prior = c(set_prior("normal(0,2)", class = "b"),
                         set_prior("normal(0,2)", class = "Intercept"),
-                        set_prior("cauchy(0,1)", class = "shape")),
-              warmup = 500, iter = 2000, 
+                        set_prior("cauchy(0,1)", class = "shape")), # is half-cauchy
+              warmup = 500, iter = 2000,  # use more iter for final model
+              seed = 5000, # so that you get the same results
               chains = nCores, cores = nCores) 
 saveRDS(brm1nb, "../output/brm1nb.RDS")
-summary(brm1nb)
-bayes_R2(brm1nb)
-
+```
+```{r}
+brm1nb <- readRDS("../output/brm1nb.RDS")
 prior_summary(brm1nb)
+
+summary(brm1nb)
+summary(mod1nb)
 # 
 ```
 
-# GLMM: Random effect for location
+The Bayesian parameter estimates match very closely to the frequentist estimates. This is expected, but reassuring that we have built the correct foundation for the more complicated models to come.
 
-The first fix we make to the model is acknowledging that overall average  moth pressure varies from location to location. To make this fix we had a location random effect (RE) and our model becomes a generalized linear mixed-effects model (GLMM or GLMER).
+```{r}
 
-We also want to acknowledge that the treatment effect may vary from location to location-- sometimes we see a big different in moth counts between control and treatment fields, and sometimes the difference is smaller. For inference though, we are only interested in the larger picture, which is the overall trapping reduction. Therefore, we also add a treatment random effect.
+# CALC TR!
+
+# plot predictions!!!
+
+```
+
+# GLMM: Random effect (RE) for locations
+
+The first fix we make to the model is acknowledging that overall average  moth pressure varies from location to location (see Fig 1 of moth counts). To make this fix, we add a location random effect (RE) and our model becomes a generalized linear mixed-effects model (GLMM or GLMER).
+
+We also want to acknowledge that the treatment effect may vary from location to location-- sometimes we see a big difference in moth counts between control and treatment fields, and sometimes the difference is smaller. For inference though, we are only interested in the larger picture, which is the overall trapping reduction. (We are not interested in what happens at these exact locations per se, we are more interested in the average treatment effect.) Therefore, we also add a treatment random effect.
 
 ## GLMM mathematical model
 
@@ -408,12 +483,14 @@ I only show the Poisson version of the model, the NB version is a straightforwar
 
 $$
 y_{ik} \sim Pois(\lambda_{ik}) \\
-log(\lambda_{ik} ) = \beta_0 + \beta_1 x_{A,i} + \gamma_{0k} x_{ik}  + \gamma_{1k} x_{A,i} x_{ik} + \mbox{ln} \left(DaysOfCatch_i\right) \\
+log(\lambda_{ik} ) = \beta_0 + \beta_1 x_{A,i} + \gamma_{0k} x_{ik}  + \gamma_{1k} x_{i} x_{ik} + \mbox{ln} \left(DaysOfCatch_i\right) \\
 \gamma_{0k} \sim Normal(0, \sigma^2_{0}) \\
 \gamma_{1k} \sim Normal(0, \sigma^2_{1}) \\
 $$
 
-where,in addition to the variables and parameters defined for the GLM, we have
+where, in addition to the variables and parameters defined for the GLM, we have
+
+$k = 1,..., K=10$ represents the locations, 
 
 $y_{ik}$ is moth count $i$ from location $k$,
 
@@ -421,7 +498,7 @@ $\lambda_{ik}$ is the expected moth count for sample $i$  from location $k$,
 
 $\beta_0$ is the expected moth count for our control treatment for a new location,
 
-$\beta_1$ is the expected difference in moth counts between the control group and the 'trt A' group for a new location, 
+$\beta_1$ is the expected difference in moth counts between the control group and the treatment A group for a new location, 
 
 $\gamma_{0k}$ is the random intercept associated with location $k$, which leads to different background moth pressures at each location. All $\gamma_{0k}$ come from an iid Normal distribution.
 
@@ -429,9 +506,7 @@ $\gamma_{1k}$ is the random slope associated with location $k$, which leads to d
 
 $x_{ik}$ is an indicator variable that equals 1 if moth count $i$ is associated with location $k$ and 0 otherwise.
 
-OK, technically I should be introducing matrices here because $k = 1,..., 10$ locations, so we need a new indicator variable for each location, but I'm going to be lazy and right it like this for now.
-
-$\left(DaysOfCatch_i\right)$ is the offset to account for the varying time itnerval between samples. This is necessary because with a longer time interval, more moths will fly into the trap.
+OK, technically I should be introducing matrices here because $k = 1,..., K=10$ locations, so we need a new indicator variable for each location, but I'm going to be lazy and write it like this for now.
 
 
 ### Bayesian GLMM
@@ -442,20 +517,20 @@ To make our models Bayesian, we add priors to our parameters:
 
 $$
 y_{ik}\sim NegBinom(\lambda_{ik}, \phi) \\
-log(\lambda_{ik} ) = \beta_0 + \beta_1 x_{A,i} + \gamma_{0k} x_{ik}  + \gamma_{1k} x_{A,i} x_{ik} + \mbox{ln} \left(DaysOfCatch_i\right) \\
+log(\lambda_{ik} ) = \beta_0 + \beta_1 x_{A,i} + \gamma_{0k} x_{ik}  + \gamma_{1k} x_{A,i} x_{ik} + \mbox{ln} \left(DaysOfCatch_i\right) \\ 
 \gamma_{0k} \sim Normal(0, \sigma^2_{0}) \\
 \gamma_{1k} \sim Normal(0, \sigma^2_{1}) \\
-
 \beta_0 \sim Normal(0, 2) \\
 \beta_1 \sim Normal(0, 2) \\
 \sigma^2_{0} \sim HalfCauchy(0,1) \\
 \sigma^2_{1} \sim HalfCauchy(0,1) \\
-\phi \sim HalfCauchy(0,1)
+\phi \sim HalfCauchy(0,1) \\
 $$
+
 
 ### Bayesian GLMM -- Matrix version
 
-Written in matrix form, which better matches the coding (and is more correct given the need for a 10x10 $Z$ desgin matrix):
+I DO write the Bayesian version in matrix form because it matches the coding (and is more correct given the need for a $KxK$ $Z$ design matrix):
 
 $$
 \mathbf{Y} \sim NegBinom(\boldsymbol\lambda, \phi) \\
@@ -467,23 +542,23 @@ log(\boldsymbol\lambda) = \mathbf{X}\boldsymbol\beta + \mathbf{Z}\boldsymbol\gam
 $$
 
 
-## GLMM frequentist version
+## GLMM frequentist fit
 
-A couple of notes here. R always gets mad when you ask for SE's for predictions from a GLMM. Technically, you need to run simulations to get them and then they still come with an asterisk related to their reliability. (This is a reason to use the Bayesian model-- credible intervals are never based on apprioximations!)
+A couple of notes here. R always gets mad when you ask for SE's for predictions from a GLMM. Technically, you need to run simulations to get them and then they still come with an asterisk related to their reliability. (This is a reason to use the Bayesian model-- credible intervals are never based on approximations!)
 
 When we plot our predictions, we see that we now have better estimates for the overall mean at each location, and we see how much they vary from location to location, but there is a strong temporal pattern at each location that we are missing.
 
 ```{r pois2}
-modp2 <- glmer(nYSB ~ DetailsF + (1 + DetailsF|Location), 
+modp2 <- glmer(nYSB ~ TreatmentF + (1 + TreatmentF|Location), 
              offset = log(DaysOfCatch),
              family = poisson,
-             data = moddatR)
+             data = datR)
 summary(modp2)
-getDR(modp2)
-tmp = predict(modp2, se = T, 
-              newdata=moddatR %>% mutate(DaysOfCatch = 1))
+getTR(modp2)
+tmp = predict(modp2, se = T, type = "link",
+              newdata=datR %>% mutate(DaysOfCatch = 1))
 # str(tmp)
-predsp2 <- data.frame(moddatR %>% mutate(DaysOfCatch = 1), 
+predsp2 <- data.frame(datR %>% mutate(DaysOfCatch = 1), 
                       preds = tmp$fit,
                       lowerCI = tmp$fit + 2*tmp$se.fit,
                       upperCI = tmp$fit - 2*tmp$se.fit)
@@ -493,27 +568,29 @@ predsp2 %<>%
          upperCI = exp(upperCI))
 # str(predsp2)
 ggplot(predsp2,
-       aes(DATI, preds, color = DetailsF)) +
-  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = DetailsF),
+       aes(DATI, preds, color = TreatmentF)) +
+  geom_line() + 
+  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = TreatmentF),
               alpha = 0.3) + 
-  # geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
-  geom_point(aes(DATI, mothsperday, color = DetailsF), size = 1.1) +
+  geom_point(aes(DATI, mothsperday, color = TreatmentF), size = 1.1) +
   # geom_smooth(se=F) +
   facet_wrap(~Location, scales = "free_y") + 
   scale_color_manual(values = mycolors[]) +
-  scale_fill_manual(values = mycolors[]) 
+  scale_fill_manual(values = mycolors[])  +
+  labs(title = "Poisson GLMM predictions",
+       subtitle = "Lines are predictions, points are the data")
 
 ```
 ```{r nb2}
-modnb2 <- glmer.nb(nYSB ~ DetailsF + (1 + DetailsF|Location), 
+modnb2 <- glmer.nb(nYSB ~ TreatmentF + (1 + TreatmentF|Location), 
              offset = log(DaysOfCatch),
-             data = moddatR)
+             data = datR)
 summary(modnb2)
-getDR(modnb2)
-tmp = predict(modnb2, se = T, 
-              newdata=moddatR %>% mutate(DaysOfCatch = 1))
+getTR(modnb2)
+tmp = predict(modnb2, se = T, type = "link",
+              newdata=datR %>% mutate(DaysOfCatch = 1))
 # str(tmp)
-predsnb2 <- data.frame(moddatR, 
+predsnb2 <- data.frame(datR, 
                       preds = tmp$fit,
                       lowerCI = tmp$fit + 2*tmp$se.fit,
                       upperCI = tmp$fit - 2*tmp$se.fit)
@@ -523,63 +600,83 @@ predsnb2 %<>%
          upperCI = exp(upperCI))
 # str(predsnb2)
 ggplot(predsnb2,
-       aes(DATI, preds, color = DetailsF)) +
-  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = DetailsF),
+       aes(DATI, preds, color = TreatmentF)) +
+  geom_line() + 
+  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = TreatmentF),
               alpha = 0.3) + 
-  # geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
-  geom_point(aes(DATI, mothsperday, color = DetailsF), size = 1.1) +
-  geom_smooth(se=F) +
+  geom_point(aes(DATI, mothsperday, color = TreatmentF), size = 1.1) +
   facet_wrap(~Location, scales = "free_y") + 
   scale_color_manual(values = mycolors[]) +
-  scale_fill_manual(values = mycolors[]) 
+  scale_fill_manual(values = mycolors[])  +
+  labs(title = "Neg. binomial GLMM predictions",
+       subtitle = "Lines are predictions, points are the data")
 
 ```
 
 
 ## GLMM Bayes (brms) version
 
-By default, the prior distributions of random slopes and intercepts are correlated in "brm". The first time I ran this model, I allowed them to be correlated, but their correlation was highly nonsignificant, so I changed the random effects term from "(1 + DetailsF|Location)" to " (1 + DetailsF||Location)" (has an extra vertical line), which makes them independent and matches our models from R more readily. However, you'll notice that the estimates are slightly different-- the more complicated your model is, the more liely you will fin dthis is true with slightly different versions of your model (here, adding priors and fitting with a different algorithm). 
+By default, the prior distributions of random slopes and intercepts are correlated in "brm". If the correlation is non-significant, you may want to remove that correlation to simplify your model. To remove the correlation, change the random effects term from "(1 + TreatmentF|Location)" to " (1 + TreatmentF||Location)" (has an extra vertical line), which makes them independent. 
 
-```{r}
-library(brms)
-nCores = 6 # nCores -2
-brm2nb <- brm(formula = nYSB ~ DetailsF + offset(logDaysOfCatch) + 
-                    (1 + DetailsF||Location),
-              data = moddatR, 
+You'll notice that the parameter estimates are slightly different from the frequentist NB model fit here-- the more complicated your model is, the more likely you will find this is true with slightly different versions of your model (here, adding priors and fitting with a different algorithm). 
+
+```{r, eval = F}
+brm2nb <- brm(formula = nYSB ~ TreatmentF + offset(logDaysOfCatch) + 
+                    (1 + TreatmentF|Location),
+              data = datR, 
               family = negbinomial,
               prior = c(set_prior("normal(0,2)", class = "b"),
-                        # below is == half-cauchy
                         set_prior("cauchy(0,1)", class = "shape"), 
-                            set_prior("normal(0,2)", class = "Intercept"),
-                            set_prior("cauchy(0,1)", class = "sd")),
+                        set_prior("normal(0,2)", class = "Intercept"),
+                        set_prior("cauchy(0,1)", class = "sd")),
+              control = list(adapt_delta = 0.9), # b/c of divergent warning
               warmup = 500, iter = 2000, 
+              seed = 5000,
               chains = nCores, cores = nCores) 
 saveRDS(brm2nb, "../output/brm2nb.RDS")
 ```
 ```{r}
-summary(brm2nb)
-
-# prior_summary(brm2nb)
+brm2nb <- readRDS("../output/brm2nb.RDS")
+prior_summary(brm2nb) # we did not change the default prior for the RE correlation
 # 
+summary(brm2nb)
+summary(modnb2)
+
 ```
 
 
 
-# RE for Trial, nested SamplingDate
+# GLMM: RE for location, nested SamplingDate
 
-## Frequentist version
+In this version of the model, we acknowledge that sampling on different days of the season adds to the variability of the moth counts, and that the sampling date variability is different for each trial location. In this model, however,  the correlation between sampling dates is ignored.
 
-```{r pois3, results = "hide", eval = F}
-modp3 <- glmer(nYSB ~ DetailsF  +
-                     (1+DetailsF|Village:SamplingDateC), 
+This model is included here because it is helpful to think whether you have nested or crossed random effects (if applicable). And it allows us to include samplign date in our model as a random effect and still fit the model quickly in a frequentist framework.
+
+Here, the predictions now mimc the spatial patterns we see over time, but our predictions are overly optimistic because we are ignoring the fact that the samples are actually correlated over time. (A priori, we expect that is moth counts are high on one sampling occasion, they will also be high on the next sampling occasion.)
+
+## Nested GLMM mathematical model
+
+Model to be filled in.
+
+
+### Bayesian nested GLMM
+
+Model to be filled in.
+
+## Nested GLMM frequentist fit
+
+```{r pois3, results = "hide"}
+modp3 <- glmer(nYSB ~ TreatmentF  +
+                     (1 + TreatmentF|Location:SamplingDateC), 
              offset = log(DaysOfCatch),
              family = poisson,
-             data = moddat)
+             data = datR)
 summary(modp3)
-getDR(modp3)
-tmp = predict(modp3, se = T, link = T)
+getTR(modp3)
+tmp = predict(modp3, se = T, type = "link",
+              newdata=datR %>% mutate(DaysOfCatch = 1))
 # str(tmp)
-predsp3 <- data.frame(moddat, 
+predsp3 <- data.frame(datR %>% mutate(DaysOfCatch = 1), 
                       preds = tmp$fit,
                       lowerCI = tmp$fit + 2*tmp$se.fit,
                       upperCI = tmp$fit - 2*tmp$se.fit)
@@ -589,131 +686,127 @@ predsp3 %<>%
          upperCI = exp(upperCI))
 # str(predsp3)
 ggplot(predsp3,
-       aes(DATI, preds, color = DetailsF)) +
-  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = DetailsF),
+       aes(DATI, preds, color = TreatmentF)) +
+  geom_line() + 
+  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = TreatmentF),
               alpha = 0.3) + 
-  # geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
-  geom_point(aes(DATI, nYSB, color = DetailsF), size = 1.1) +
-  geom_smooth(se=F) +
-  facet_wrap(~Country + Region + Village, scales = "free_y") + 
+  geom_point(aes(DATI, mothsperday, color = TreatmentF), size = 1.1) +
+  # geom_smooth(se=F) +
+  facet_wrap(~Location, scales = "free_y") + 
   scale_color_manual(values = mycolors[]) +
-  scale_fill_manual(values = mycolors[]) 
-
+  scale_fill_manual(values = mycolors[])  +
+  labs(title = "Poisson nested GLMM predictions",
+       subtitle = "Lines are predictions, points are the data")
 ```
-```{r nb3, results = "hide", eval = F}
+```{r nb3, results = "hide"}
 # too slow!
-# modnb3 <- glmer.nb(nYSB ~ DetailsF  +
-#                      (1+DetailsF|Village:SamplingDateC), 
-#              offset = log(DaysOfCatch),
-#              # family = poisson,
-#              data = moddat)
-# summary(modnb3)
-# getDR(modnb3)
-# tmp = predict(modnb3, se = T, link = T)
-# # str(tmp)
-# predsnb3 <- data.frame(moddat, 
-#                       preds = tmp$fit,
-#                       lowerCI = tmp$fit + 2*tmp$se.fit,
-#                       upperCI = tmp$fit - 2*tmp$se.fit)
-# predsnb3 %<>%
-#   mutate(preds = exp(preds),
-#          lowerCI = exp(lowerCI),
-#          upperCI = exp(upperCI))
-# # str(predsnb2)
-# ggplot(predsnb3,
-#        aes(DATI, preds, color = DetailsF)) +
-#   geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = DetailsF),
-#               alpha = 0.3) + 
-#   # geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
-#   geom_point(aes(DATI, nYSB, color = DetailsF), size = 1.1) +
-#   geom_smooth(se=F) +
-#   facet_wrap(~Country + Region + Village, scales = "free_y") + 
-#   scale_color_manual(values = mycolors[]) +
-#   scale_fill_manual(values = mycolors[]) 
+modnb3 <- glmer.nb(nYSB ~ TreatmentF  +
+                     (1+TreatmentF|Location:SamplingDateC),
+             offset = log(DaysOfCatch),
+             data = datR)
+summary(modnb3)
+getTR(modnb3)
+
+tmp = predict(modnb3, se = T, type = "link",
+              newdata=datR %>% mutate(DaysOfCatch = 1))
+# str(tmp)
+predsnb3 <- data.frame(datR %>% mutate(DaysOfCatch = 1), 
+                       preds = tmp$fit,
+                       lowerCI = tmp$fit + 2*tmp$se.fit,
+                       upperCI = tmp$fit - 2*tmp$se.fit)
+predsnb3 %<>%
+  mutate(preds = exp(preds),
+         lowerCI = exp(lowerCI),
+         upperCI = exp(upperCI))
+# str(predsnb2)
+ggplot(predsnb3,
+       aes(DATI, preds, color = TreatmentF)) +
+  geom_line() + 
+  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = TreatmentF),
+              alpha = 0.3) + 
+  geom_point(aes(DATI, mothsperday, color = TreatmentF), size = 1.1) +
+  # geom_smooth(se=F) +
+  facet_wrap(~Location, scales = "free_y") + 
+  scale_color_manual(values = mycolors[]) +
+  scale_fill_manual(values = mycolors[])  +
+  labs(title = "Neg. binomial nested GLMM predictions",
+       subtitle = "Lines are predictions, points are the data")
 
 ```
 
 
-## Bayes (brms) version
+## Nested GLMM Bayes (brms) version
 
-```{r}
-library(brms)
-nCores = 6 # nCores -2
-
-# summary(moddat$numericDate) # check max before fitting
-# brm3p <- brm(formula = nYSB ~ DetailsF + offset(logDaysOfCatch) + 
-#                     (1 + DetailsF||TrialID:SamplingDateC),
-#                     # gp(numericDate, by =TrialID), 
-#                   # control = list(adapt_delta = 0.9),
-#                   data = moddat, 
-#              family = poisson,
-#                   prior = c(set_prior("normal(0,2)", class = "b"),
-#                             set_prior("normal(0,2)", class = "Intercept"),
-#                             set_prior("cauchy(0,2)", class = "sd")),
-#                             # set_prior("half-N(0,1)", class = "lscale"),
-#                             # set_prior("normal(0,2)", class = "sdgp"),
-#                             # set_prior("lkj(2)", class = "cor")),
-#                   # sample_prior = TRUE,
-#                   warmup = 500, iter = 2000, 
-#                   chains = nCores, cores = nCores) 
-# saveRDS(brm3p, "../output/brm3p.RDS")
-# summary(brm3p)
-# bayes_R2(brm3p) 
-# 
-
-brm3nb <- brm(formula = nYSB ~ DetailsF + offset(logDaysOfCatch) + 
-                    (1 + DetailsF||Location:SamplingDateC),
-              data = moddatR, 
+```{r, eval = F}
+brm3nb <- brm(formula = nYSB ~ TreatmentF + offset(log(DaysOfCatch)) + 
+                    (1 + TreatmentF|Location:SamplingDateC),
+              data = datR, 
               family = negbinomial,
               prior = c(set_prior("normal(0,2)", class = "b"),
                         set_prior("cauchy(0,1)", class = "shape"), # == half-cauchy
-                            set_prior("normal(0,2)", class = "Intercept"),
-                            set_prior("cauchy(0,2)", class = "sd")),
+                        set_prior("normal(0,2)", class = "Intercept"),
+                        set_prior("cauchy(0,1)", class = "sd")),
               warmup = 500, iter = 2000, 
+              seed = 5000,
               chains = nCores, cores = nCores) 
-saveRDS(brm3nb, "../output/brm2nb.RDS")
+saveRDS(brm3nb, "../output/brm3nb.RDS")
+```
+```{r}
+brm3nb <- readRDS("../output/brm3nb.RDS")
+prior_summary(brm3nb, all = FALSE)
+print(prior_summary(brm3nb, all = FALSE), show_df = FALSE)
+
 summary(brm3nb)
-bayes_R2(brm3nb)
-
-prior_summary(brm3nb)
-# prior_summary(brm3nb, all = FALSE)
-# print(prior_summary(brm3nb, all = FALSE), show_df = FALSE)
-
+summary(modnb3)
 # 
 ```
 
-# RE for Trial, GP for Date
+# GLMM with Gaussian Processes: RE for Trial, GP for Date
 
-## Bayes (brms) version
+Now we are in the territory where we have to fit the models in a Bayesian framework. If our response variable was continuous (i.e., the regression model was based on a Normal distribution), then we could still use maximum likelihood estimation.
 
-```{r}
-library(brms)
-nCores = 6 # nCores -2
+## Gaussian Process Bayes (brms) version
 
-summary(moddatR$numericDate) # check max before fitting
-brm4nb <- brm(formula = nYSB ~ DetailsF + offset(logDaysOfCatch) + 
-                    (1 + DetailsF||Location) + 
+* Use numeric version of sampling date for better algorithm stability. Still, we have a warning about a divergent transition. Ideally, we would tweak the model and look at the data carefully so fix this warning, but because we are working with made up data, we will not worry abotu the warning for now.
+
+```{r, eval =F}
+summary(datR$numericDate) # check max before fitting, in case seasons don't line up
+brm4nb <- brm(formula = nYSB ~ TreatmentF + offset(log(DaysOfCatch)) + 
+                    (1 + TreatmentF||Location) + 
               gp(numericDate, by =Location), 
-                  # control = list(adapt_delta = 0.9),
-              data = moddatR, 
+                  control = list(adapt_delta = 0.9),
+              data = datR, 
               family = negbinomial,
               prior = c(set_prior("normal(0,2)", class = "b"),
                         set_prior("cauchy(0,1)", class = "shape"), # == half-cauchy
-                            set_prior("normal(0,2)", class = "Intercept"),
-                            set_prior("cauchy(0,2)", class = "sd")),
-                            # set_prior("half-N(0,1)", class = "lscale"),
-                            # set_prior("normal(0,2)", class = "sdgp"),
-                            # set_prior("lkj(2)", class = "cor")),
-              warmup = 500, iter = 2000, 
+                        set_prior("normal(0,2)", class = "Intercept"),
+                        set_prior("cauchy(0,1)", class = "sd"),
+                        set_prior("cauchy(0,1)", class = "lscale", 
+                                  coef = "gpnumericDateLocationLoc1"),
+                        set_prior("cauchy(0,1)", class = "lscale", 
+                                  coef = "gpnumericDateLocationLoc2"),
+                        set_prior("cauchy(0,1)", class = "lscale", coef = "gpnumericDateLocationLoc3"),
+                        set_prior("cauchy(0,1)", class = "lscale", coef = "gpnumericDateLocationLoc4"),
+                        set_prior("cauchy(0,1)", class = "lscale", coef = "gpnumericDateLocationLoc5"),
+                        set_prior("cauchy(0,1)", class = "lscale", coef = "gpnumericDateLocationLoc6"),
+                        set_prior("cauchy(0,1)", class = "lscale", coef = "gpnumericDateLocationLoc7"),
+                        set_prior("cauchy(0,1)", class = "lscale", coef = "gpnumericDateLocationLoc8"),
+                        set_prior("cauchy(0,1)", class = "lscale", coef = "gpnumericDateLocationLoc9"),
+                        set_prior("cauchy(0,1)", class = "lscale", coef = "gpnumericDateLocationLoc10"),
+                        set_prior("normal(0,2)", class = "sdgp")),
+                        # set_prior("lkj(2)", class = "cor")),
+              warmup = 1000, iter = 5000, 
+              seed = 5000,
               chains = nCores, cores = nCores) 
-saveRDS(brm4nb, "../output/brm2nb.RDS")
+saveRDS(brm4nb, "../output/brm4nb.RDS")
+```
+```{r}
+brm4nb <- readRDS("../output/brm4nb.RDS")
 summary(brm4nb)
-bayes_R2(brm4nb)
+bayes_R2(brm4nb) # 0.824
 
 prior_summary(brm4nb)
-# prior_summary(brm4nb, all = FALSE)
-# print(prior_summary(brm4nb, all = FALSE), show_df = FALSE)
-
+prior_summary(brm4nb, all = FALSE)
 # 
 ```
 
