@@ -2,9 +2,6 @@
 
 When completing an analysis, I may skip around in my script quite a bit. Therefore, I like all packages loaded, and all data uploaded and manipulated at the start of my script.
 
-```{r setwd, eval = F, echo = F}
-setwd("analysis")
-```
 ```{r setup, include=FALSE, message=F, warning=FALSE, results = "hide", echo=F}
 knitr::opts_chunk$set(cache = T, message =F, warning = F, echo=F,
                       # dpi = 36, out.width="600px", out.height="600px")
@@ -13,6 +10,7 @@ knitr::opts_chunk$set(cache = T, message =F, warning = F, echo=F,
   out.width = '100%')
 
 # R libraries:
+# install.packages("kableExtra") ## uncomment to download any required packages
 library(MASS)
 library(lme4)
 library(magrittr)
@@ -24,7 +22,12 @@ register_google(Sys.getenv("ggmapKey"))
 # to run Bayesian models. Set appropriate nCores for your machine
 library(brms)
 nCores = 6 # nCores -2
+library(rjags)
+library(kableExtra)
 
+## to use jags, you first need to download. For a Mac, go to terminal:
+# brew install jags
+# instructions from: https://gist.github.com/casallas/8411082
 
 ## Set colors:
 # library(RColorBrewer)
@@ -58,6 +61,42 @@ getTR <- function (mod, coefs = -1) {
 `%+%` <- function(x, y)  mapply(sum, x, y, MoreArgs = list(na.rm = TRUE))
 #
 
+## prediction plot for frequentist models:
+predplot <- function(preddata, plottitle = "") {
+  p = ggplot(preddata,
+       aes(DATI, preds, color = TreatmentF)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = TreatmentF),
+              alpha = 0.3) + 
+  geom_point(data = mean_cts,
+             aes(DATI, mean_mothsperday, color = TreatmentF), size = 1.1) +
+  facet_wrap(~Location, scales = "free_y") + 
+  scale_color_manual(values = mycolors[]) +
+  scale_fill_manual(values = mycolors[]) +
+  labs(title = plottitle, 
+       subtitle = "Lines are predictions, points are the data")
+
+  return(p)
+}
+
+brmspredplot = function(preddata, plottitle = "") {
+  p <- ggplot(preddata, 
+       aes(x = DATI, y = Estimate, color = TreatmentF)) +  
+  geom_line() + 
+  geom_ribbon(aes(ymin = `Q2.5`, ymax = `Q97.5`, 
+                  fill = TreatmentF),  # regression line and CI
+                    alpha = 0.3) +
+  geom_point(data = mean_cts, 
+             aes(DATI, mean_mothsperday, color = TreatmentF), 
+             size = 1.1) +
+  facet_wrap(~Location, scales = "free_y") + 
+  scale_color_manual(values = mycolors[]) +
+  scale_fill_manual(values = mycolors[]) +
+  labs(title = plottitle,
+       subtitle = "Lines are predictions, points are the data")
+
+  return(p)
+}
 
 ```
 ```{r readdatR}
@@ -103,13 +142,6 @@ mean_cts <- datR %>%
 ```
 
 
-## Outline
-
-* Introduce the data to be used throughout the tutorial.
-
-* Fit generalized linear models (GLMs, here Poisson and negative binomial regressions). Models are fit in both frequentist and Bayesian frameworks to lay the groundwork for the more complicated models.
-
-* Fit generalized linear models with random effects (GLMMs) to allow for correlations in space and time. Models are fit in both frequentist and Bayesian frameworks.
 
 ## Data Exploration
 
@@ -345,19 +377,9 @@ preds1p %<>%
          lowerCI = exp(lowerCI),
          upperCI = exp(upperCI))
 
-p1p_glm <- ggplot(preds1p,
-       aes(DATI, preds, color = TreatmentF)) +
-  geom_line() +
-  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = TreatmentF),
-              alpha = 0.3) + 
-  geom_point(data = mean_cts,
-             aes(DATI, mean_mothsperday, color = TreatmentF), size = 1.1) +
-  facet_wrap(~Location, scales = "free_y") + 
-  scale_color_manual(values = mycolors[]) +
-  scale_fill_manual(values = mycolors[]) +
-  labs(title = "Poisson GLM predictions",
-       subtitle = "Lines are predictions, points are the data")
+p1p_glm = predplot(preds1p, "Poisson GLM predictions")
 print(p1p_glm)
+
 ```
 
 The model is such a bad fit to the data, it is hard to even tell what is going on in the plot above.
@@ -382,18 +404,8 @@ preds1nb %<>%
          lowerCI = exp(lowerCI),
          upperCI = exp(upperCI))
 # str(preds1nb)
-p1nb_glm <- ggplot(preds1nb,
-       aes(DATI, preds, color = TreatmentF)) +
-  geom_line() +
-  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = TreatmentF),
-              alpha = 0.3) + 
-  geom_point(data = mean_cts,
-      aes(DATI, mean_mothsperday, color = TreatmentF), size = 1.1) +
-  facet_wrap(~Location, scales = "free_y") + 
-  scale_color_manual(values = mycolors[]) +
-  scale_fill_manual(values = mycolors[]) +
-  labs(title = "Neg. binomial GLM predictions",
-       subtitle = "Lines are predictions, points are the data")
+
+p1nb_glm = predplot(preds1nb, "Neg. binomial GLM predictions")
 print(p1nb_glm)
 
 ```
@@ -448,29 +460,157 @@ bayesTR_1nb <- data.frame(TR = round(median(TR), 1),
 print(bayesTR_1nb)
 
 # plot predictions!!!
-library(tidybayes) # add_predicted_draws()
 predsbrm1nb <- fitted(brm1nb,
                        # type = "link",
                        scale = "linear",
-                        newdata = datR  %>% mutate(DaysOfCatch = 1))   # adding the posterior distribution
-# dim(exp(predsbrm1nb))
-tmp <- cbind(datR, exp(predsbrm1nb))
+                        newdata = datR  %>% mutate(DaysOfCatch = 1))   
 
-bayes_p1nb <- ggplot(tmp, 
-       aes(x = DATI, y = Estimate, color = TreatmentF)) + 
-  geom_line() + 
-  geom_ribbon(aes(ymin = `Q2.5`, ymax = `Q97.5`, fill = TreatmentF),  # regression line and CI
-                    alpha = 0.3) +
-  geom_point(data = mean_cts, 
-             aes(DATI, mean_mothsperday, color = TreatmentF), size = 1.1) +
-  facet_wrap(~Location, scales = "free_y") + 
-  scale_color_manual(values = mycolors[]) +
-  scale_fill_manual(values = mycolors[]) +
-  labs(title = "Bayesian neg. binomial GLM predictions",
-       subtitle = "Lines are predictions, points are the data")
+bayes_p1nb = brmspredplot(cbind(datR, exp(predsbrm1nb)), 
+                          "Bayesian neg. binomial GLM predictions")
 print(bayes_p1nb)
 
 ```
+
+### Bayesian (rjags) model fit
+
+I also fit the Bayesian models using the "rjags" package. Eventually, I fit complex non-linear, hierarchical Bayesian models and for those models, I need mroe flexibility than "brms" provides. Because it is good practice to build up to the complex models, I am also fitting these simpler models with the rjags package. 
+
+#### Poisson model in jags
+
+```{r jagsSetup1p}
+
+model_string1p <- "model{
+  # Likelihood
+  for(i in 1:N){
+    y[i] ~ dpois(lambda[i]) 
+    log(lambda[i]) <-  b0 + b1 * xA[i] + logDaysOfCatch[i]
+  }
+  
+  # Priors
+  b0 ~ dnorm(0, 1/2)
+  b1 ~ dnorm(0, 1/2)
+  # (normal dist uses precision not variance)
+
+    # derived parameters:
+  TR <- 100 - 100 * exp(b1)
+
+}"
+
+dataList = list(N= nrow(datR),
+                y = datR$nYSB, 
+                xA = ifelse(datR$Treatment == "CGP", 0, 1),
+                logDaysOfCatch = log(datR$DaysOfCatch))
+
+jags1p <- jags.model(file = textConnection(model_string1p), 
+                    data = dataList)
+```
+```{r jagsRun1p}
+update(jags1p, n.iter = 1000) # burn-in
+idata_jags1p <- coda.samples(jags1p,
+                              variable.names = c("b0", "b1", "TR"),
+                              n.iter = 10000,
+                              thin = 5)
+write_rds(idata_jags1p, "output/jags1p.RDS")
+```
+```{r jagsOut1p}
+idata_jags1p <- readRDS("output/jags1p.RDS")
+
+summary(idata_jags1p)
+summary(mod1p)
+# check for convergence:
+# plot(posterior_sample)
+# heidel.diag(out)  
+# raftery.diag(out)  
+# effectiveSize(out)  
+
+# plot predictions:
+pars <- as.mcmc(idata_jags1p)
+# str(pars)
+# create a model matrix from x
+X <- cbind(1, ifelse(datR$Treatment == "CGP", 0, 1))
+lambda_hat <- exp(X %*% t(pars[,-1]))
+
+predjags1p <- datR %>%
+  mutate(preds = apply(lambda_hat, 1, median),
+         lowerCI = apply(lambda_hat, 1, quantile, 0.025),
+         upperCI = apply(lambda_hat, 1, quantile, 0.975))
+predplot(predjags1p, "Bayesian Poisson GLM predictions- jags")
+
+```
+
+#### NB model in jags
+
+Here I also use the matrix form of $X\beta$.
+
+Note that jags uses a different parameterization than R., so there is an extra line of code to make them match. Also, I coded my model in matrix form here-- this paramaterization of the priors is equivalent to the Poisson model above. I include both for comparison.
+
+```{r jagsSetup1nb}
+model_string1nb <- "model{
+  # Likelihood
+  for(i in 1:N){
+    y[i] ~ dnegbin(p[i], r)
+    p[i] <- r / (r+lambda[i]) 
+    log(lambda[i]) <-  mu[i]
+    mu[i] <- inprod(beta[],X[i,]) + logDaysOfCatch[i]
+
+  }
+  
+  # Priors
+  beta ~ dmnorm(muBeta,tauBeta)  # multivariate Normal prior
+  r ~ dt(0, 1/2, 1)T(0,) # dunif(0,50) # switched to half Cauchy
+
+    # derived parameters:
+  TR <- 100 - 100 * exp(beta[2])
+}"
+
+dataList = list(N= nrow(datR),
+                y = datR$nYSB, 
+                X = cbind(1, ifelse(datR$Treatment == "CGP", 0, 1)),
+                logDaysOfCatch = log(datR$DaysOfCatch),
+                muBeta = rep(0, 2),
+                tauBeta = diag(1/2, 2))
+
+jags1nb <- jags.model(file = textConnection(model_string1nb), 
+                    data = dataList)
+```
+```{r jagsRun1nb, eval = F}
+update(jags1nb, n.iter = 1000) # burn-in
+idata_jags1nb <- coda.samples(jags1nb,
+                              variable.names = c("beta", "r", "TR"),
+                              n.iter = 10000,
+                              thin = 5)
+write_rds(idata_jags1nb, "output/jags1nb.RDS")
+```
+```{r jagsOut1nb}
+idata_jags1nb <- readRDS("output/jags1nb.RDS")
+
+summary(idata_jags1nb)
+# summary(mod1nb)
+
+# check for convergence:
+# plot(posterior_sample)
+# heidel.diag(out)  
+# raftery.diag(out)  
+# effectiveSize(out)  
+
+# plot predictions:
+pars <- as.mcmc(idata_jags1nb)#[, grepl("beta", colnames(pars))]
+# str(pars)
+pars = pars[, grepl("beta", colnames(pars))]
+# create a model matrix from x
+X <- cbind(1, ifelse(datR$Treatment == "CGP", 0, 1))
+lambda_hat <- exp(X %*% t(pars))
+
+predjags1nb <- datR %>%
+  mutate(preds = apply(lambda_hat, 1, median),
+         lowerCI = apply(lambda_hat, 1, quantile, 0.025),
+         upperCI = apply(lambda_hat, 1, quantile, 0.975))
+predplot(predjags1nb, "Bayesian neg binomial GLM predictions- jags")
+
+```
+
+This model is not yet fully converged, so some differences from R output are expected.
+
 
 ## GLMM: Random effect (RE) for locations
 
@@ -510,7 +650,7 @@ $x_{ik}$ is an indicator variable that equals 1 if moth count $i$ is associated 
 OK, technically I should be introducing matrices here because $k = 1,..., K=10$ locations, so we need a new indicator variable for each location, but I'm going to be lazy and write it like this for now.
 
 
-### Bayesian GLMM
+#### Bayesian GLMM mathematical model
 
 Here is the same model with a Bayesian framework and using a negative binomial regression:
 
@@ -529,7 +669,7 @@ log(\lambda_{ik} ) = \beta_0 + \beta_1 x_{A,i} + \gamma_{0k} x_{ik}  + \gamma_{1
 $$
 
 
-### Bayesian GLMM -- Matrix version
+#### Bayesian GLMM -- Matrix version
 
 I DO write the Bayesian version in matrix form because it matches the coding (and is more correct given the need for a $KxK$ $Z$ design matrix):
 
@@ -560,29 +700,19 @@ knitr::kable(TR_2p)
 tmp = predict(mod2p, se = T, type = "link",
               newdata=datR %>% mutate(DaysOfCatch = 1))
 # str(tmp)
-predsp2 <- data.frame(datR %>% mutate(DaysOfCatch = 1), 
+preds2p <- data.frame(datR %>% mutate(DaysOfCatch = 1), 
                       preds = tmp$fit,
                       lowerCI = tmp$fit + 2*tmp$se.fit,
                       upperCI = tmp$fit - 2*tmp$se.fit)
-predsp2 %<>%
+preds2p %<>%
   mutate(preds = exp(preds),
          lowerCI = exp(lowerCI),
          upperCI = exp(upperCI))
 # str(predsp2)
-p2p_glmm <- ggplot(predsp2,
-       aes(DATI, preds, color = TreatmentF)) +
-  geom_line() + 
-  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = TreatmentF),
-              alpha = 0.3) + 
-  geom_point(data = mean_cts,
-             aes(DATI, mean_mothsperday, color = TreatmentF), 
-             size = 1.1) +
-  facet_wrap(~Location, scales = "free_y") + 
-  scale_color_manual(values = mycolors[]) +
-  scale_fill_manual(values = mycolors[])  +
-  labs(title = "Poisson GLMM (Location) predictions",
-       subtitle = "Lines are predictions, points are the data")
+
+p2p_glmm = predplot(preds2p, "Poisson GLMM (Location) predictions")
 print(p2p_glmm)
+# print(p2p_glmm)
 
 ```
 ```{r nb2}
@@ -595,42 +725,31 @@ knitr::kable(TR_2nb)
 tmp = predict(mod2nb, se = T, type = "link",
               newdata=datR %>% mutate(DaysOfCatch = 1))
 # str(tmp)
-predsnb2 <- data.frame(datR, 
+preds2nb <- data.frame(datR, 
                       preds = tmp$fit,
                       lowerCI = tmp$fit + 2*tmp$se.fit,
                       upperCI = tmp$fit - 2*tmp$se.fit)
-predsnb2 %<>%
+preds2nb %<>%
   mutate(preds = exp(preds),
          lowerCI = exp(lowerCI),
          upperCI = exp(upperCI))
 # str(predsnb2)
-p2nb_glmm <- ggplot(predsnb2,
-       aes(DATI, preds, color = TreatmentF)) +
-  geom_line() + 
-  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, 
-                  fill = TreatmentF),
-              alpha = 0.3) + 
-  geom_point(data = mean_cts,
-             aes(DATI, mean_mothsperday, color = TreatmentF), 
-             size = 1.1) +
-  facet_wrap(~Location, scales = "free_y") + 
-  scale_color_manual(values = mycolors[]) +
-  scale_fill_manual(values = mycolors[])  +
-  labs(title = "Neg. binomial GLMM (Location) predictions",
-       subtitle = "Lines are predictions, points are the data")
+
+p2nb_glmm = predplot(preds2nb, "Neg. binomial GLMM (Location) predictions")
 print(p2nb_glmm)
+
 
 ```
 
 
 ### GLMM Bayes (brms) version
 
-By default, the prior distributions of random slopes and intercepts are correlated in "brm". If the correlation is non-significant, you may want to remove that correlation to simplify your model. To remove the correlation, change the random effects term from "(1 + TreatmentF|Location)" to " (1 + TreatmentF||Location)" (has an extra vertical line), which makes them independent. 
+By default, the prior distributions of random slopes and intercepts are correlated in "brm", which matches the "GLMM" frequentist fit. If the correlation is non-significant, you may want to remove that correlation to simplify your model. To remove the correlation, change the random effects term from "(1 + TreatmentF|Location)" to " (1 + TreatmentF||Location)" (has an extra vertical line), which makes them independent. 
 
 You'll notice that the parameter estimates are slightly different from the frequentist NB model fit here-- the more complicated your model is, the more likely you will find this is true with slightly different versions of your model (here, adding priors and fitting with a different algorithm). 
 
-```{r, eval = F}
-brm2nb <- brm(formula = nYSB ~ TreatmentF + offset(logDaysOfCatch) + 
+```{r brmSetup2p, eval = F}
+brm2nb <- brm(formula = nYSB ~ TreatmentF + offset(log(DaysOfCatch)) + 
                     (1 + TreatmentF|Location),
               data = datR, 
               family = negbinomial,
@@ -669,48 +788,281 @@ bayesTR_2nb <- data.frame(TR = round(median(TR), 1),
           upperCI = round(quantile(TR, 0.975), 1))   
 knitr::kable(bayesTR_2nb)
 
-# plot predictions!!!
-library(tidybayes) # add_predicted_draws()
+# plot predictions:
 predsbrm <- fitted(brm2nb,
                    scale = "linear",
                    newdata = datR  %>% mutate(logDaysOfCatch = 0))  
-# dim(exp(predsbrm))
-# head(predsbrm)
-tmp <- cbind(datR, exp(predsbrm))
-bayes_p2nb <- ggplot(tmp, 
-       aes(x = DATI, y = Estimate, color = TreatmentF)) +  
-  geom_line() + 
-  geom_ribbon(aes(ymin = `Q2.5`, ymax = `Q97.5`, 
-                  fill = TreatmentF),  # regression line and CI
-                  alpha = 0.3) +
-  geom_point(data = mean_cts, 
-             aes(DATI, mean_mothsperday, color = TreatmentF), size = 1.1) +
-  facet_wrap(~Location, scales = "free_y") + 
-  scale_color_manual(values = mycolors[]) +
-  scale_fill_manual(values = mycolors[]) +
-  labs(title = "Bayes neg. binomial GLMM predictions",
-       subtitle = "Lines are predictions, points are the data")
+
+bayes_p2nb = brmspredplot(cbind(datR, exp(predsbrm)), 
+                          "Bayesian neg. binomial GLMM (Location) predictions")
 print(bayes_p2nb)
+
+
+```
+
+### GLMM Bayes (rjags) model fit
+
+#### Poisson model in jags
+
+Does not converge well without correlated RE's.
+
+Also, need correlated RE's to match glmer and "brms"...
+adapted from:
+https://people.ucsc.edu/~abrsvn/general_correlated_ranefs_bayes_jags.r
+
+```{r jagsSetup2pOLD, eval = F}
+
+# this model doesn't allow for correlation between the RE's
+model_string2p <- "model{
+  # Likelihood
+  for(i in 1:N){
+    y[i] ~ dpois(lambda[i]) 
+    log(lambda[i]) <- mu[i]
+    # mu[i] <- inprod(beta[], X[i,]) + gamLoc0[LocRe[i]] +  logDaysOfCatch[i]
+    mu[i] <- gamLoc0[LocRe[i]] +  gamLoc1[LocRe[i]] * X[i,2] +logDaysOfCatch[i]
+    #  b1 * X[i,2] +
+  }
+  
+  # Priors
+  # beta ~ dmnorm(muBeta, tauBeta)  # multivariate Normal prior
+  b0 ~ dnorm(0, 1/4)
+  b1 ~ dnorm(0, 1/4)
+  
+  sigmaLoc0 ~ dunif(0.01, 4) #dt(0, 1, 1)T(0,) # (hyperpriors)
+  sigmaLoc1 ~ dunif(0.01, 4) #dt(0, 1, 1)T(0,)
+  tauLoc0 <- 1 / (sigmaLoc0 * sigmaLoc0)
+  tauLoc1 <- 1 / (sigmaLoc1 * sigmaLoc1)
+
+  # priors for random effects:
+  for (i in 1:NLocRE) {
+    gamLoc0[i] ~ dnorm(b0, tauLoc0) # intecept-- mean is 0 (b/c of b0)
+    gamLoc1[i] ~ dnorm(b1, tauLoc1) # slope-- mean is 0 (b/c of b1)
+  }
+  
+    # derived parameters:
+  TR <- 100 - 100 * exp(b1)
+
+}"
+```
+```{r jagsSetup2p}
+
+model_string2p <- "model{
+  # Likelihood
+  for(i in 1:N){
+    y[i] ~ dpois(lambda[i]) 
+    log(lambda[i]) <- mu_obs[i]
+    # mu[i] <- inprod(beta[], X[i,]) + gamLoc0[LocRe[i]] +  logDaysOfCatch[i]
+    mu_obs[i] <- gamLoc0[LocRe[i]] +  gamLoc1[LocRe[i]] * X[i,2] +logDaysOfCatch[i]
+    #  b1 * X[i,2] +
+  }
+  
+# Priors
+# Set up the means for the multivariate ranef distribution
+for (i in 1:2) {
+    xi[i]~dunif(0, 100) # scaling for the multivariate RE dist (for means, sds, and the ranefs themselves)
+    mu_raw[i]~dnorm(0, 1/4) # unscaled means for the multivariate RE dist
+    mu[i] <- xi[i]*mu_raw[i] # scaled means for the multivariate RE dist
+}
+b0 <- mu[1] # mean for random intercepts
+b1 <- mu[2] # mean for random slopes
+
+# Set up the var-covar matrix for the multivariate RE dist
+Tau_B_raw[1:2, 1:2] ~ dwish(W[,], 3) # W is the identity matrix, provided as data; we have 3 dofs, i.e., 2 ranefs + 1, to ensure a uniform (-1, 1) prior for the correlation between ranefs
+Sigma_B_raw[1:2, 1:2] <- inverse(Tau_B_raw[,])
+for (i in 1:2) {
+    sigma[i] <- xi[i]*sqrt(Sigma_B_raw[i, i])
+}
+sigma_b0 <- sigma[1] # SD of intercepts
+sigma_b1 <- sigma[2] # SD of slopes
+for (i in 1:2) { for (j in 1:2) {
+    rho[i, j] <- Sigma_B_raw[i, j]/sqrt(Sigma_B_raw[i, i]*Sigma_B_raw[j, j])
+} }
+rho_b0_b1 <- rho[1, 2]
+covariance <- rho_b0_b1*sigma_b0*sigma_b1
+
+
+# The multivariate ranef distribution, i.e., modeling the correlated ranefs
+# priors for random effects:
+for (j in 1:NLocRE) {
+	B_raw_hat[j, 1] <- mu_raw[1]
+	B_raw_hat[j, 2] <- mu_raw[2]
+	B_raw[j, 1:2] ~ dmnorm(B_raw_hat[j, ], Tau_B_raw[, ]) # the pairs of unscaled (raw) correlated random effects
+	gamLoc0[j] <- xi[1]*B_raw[j, 1] # random intercept
+  gamLoc1[j] <- xi[2]*B_raw[j, 2] # random slope
+}
+
+
+  
+  # Sampling from the prior: given that we do not place hyperpriors directly on the means, sds and correlation(s) of the multivariate ranef distribution, we want to sample from the prior to make sure we didn't accidentally make it more informed than we wanted (and we want it very vague)
+for (i in 1:2) {
+    xi_prior[i]~dunif(0, 100)
+    mu_raw_prior[i]~dnorm(0, .0001)
+    mu_prior[i] <- xi_prior[i]*mu_raw_prior[i]
+}
+b0_prior <- mu_prior[1]
+b1_prior <- mu_prior[2]
+Tau_B_raw_prior[1:2, 1:2] ~ dwish(W[,], 3)
+Sigma_B_raw_prior[1:2, 1:2] <- inverse(Tau_B_raw_prior[,])
+for (i in 1:2) {
+    sigma_prior[i] <- xi_prior[i]*sqrt(Sigma_B_raw_prior[i, i])
+}
+sigma_b0_prior <- sigma_prior[1]
+sigma_b1_prior <- sigma_prior[2]
+for (i in 1:2) { for (j in 1:2) {
+    rho_prior[i, j] <- Sigma_B_raw_prior[i, j]/sqrt(Sigma_B_raw_prior[i, i]*Sigma_B_raw_prior[j, j])
+} }
+rho_b0_b1_prior <- rho_prior[1, 2]
+  
+    # derived parameters:
+  TR <- 100 - 100 * exp(b1)
+
+}"
+
+
+NLocRE = length(unique(datR$Location))
+LocRe = as.numeric(as.factor(datR$Location)) # Location indexing for RE's
+dataList = list(N= nrow(datR),
+                NLocRE = NLocRE,
+                y = datR$nYSB, 
+                X = cbind(1, ifelse(datR$Treatment == "CGP", 0, 1)),
+                LocRe = LocRe,
+                logDaysOfCatch = log(datR$DaysOfCatch),
+                W = diag(2))
+# install.packages("bayesm")
+library("bayesm")
+var_vec <- apply(coef(mod2p)$Location, 2, var)
+
+inits = function () {
+        list(
+          'xi'=rlnorm(2),
+          'mu_raw'=rnorm(2), 
+          'Tau_B_raw'=rwishart(3, diag(2)*var_vec)$W, 
+          'sigma_res'=rlnorm(1), 
+          'xi_prior'=rlnorm(2), 
+          'mu_raw_prior'=rnorm(2), 
+          'Tau_B_raw_prior'=rwishart(3, diag(2)*var_vec)$W
+        )
+}
+
+jags2p <- jags.model(file = textConnection(model_string2p), 
+                     inits = inits,
+                    data = dataList, n.chains = 4)
+
+```
+```{r jagsRun2p, eval = F}
+update(jags2p, n.iter = 50000) # burn-in
+idata_jags2p <- coda.samples(jags2p,
+                             variable.names <- c("mu", "mu_b0", "mu_b1", "sigma", "sigma_b0", "sigma_b1", "rho", "rho_b0_b1", "covariance", "b0", "b1", "sigma_res", "mu_b0_prior", "mu_b1_prior", "sigma_b0_prior", "sigma_b1_prior", "rho_b0_b1_prior",
+                                                 "TR"),
+
+                              n.iter = 10000, 
+                              thin = 5)
+write_rds(idata_jags2p, "output/jags2p.RDS")
+```
+```{r jagsOut2p, eval = F}
+idata_jags2p <- readRDS("output/jags2p.RDS")
+
+summary(idata_jags2p)[[1]]
+# summary(mod2p)
+getTR(mod2p)
+# check for convergence:
+# gelman.diag(idata_jags2p) # rhat values
+# plot(idata_jags2p)
+# gelman.plot(idata_jags2p)
+# cor(idata_jags2p[[1]])
+# effectiveSize(idata_jags2p)
+# library(coda)
+
+
+# plot predictions:
+# pars <- as.mcmc(idata_jags2p)
+pars <- runjags::combine.mcmc(idata_jags2p)
+str(pars[,c("b0", "b1")])
+# create a model matrix from x
+X <- cbind(1, ifelse(datR$Treatment == "CGP", 0, 1))
+lambda_hat <- exp(X %*% t(pars[,c("b0", "b1")]) + X %*% t())
+
+predjags2p <- datR %>%
+  mutate(preds = apply(lambda_hat, 1, median),
+         lowerCI = apply(lambda_hat, 1, quantile, 0.025),
+         upperCI = apply(lambda_hat, 1, quantile, 0.975))
+predplot(predjags2p, "Bayesian Poisson GLMM predictions- jags")
 
 ```
 
 
-## GLMM: RE for location, SamplingDate
+**Need to add RE's for predictions!!
+
+#### NB model in jags
+
+Not done.
+
+
+## GLMM: RE for Location, SamplingDate
 
 In this version of the model, we acknowledge that sampling on different days of the season adds to the variability of the moth counts, and that counts from the same sampling date are more similar than for a different date. In this model, however,  the correlation between sampling dates is ignored.
 
-This model is included here because it is important to think about whether you have nested or crossed random effects (if applicable; we are assuming crossed random effects). And it allows us to include sampling date in our model as a random effect and still fit the model quickly in a frequentist framework.
+This model is included here because it is important to think about whether you have nested or crossed random effects (if applicable). Here, we are assuming crossed random effects because Java island is fairly homogeneous in terms of weather and ecosystem so it may make sense for all samples from one date to be grouped together. However, one could also argue for nested RE's for this case study. 
 
-Here, the predictions now mimic the spatial patterns we see over time, but our predictions are overly optimistic because we are ignoring the fact that the samples are actually correlated over time. (_A priori_, we expect that if moth counts are high on one sampling occasion, they will also be high on the next sampling occasion.)
+This model allows us to include sampling date in our model as a random effect and still fit the model quickly in a frequentist framework. 
 
-### Nested GLMM mathematical model
+Include dates because samples within a date will be more similar than samples across all dates at a location. But only include random intercepts.
 
-Model to be filled in.
+The predictions now mimic the spatial patterns we see over time.
+
+Nested vs crossed good reference:
+https://stats.stackexchange.com/questions/228800/crossed-vs-nested-random-effects-how-do-they-differ-and-how-are-they-specified
+
+### Crossed GLMM mathematical model
+
+I only show the Poisson version of the model, the NB version is a straightforward extension.
+
+$$
+y_{ik} \sim Pois(\lambda_{ik}) \\
+log(\lambda_{ij} ) = \beta_0 + \beta_1 x_{A,i} + \gamma_{0k} x_{ik}  + \gamma_{1k} x_{A,i} x_{ik}  + \gamma_{00j} x_{ij}  + \mbox{ln} \left(DaysOfCatch_i\right) \\
+\gamma_{0k} \sim Normal(0, \sigma^2_{0}) \\
+\gamma_{1k} \sim Normal(0, \sigma^2_{1}) \\
+\gamma_{00j} \sim Normal(0, \sigma^2_{00}) \\
+$$
+
+where, in addition to the variables and parameters defined for the GLM, we have
+
+$k = 1,..., K=10$ represents the locations, 
+
+$j = 1, ..., J = 117$ represents the 117 unique date-location combinations,
+
+$y_{ikj}$ is moth count $i$ from location $k$ on date $j$,
+
+$\lambda_{ikj}$ is the expected moth count for sample $i$  from location $k$ on date $j$,
+
+$\beta_0$ is the expected moth count for our control treatment for a new location,
+
+$\beta_1$ is the expected difference in moth counts between the control group and the treatment A group for a new location, 
+
+$\gamma_{0k}$ is the random intercept associated with location $k$, which leads to different background moth pressures at each location. All $\gamma_{0k}$ come from an iid Normal distribution,
+
+$\gamma_{1k}$ is the random slope associated with location $k$, which leads to different treatment effects at each location. All $\gamma_{1k}$ come from an iid Normal distribution, 
+
+$x_{ik}$ is an indicator variable that equals 1 if moth count $i$ is associated with location $k$ and 0 otherwise,
+
+$\gamma_{00j}$ is the random intercept associated with date-location $j$, which leads to different background moth pressures for each date, and 
+
+$x_{ij}$ is an indicator variable that equals 1 if moth count $i$ is associated with date-location $j$ and 0 otherwise.
 
 
-#### Bayesian crossed GLMM model
+#### Bayesian GLMM -- Matrix version
 
-Model to be filled in.
+$$
+\mathbf{Y} \sim NegBinom(\boldsymbol\lambda, \phi) \\
+log(\boldsymbol\lambda) = \mathbf{X}\boldsymbol\beta + \mathbf{Z}\boldsymbol\gamma  + \mathbf{z_{00}}\gamma_{00}  + \mbox{ln} \left(\bf{DaysOfCatch}\right) \\
+\boldsymbol\beta \sim Normal(\mathbf{0}, 2\mathbf{I}) \\
+\boldsymbol\gamma \sim Normal(\mathbf{0}, \boldsymbol\sigma^2 \mathbf{I}) \\
+\gamma_{00} \sim Normal(0, \sigma^2) \\
+\boldsymbol\sigma^2 \sim HalfCauchy(\mathbf{0}, 1\mathbf{I})) \\
+\sigma^2_{00} \sim HalfCauchy(0,1) \\
+\phi \sim HalfCauchy(0,1)
+$$
+
 
 ### Crossed GLMM frequentist fit
 
@@ -728,28 +1080,18 @@ knitr::kable(TR_3p)
 tmp = predict(mod3p, se = T, type = "link",
               newdata = datR %>% mutate(DaysOfCatch = 1))
 # str(tmp)
-predsp3 <- data.frame(datR %>% mutate(DaysOfCatch = 1), 
+preds3p <- data.frame(datR %>% mutate(DaysOfCatch = 1), 
                       preds = tmp$fit,
                       lowerCI = tmp$fit + 2*tmp$se.fit,
                       upperCI = tmp$fit - 2*tmp$se.fit)
-predsp3 %<>%
+preds3p %<>%
   mutate(preds = exp(preds),
          lowerCI = exp(lowerCI),
          upperCI = exp(upperCI))
 # str(predsp3)
-p3p_glmm <- ggplot(predsp3,
-       aes(DATI, preds, color = TreatmentF)) +
-  geom_line() +
-  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = TreatmentF),
-              alpha = 0.3) + 
-  geom_point(data = mean_cts,
-             aes(DATI, mean_mothsperday, color = TreatmentF),
-             size = 1.1) +
-  facet_wrap(~Location, scales = "free_y") + 
-  scale_color_manual(values = mycolors[]) +
-  scale_fill_manual(values = mycolors[])  +
-  labs(title = "Poisson crossed GLMM predictions",
-       subtitle = "Lines are predictions, points are the data")
+
+
+p3p_glmm = predplot(preds3p, "Poisson GLMM (Location, Date) predictions")
 print(p3p_glmm)
 
 ```
@@ -767,29 +1109,19 @@ knitr::kable(TR_3nb)
 tmp = predict(mod3nb, se = T, type = "link",
               newdata=datR %>% mutate(DaysOfCatch = 1))
 # str(tmp)
-predsnb3 <- data.frame(datR %>% mutate(DaysOfCatch = 1), 
+preds3nb <- data.frame(datR %>% mutate(DaysOfCatch = 1), 
                        preds = tmp$fit,
                        lowerCI = tmp$fit + 2*tmp$se.fit,
                        upperCI = tmp$fit - 2*tmp$se.fit)
-predsnb3 %<>%
+preds3nb %<>%
   mutate(preds = exp(preds),
          lowerCI = exp(lowerCI),
          upperCI = exp(upperCI))
 # str(predsnb2)
-p3nb_glmm <- ggplot(predsnb3,
-       aes(DATI, preds, color = TreatmentF)) +
-  geom_line() + 
-  geom_ribbon(aes(ymin = lowerCI, ymax = upperCI, fill = TreatmentF),
-              alpha = 0.3) + 
-  geom_point(data = mean_cts,
-             aes(DATI, mean_mothsperday, color = TreatmentF), 
-             size = 1.1) +
-  facet_wrap(~Location, scales = "free_y") + 
-  scale_color_manual(values = mycolors[]) +
-  scale_fill_manual(values = mycolors[])  +
-  labs(title = "Neg. binomial crossed GLMM predictions",
-       subtitle = "Lines are predictions, points are the data")
+
+p3nb_glmm = predplot(preds3nb, "Neg. binomial GLMM (Location, Date) predictions")
 print(p3nb_glmm)
+
 ```
 
 
@@ -798,7 +1130,8 @@ print(p3nb_glmm)
 ```{r, eval = F}
 brm3nb <- brm(formula = nYSB ~ TreatmentF + offset(log(DaysOfCatch)) + 
                     (1 + TreatmentF|Location) + 
-                    (1 + TreatmentF|Location:SamplingDateC),
+                    (1|SamplingDateC),
+                    # (1|Location:SamplingDateC),
               data = datR, 
               family = negbinomial,
               prior = c(set_prior("normal(0,2)", class = "b"),
@@ -824,9 +1157,6 @@ summary(brm3nb)
 library(ggmcmc) # ggs()
 # CALC TR!
 modtranformed <- ggs(brm3nb) # transform MCMC output into a table
-# head(modtranformed)
-# summary(modtranformed)
-# unique(modtranformed$Parameter)
 beta1 <- modtranformed %>% 
   filter(Parameter == "b_TreatmentFtrtA", # our beta1
          Iteration > 500) # remove burn-in
@@ -837,28 +1167,14 @@ bayesTR_3nb <- data.frame(TR = round(median(TR), 1),
 # knitr::kable(bayesTR_3nb)
 
 # plot predictions:
-library(tidybayes) # add_predicted_draws()
 predsbrm <- fitted(brm3nb,
                    scale = "linear",
                    newdata = datR  %>% mutate(DaysOfCatch = 1))
-# dim(exp(predsbrm))
-# head(predsbrm)
-tmp <- cbind(datR, exp(predsbrm))
-bayes_p3nb <- ggplot(tmp, 
-       aes(x = DATI, y = Estimate, color = TreatmentF)) +  
-  geom_line() + 
-  geom_ribbon(aes(ymin = `Q2.5`, ymax = `Q97.5`, 
-                  fill = TreatmentF),  # regression line and CI
-                    alpha = 0.3) +
-  geom_point(data = mean_cts, 
-             aes(DATI, mean_mothsperday, color = TreatmentF), 
-             size = 1.1) +
-  facet_wrap(~Location, scales = "free_y") + 
-  scale_color_manual(values = mycolors[]) +
-  scale_fill_manual(values = mycolors[]) +
-  labs(title = "Bayesian Poisson nested GLMM predictions",
-       subtitle = "Lines are predictions, points are the data")
+
+bayes_p3nb = brmspredplot(cbind(datR, exp(predsbrm)), 
+                          "Bayesian Poisson GLMM (Location, Date) predictions")
 print(bayes_p3nb)
+
 ```
 
 
@@ -866,14 +1182,62 @@ print(bayes_p3nb)
 
 Now we are in the territory where we have to fit the models in a Bayesian framework. If our response variable was continuous (i.e., the regression model was based on a Normal distribution), then we could still use maximum likelihood estimation.
 
+### Bayesian mathematical model
+
+$$
+y_{ijk} \sim NegBinom(\lambda_{ijk}, r) \\
+log(\lambda_{ijk} ) = \beta_0 + \beta_1 x_{A,i} + \gamma_{0k} x_{ik}  + \gamma_{1k} x_{A,i} x_{ik}  + GP_{ijk}  + \mbox{ln} \left(DaysOfCatch_i\right) \\
+ \boldsymbol\gamma \sim Normal(\mathbf{0}, \boldsymbol\Sigma_{\gamma}) \\ 
+ \mathbf{GP_k} \sim MVN(0, \boldsymbol\Sigma_k) \\
+ \boldsymbol\beta \sim Normal(\mathbf{0}, 2\mathbf{I}) \\
+ \boldsymbol\sigma^2 \sim HalfCauchy(\mathbf{0}, 1\mathbf{I})) \\
+ r \sim HalfCauchy(0,1) \\
+ \Sigma_{lm, k} = \tau \cdot e^{-\frac{|d_l - d_m|^2}{l^2}\right} \\
+\tau_k \sim HalfCauchy(0, 1) \\
+\l_k \sim HalfCauchy(0, 1) \\
+$$
+
+where, in addition to the variables and parameters defined for the GLM, we have
+
+$k = 1,..., K=10$ represents the locations, 
+
+$j = 1, ..., J = 117$ represents the 117 unique date-location combinations,
+
+$y_{ikj}$ is moth count $i$ from location $k$ on date $j$,
+
+$\lambda_{ikj}$ is the expected moth count for sample $i$  from location $k$ on date $j$,
+
+$\beta_0$ is the expected moth count for our control treatment for a new location,
+
+$\beta_1$ is the expected difference in moth counts between the control group and the treatment A group for a new location, 
+
+$\gamma_{0k}$ is the random intercept associated with location $k$, which leads to different background moth pressures at each location. All $\gamma_{0k}$ come from an iid Normal distribution,
+
+$\gamma_{1k}$ is the random slope associated with location $k$, which leads to different treatment effects at each location. All $\gamma_{1k}$ come from an iid Normal distribution, 
+
+$x_{ik}$ is an indicator variable that equals 1 if moth count $i$ is associated with location $k$ and 0 otherwise,
+
+$\gamma_{00j}$ is the random intercept associated with date-location $j$, which leads to different background moth pressures for each date, and 
+
+$x_{ij}$ is an indicator variable that equals 1 if moth count $i$ is associated with date-location $j$ and 0 otherwise.
+
+$l$ = lscale (differnt for each location)
+
+$\phi$ = sdgp
+
+
 ### Gaussian Process Bayes (brms) version
 
-* Use numeric version of sampling date for better algorithm stability. Still, we have a warning about a divergent transition. Ideally, we would tweak the model and look at the data carefully so fix this warning, but because we are working with made up data, we will not worry abotu the warning for now.
+* Use numeric version of sampling date for better algorithm stability. Still, we have a warning about a divergent transition. Ideally, we would tweak the model and look at the data carefully so fix this warning, but because we are working with made up data, we will not worry about the warning for now.
+
+* Using squared-exponential covariance function (quite typical choice).
+
+* Here, we have a different GP for each location (each location has its own parameters for the function). This is done to further account for expected differences between locations. Ideally, we would do some model selection to decide between this model and one that shares the GP parameters across all locations.
 
 ```{r, eval =F}
 summary(datR$numericDate) # check max before fitting, in case seasons don't line up
 brm4nb <- brm(formula = nYSB ~ TreatmentF + offset(log(DaysOfCatch)) + 
-                    (1 + TreatmentF||Location) + 
+                    (1 + TreatmentF|Location) + 
               gp(numericDate, by =Location), 
                   control = list(adapt_delta = 0.9),
               data = datR, 
@@ -899,15 +1263,37 @@ brm4nb <- brm(formula = nYSB ~ TreatmentF + offset(log(DaysOfCatch)) +
               warmup = 1000, iter = 5000, 
               seed = 5000,
               chains = nCores, cores = nCores) 
-saveRDS(brm4nb, "../output/brm4nb.RDS")
+saveRDS(brm4nb, "output/brm4nb.RDS")
 ```
+```{r, eval =F}
+summary(datR$numericDate) # check max before fitting, in case seasons don't line up
+brm4nb1gp <- brm(formula = nYSB ~ TreatmentF + offset(log(DaysOfCatch)) + 
+                    (1 + TreatmentF|Location) + 
+              gp(numericDate), 
+                  control = list(adapt_delta = 0.9),
+              data = datR, 
+              family = negbinomial,
+              prior = c(set_prior("normal(0,2)", class = "b"),
+                        set_prior("cauchy(0,1)", class = "shape"), # == half-cauchy
+                        set_prior("normal(0,2)", class = "Intercept"),
+                        set_prior("cauchy(0,1)", class = "sd"),
+                        set_prior("cauchy(0,1)", class = "lscale", coef = "gpnumericDate"),
+                        set_prior("normal(0,2)", class = "sdgp")),
+                        # set_prior("lkj(2)", class = "cor")),
+              warmup = 1000, iter = 5000, 
+              seed = 5000,
+              chains = nCores, cores = nCores) 
+saveRDS(brm4nb1gp, "output/brm4nb1GP.RDS")
+brm4nb = brm4nb1gp
+```
+
 ```{r}
 brm4nb <- readRDS("output/brm4nb.RDS")
 summary(brm4nb)
 # bayes_R2(brm4nb) # 0.824
 
-# prior_summary(brm4nb)
-# prior_summary(brm4nb, all = FALSE)
+prior_summary(brm4nb)
+prior_summary(brm4nb, all = FALSE)
 # 
 ```
 
@@ -925,7 +1311,7 @@ bayesTR_4nb <- data.frame(TR = round(median(TR), 1),
 knitr::kable(bayesTR_4nb)
 
 # plot predictions:
-library(tidybayes) # add_predicted_draws()
+# library(tidybayes) # add_predicted_draws()
 predsbrm <- fitted(brm4nb,
                    scale = "linear",
                    newdata = datR  %>% mutate(DaysOfCatch = 1))
@@ -936,20 +1322,9 @@ predsbrm <- fitted(brm4nb,
 # but I want the resolution that is had at the linear scale.
 # (If I chose response scale, Id' get lots of 0's which aren't informative. 
 # Give it a try!)
-tmp <- cbind(datR, exp(predsbrm))
-bayes_p4nb <- ggplot(tmp, 
-       aes(x = DATI, y = Estimate, color = TreatmentF)) +  
-  geom_line() + 
-  geom_ribbon(aes(ymin = `Q2.5`, ymax = `Q97.5`, fill = TreatmentF),  # regression line and CI
-                    alpha = 0.3) +
-  geom_point(data = mean_cts, 
-             aes(DATI, mean_mothsperday, color = TreatmentF), 
-             size = 1.1) +
-  facet_wrap(~Location, scales = "free_y") + 
-  scale_color_manual(values = mycolors[]) +
-  scale_fill_manual(values = mycolors[]) +
-  labs(title = "Bayesian neg binomial GP GLMM predictions",
-       subtitle = "Lines are predictions, points are the data")
+
+bayes_p4nb = brmspredplot(cbind(datR, exp(predsbrm)), 
+                          "Bayesian neg binomial GP GLMM predictions")
 print(bayes_p4nb)
 
 ```
@@ -960,7 +1335,7 @@ print(bayes_p4nb)
 
 Here, the trapping reduction estimates from all of the models are compared. As expected, the median TR estimates are very close from model to model, but the uncertainty in that estimate increase (i.e., the confidence/credible intervals get wider) when we properly account for the correlations in our data.
 
-```{r}
+```{r compareTR}
 
 # Framework = Frequentist, Bayes
 # Distribtuion = Poisson, NB
@@ -995,14 +1370,23 @@ data.frame(Framework = "Bayesian", Distribution = "Neg Binomial", Model_name = "
       round(bayesTR_4nb))
 )
 rownames(tableTR) <- NULL
-knitr::kable(tableTR)
+kable(tableTR, booktabs = TRUE,
+             caption = "Comparison of derived TR estimates from each model fit.") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))  %>%
+  # column_spec(4, 
+  #             background = "lightblue")  %>%
+  pack_rows("GLM", 1, 3) %>%
+  pack_rows("GLMM (Location)", 4, 6) %>%
+  pack_rows("GLMM (Location, Date)", 7, 9) %>%
+  pack_rows("GLMM (Location, GP)", 10, 10)
+
 ```
 
 ### Compare coefficients
 
 Because TR is a non-linear function of $\beta_1$, the differences int he model output get slightly distorted from the transformation. Thereofre, the $\beta_1$ coefficients are displayed as well:
 
-```{r}
+```{r compareBetas}
 
 # Framework = Frequentist, Bayes
 # Distribtuion = Poisson, NB
@@ -1064,7 +1448,14 @@ data.frame(Framework = "Bayesian", Distribution = "Neg Binomial", Model_name = "
 )
 
 rownames(tableBeta) <- NULL
-knitr::kable(tableBeta)
+knitr::kable(tableBeta, booktabs = TRUE,
+             caption = "Comparison of regression coefficient estimates from each model fit.")  %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))  %>%
+  pack_rows("GLM", 1, 3) %>%
+  pack_rows("GLMM (Location)", 4, 6) %>%
+  pack_rows("GLMM (Location, Date)", 7, 9) %>%
+  pack_rows("GLMM (Location, GP)", 10, 10)
+
 ```
 
 

@@ -1,8 +1,17 @@
 # GLMM's in Python {#GLMMsPython}
 ```{r reticulate, include=FALSE, message=F, warning=FALSE, results = "hide", echo=F}
 
+knitr::opts_chunk$set(cache = T, message =F, warning = F, echo=F,
+                      # dpi = 36, out.width="600px", out.height="600px")
+  fig.width = 8,
+  fig.height = 5,
+  out.width = '100%')
+
+
 # library to use Python within R:
 library(reticulate)
+# matplotlib <- import("matplotlib")
+# matplotlib$use("Agg", force = TRUE)
 # py_install("pandas")
 #
 ## make sure these packages are installed before installing pymer4:
@@ -16,11 +25,11 @@ library(reticulate)
 
 
 ```
-```{python, eval = F}
+```{python install_modules, eval = F}
 # You may have to install the packages if you have not used them before:
 # code chunk is here for easy retrieval
 # replace module name as needed.
-!pip install patsy
+!pip install patchworklib
 
 # installing googlemaps needs a modification:
 # !pip install  --use-pep517 googlemaps
@@ -34,7 +43,7 @@ library(reticulate)
 ```
 ```{python modules}
 import pandas as pd
-import pandas as pd
+import numpy as np
 
 import bambi as bmb
 
@@ -46,8 +55,15 @@ import pymc as pm
 import pickle # to write, read python objects to file
 import patsy # for dmatrix function
 
+from plotnine import * # using ggplot in Python
+
+import os # save API key in .env file
+
+import gmplot ## ggmap 
+
+
 ```
-```{python readdatP}
+```{python readdatPy}
 
 import pandas as pd
 
@@ -56,8 +72,11 @@ datP = pd.read_csv("data/moths.csv", delimiter = ",")
 # drop first column, is just unnecessary indexing:
 datP = datP.drop(datP.columns[0], axis=1)
 
+
+mycolors = ["#9E0142", "#66C2A5"]
+
 ```
-```{python data_manip, results = "hide"}
+```{python data_manipPy, results = "hide"}
 
 # check data values: 
 datP.info()
@@ -71,6 +90,9 @@ for col in datP:
     print(datP[col].unique())
 
 # convert dates to dates in case further manipulation on them is needed:
+# but first keep object version of samplingdate:
+datP['SamplingDateC'] = datP['SamplingDate']
+
 cols = ['TransplantDate', 'DispInstallDate', 'TrapInstallDate', 'SamplingDate']
 for col in cols:
     datP[col] = pd.to_datetime(datP[col])
@@ -83,8 +105,6 @@ datP['mothsperday'] = datP['nYSB'] / datP['DaysOfCatch']
 #   mutate(TreatmentF = factor(Treatment), # if we need to fix levels in non-alpha order
          # LocationF = as.factor(Location),
          
-# convert sampling date to string for nested RE's:
-datP['SamplingDateC'] = str(datP['SamplingDate'])
 # convert sampling date to numeric starting at 1 for GP's:
 datP['numericDate'] = datP['SamplingDate'].dt.dayofyear
 datP['numericDate'] = datP['numericDate'] - datP['numericDate'].min() + 1
@@ -95,7 +115,7 @@ mean_cts = datP.groupby(['Location', 'Treatment', 'AssessmentNumber', 'SamplingD
 mean_cts.describe(include='all')
 
 ```
-```{python functions}
+```{python functionsPy}
 # calculate trapping reduction for frequentist model fits.
 def getTR(mod):
     """Calculate TR with confidence interval for stats model"""
@@ -130,7 +150,7 @@ To interact with Python via RMarkdowns in RStudio, check out the "reticulate" pa
 R Markdown Python Engine (aka the "reticulate" package):
 https://rstudio.github.io/reticulate/articles/r_markdown.html
 
-```{r reticulate, include=FALSE, message=F, warning=FALSE, results = "hide", echo=F}
+```{r reticulateCopy, eval = F, include=FALSE, message=F, warning=FALSE, results = "hide", echo=F}
 
 # library to use Python within R:
 library(reticulate)
@@ -222,72 +242,6 @@ pandas <- import("pandas")
 
 When completing an analysis, I may skip around in my script quite a bit. Therefore, I like all packages loaded, and all data uploaded and manipulated at the start of my script.
 
-```{python readdatP}
-
-import pandas as pd
-
-# read in the moth data:
-datP = pd.read_csv("data/moths.csv", delimiter = ",")
-# drop first column, is just unnecessary indexing:
-datP = datP.drop(datP.columns[0], axis=1)
-
-```
-```{python data_manip, results = "hide"}
-
-# check data values: 
-datP.info()
-
-pd.set_option('display.max_columns', None) # Display all columns
-datP.describe(percentiles=[0.5], include = 'all')
-
-for col in datP:
-  if (datP[col].dtype == 'object'):
-    print(col)
-    print(datP[col].unique())
-
-# convert dates to dates in case further manipulation on them is needed:
-cols = ['TransplantDate', 'DispInstallDate', 'TrapInstallDate', 'SamplingDate']
-for col in cols:
-    datP[col] = pd.to_datetime(datP[col])
-datP['SamplingDate'].describe()
-
-# standardize the counts
-datP['mothsperday'] = datP['nYSB'] / datP['DaysOfCatch']
-
-# datR <- datP %>%
-#   mutate(TreatmentF = factor(Treatment), # if we need to fix levels in non-alpha order
-         # LocationF = as.factor(Location),
-         
-# convert sampling date to string for nested RE's:
-datP['SamplingDateC'] = str(datP['SamplingDate'])
-# convert sampling date to numeric starting at 1 for GP's:
-datP['numericDate'] = datP['SamplingDate'].dt.dayofyear
-datP['numericDate'] = datP['numericDate'] - datP['numericDate'].min() + 1
-datP['numericDate'].describe()
-
-## average counts for each location, date
-mean_cts = datP.groupby(['Location', 'Treatment', 'AssessmentNumber', 'SamplingDate', 'DATI'], as_index=False).agg({'nYSB': 'mean', 'mothsperday': 'mean'})
-mean_cts.describe(include='all')
-
-```
-```{python functions}
-# calculate trapping reduction for frequentist model fits.
-def getTR(mod):
-    """Calculate TR with confidence interval for stats model"""
-    # Function body
-    import pandas as pd
-
-    b1 = mod.params.iloc[1]
-    seb1 = mod.bse.iloc[1]
-    
-    outTR = {'TR': [round(100 * 1 - math.exp(b1))], 
-    'lowerCI': [round(100 * 1 - math.exp(b1 + 1.96*seb1))],
-    'upperCI': [round(100 * 1 - math.exp(b1 - 1.96*seb1))]}
-    df = pd.DataFrame(outTR)
-    return df
-
-```
-
 ## Outline
 
 * Introduce the data to be used throughout the tutorial.
@@ -302,7 +256,7 @@ def getTR(mod):
 
 Here is what the data look like. Columns: Location, Treatment, TrapID, Longitude, Latitude, AssessmentNumber, and SamplingDate should be self-explanatory... TransplantDate is the date that the rice seedlings were transplanted into the field; DispInstallDate is the treatment installation date; TrapInstallDate is the trap installation date; "nYSB" are the moth counts (number of YSB moths); DaysOfCatch is the number of days since the trap was previously sampled  or the number of days since trap installation if it is assessment number 1; DATI is days after trap installation; DADI is days after dispenser installation; and DAT is days after transplant. Some of these columns will be discussed more later.
 
-```{python display_data}
+```{python display_dataPy}
 # check data values: 
 datP.info()
 
@@ -318,10 +272,10 @@ for col in datP:
 
 The data are the moth counts collected at each trap (average per day), within each location and throughout the season. Note how the y-axis changes for each plot in the figure.
 
-```{python plotMoths, fig.width = 8, fig.height = 6}
+```{python plotMothsPy, fig.width = 8, fig.height = 6}
 from plotnine import * # using ggplot in Python
 
-mycolors = ["#9E0142", "#66C2A5"]
+
 pmoths = (ggplot(datP, aes(x = 'DATI', y='mothsperday', color = 'Treatment')) +
         geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
         geom_smooth(se=False) +
@@ -338,7 +292,7 @@ pmoths.draw(True)
 
 Trial locations in relation to each other. Some trial locations are closer to each other than others.
 
-```{python}
+```{python trapLocs, cache = T}
 
 # get API key (keep hidden though!)
 import os
@@ -359,7 +313,7 @@ gmap1.draw( "test_map.html" )
 
 Within each location, the treatment traps have a slightly different alignment:
 
-```{python plotTrapLocs}
+```{python plotTrapLocsPy, cache = T}
 
 coords = datP[['Location', 'Treatment', 'TrapID', 'Latitude', 'Longitude']].drop_duplicates()
 coords.describe(include = 'all')
@@ -383,7 +337,7 @@ pcoords.draw(True)
 
 ### Timeline
 
-```{python timeline, results="hide", fig.width = 7}
+```{python timelinePy, results="hide", fig.width = 7}
 
 dates = datP.groupby(['Location', 'TransplantDate', 'TrapInstallDate'], as_index = False).agg(minDate=('SamplingDate', lambda x: x.min()), 
 maxDate=('SamplingDate', lambda x: x.max()))
@@ -528,8 +482,8 @@ print(TR_1p)
 
 # predict from poisson regression:
 preds1p = results1p.get_prediction(X, which = 'linear')
-preds1pDF = preds1p.summary_frame() #summary_frame() returns a pandas DF
-preds1pDF.describe()
+preds1pDFtmp = preds1p.summary_frame() #summary_frame() returns a pandas DF
+preds1pDFtmp.describe()
 
 preds1pDF = datP
 preds1pDF['exp_values'] = preds1pDFtmp['predicted'].apply(math.exp)
@@ -537,7 +491,7 @@ preds1pDF['lowerCI'] = preds1pDFtmp['ci_lower'].apply(math.exp)
 preds1pDF['upperCI'] = preds1pDFtmp['ci_upper'].apply(math.exp)
 
 ## plot predicted and actual:
-plot1p = (ggplot(preds1pDF, 
+freqplot1p = (ggplot(preds1pDF, 
                 aes(x = 'DATI', y='exp_values', color = 'Treatment')) +
         geom_line() +
         geom_ribbon(aes(ymin = 'lowerCI', ymax = 'upperCI', fill = 'Treatment'),
@@ -549,7 +503,9 @@ plot1p = (ggplot(preds1pDF,
         scale_fill_manual(values = mycolors) +
         labs(title = "Poisson GLM predictions",
              subtitle = "Lines are predictions, points are the data"))
-plot1p.draw(True)
+freqplot1p.draw(True)
+freqplot1p.save(filename='freqplot1p.png', path='./output/')
+
 
 ```
 
@@ -585,7 +541,7 @@ preds1nbDF['upperCI'] = preds1nbDFtmp['ci_upper'].apply(math.exp)
 
 
 ## plot predicted and actual:
-plot1nb = (ggplot(preds1nbDF, aes(x = 'DATI', y='exp_values', color = 'Treatment')) +
+freqplot1nb = (ggplot(preds1nbDF, aes(x = 'DATI', y='exp_values', color = 'Treatment')) +
         geom_line() +
         geom_ribbon(aes(ymin = 'lowerCI', ymax = 'upperCI', fill = 'Treatment'),
               alpha = 0.3) +
@@ -597,8 +553,8 @@ plot1nb = (ggplot(preds1nbDF, aes(x = 'DATI', y='exp_values', color = 'Treatment
         labs(title = "Negative binomial GLM predictions",
              subtitle = "Lines are predictions, points are the data"))
 
-plot1nb.draw(True)
-
+freqplot1nb.draw(True)
+freqplot1nb.save(filename="freqplot1nb.png", path = "./output/")
 
 ```
 
@@ -610,101 +566,98 @@ Because the models take a few minutes to fit, I usually fit them when I am initi
 
 The prior_summary command is helpful if you do not know what a parameter is called in 'brms'. Here, I used the command to find out what they called their $\phi$ parameter. (They call it the shape parameter.)
 
-```{python nbBambi1}
+"Bambi" created InferenceData objects. Read the reference guide-- it is very helpful!
+https://python.arviz.org/en/latest/getting_started/WorkingWithInferenceData.html#
+
+
+```{python nbBambi1setup}
 # https://bambinos.github.io/bambi/notebooks/negative_binomial.html
 import bambi as bmb
-bambi1nb = bmb.Model("nYSB ~ Treatment + offset(log(DaysOfCatch))", 
+## build the model:
+model_bmb1nb = bmb.Model("nYSB ~ Treatment + offset(log(DaysOfCatch))", 
                     datP, family="negativebinomial",
                     priors = {
                         "Intercept": bmb.Prior("Normal", mu = 0, sigma = 2),
                         "Treatment": bmb.Prior("Normal", mu = 0, sigma = 2),
                         "alpha": bmb.Prior("HalfCauchy", beta = 1)
                     })
-resbambi1nb = bambi1nb.fit(tune = 500, draws=2000, chains=6, random_seed = 5000)
+```
+```{python nbBambi1fit, eval =F}
+# https://bambinos.github.io/bambi/notebooks/negative_binomial.html
+import bambi as bmb
+## fit the model:
+idata_bmb1nb = model_bmb1nb.fit(tune = 500, draws=2000, chains=6, random_seed = 5000)
 # tune = warmup; draws = iter
+print(az.summary(idata_bmb1nb))
 
 import pickle # to save bambi object to file.
-filename = 'output/resbambi1nb.pkl'
+filename = 'output/idata_bmb1nb.pkl'
 # save bambi object to file.
 with open(filename, 'wb') as file:
-    pickle.dump(resbambi1nb, file)
+    pickle.dump(idata_bmb1nb, file)
  
+
+```
+
+```{python nbBambi1Output, cache = T}
+import arviz as az
+import matplotlib.pyplot as plt 
+import pickle
+
+# Load the object from the file
+filename = 'output/idata_bmb1nb.pkl'
+with open(filename, 'rb') as file:
+    idata_bmb1nb = pickle.load(file)
+
+# to see the priors:
+# model_bmb1nb
+
+# summary stats
+print(az.summary(idata_bmb1nb))
+
+
+# CALC TR:
+b1 = idata_bmb1nb.posterior["Treatment"].stack(sample=("chain", "draw")).to_dataframe(name = "trtA")
+
+TR1nb = 100 * (1 - np.exp(b1['trtA']))
+print(round(TR1nb.quantile(q=[0.025, 0.5, 0.975])))
+
+
+
+# Plot the predictions
+# Make predictions of the mean without offset effect:
+bmbPreds1p = datP.copy() ## IMPORTANT DIFF FROM R!!!
+## if newdf = olddf, changes to newdf affect olddf!!!
+bmbPreds1p["DaysOfCatch"] = 1
+predictions1p = model_bmb1nb.predict(idata_bmb1nb, data=bmbPreds1p, kind = "response_params", inplace = False)
+post1p = predictions1p.posterior
+post1p
+bmbPreds1p["preds"] = post1p.mean(dim=["chain", "draw"])["mu"].values
+bmbPreds1p["lowerCI"] = post1p.quantile(dim=["chain", "draw"], q = 0.025)["mu"].values
+bmbPreds1p["upperCI"] = post1p.quantile(dim=["chain", "draw"], q = 0.975)["mu"].values
+bmbPreds1p.describe()
+
+plot1nb = (ggplot(bmbPreds1p, 
+                aes(x = 'DATI', y='preds', color = 'Treatment')) +
+        geom_line() +
+        geom_ribbon(aes(ymin = 'lowerCI', ymax = 'upperCI', fill = 'Treatment'),
+              alpha = 0.3) +
+        geom_point(aes(x='DATI', y='mothsperday', color = 'Treatment'), 
+            data = mean_cts, size = 1.1) +
+        facet_wrap(['Location'], scales = "free_y") +
+        scale_color_manual(values = mycolors) +
+        scale_fill_manual(values = mycolors) +
+        labs(title = "Bayes neg binom GLM",
+             subtitle = "Lines are predictions, points are the data"))
+plot1nb.draw(True)
+plot1nb.save(filename='plot1nb.png', path='./output/')
+
 ```
 
 The Bayesian parameter estimates match very closely to the frequentist estimates. This is expected, but reassuring that we have built the correct foundation for the more complicated models to come. The first summary output is from the Bayesian model; the second is from the frequentist fit. (Note that in the fequentitst fit, they summarize the inverse shape parameter compared to the bambi fit.)
 
 Comparisons of TR predictions and predicted moth count values can be found at the end of the page.
 
-```{python nbBambiOutput1}
-import arviz as az
-import matplotlib.pyplot as plt 
-import pickle
-
-# Load the object from the file
-filename = 'output/resbambi1nb.pkl'
-with open(filename, 'rb') as file:
-    resbambi1nb = pickle.load(file)
-
-# to see the priors:
-# bambi1nb
-
-# summary stats
-print(az.summary(resbambi1nb))
-print(results1nb.summary())
-
-
-# CALC TR!
-b1 = resbambi1nb.posterior["Treatment"].stack(sample=("chain", "draw")).to_dataframe(name = "trtA")
-import numpy as np
-
-TR1nb= 100 * (1 - np.exp(b1['trtA']))
-TR1nb.quantile(q=[0.025, 0.5, 0.975])
-outTR1nb = {'TR': [round(TR1nb.quantile(q=0.5))], 
-    'lowerCI': [round(TR1nb.quantile(q=0.025))], 
-    'upperCI': [round(TR1nb.quantile(q=0.975))]}
-
-# post = idata.posterior
-# post
-# post["log_tau"] = np.log(post["tau"])
-# idata.posterior
-# post.mean() # to get mean TR
-# post["mlogtau"] = post["log_tau"].rolling({"draw": 50}).mean()
-
-
-# plot predictions!!!
-# predictions
-# fig, ax = plt.subplots(figsize=(7, 3), dpi=120)
-# bmb.interpret.plot_predictions(bambi1nb, resbambi1nb, average_by = ["Treatment"]); #,"Village"]);
-
-newdata = datP
-newdata['DaysOfCatch'] = 1
-
-# Plot the data
-idata = bambi1nb.predict(resbambi1nb, kind="response_params", data=newdata, inplace = False)
-# idata = model.predict(fitted, kind='pps', inplace=False)
-
-
-# stacked = az.extract(idata)
-# stacked
-# stacked.mu.values
-# idata.observed_data.nYSB
-
-# bayes_p1nb <- ggplot(tmp, 
-#        aes(x = DATI, y = Estimate, color = TreatmentF)) + 
-#   geom_line() + 
-#   geom_ribbon(aes(ymin = `Q2.5`, ymax = `Q97.5`, fill = TreatmentF),  # regression line and CI
-#                     alpha = 0.3) +
-#   geom_point(data = mean_cts, 
-#              aes(DATI, mean_mothsperday, color = TreatmentF), size = 1.1) +
-#   facet_wrap(~Location, scales = "free_y") + 
-#   scale_color_manual(values = mycolors[]) +
-#   scale_fill_manual(values = mycolors[]) +
-#   labs(title = "Bayesian neg. binomial GLM predictions",
-#        subtitle = "Lines are predictions, points are the data")
-# print(bayes_p1nb)
-
-
-```
 
 ### Bayesian (PyMC) models-- Python
 
@@ -777,7 +730,8 @@ with open(filename, 'rb') as file:
 print(az.summary(pymc1nb))
 
 # CALC TR!
-outTR1nb = round(TR1nb.quantile(q=[0.025, 0.5, 0.975]).to_pandas())
+print(az.summary(pymc1nb, var_names=['TR']))
+# outTR1nb = round(TR1nb.quantile(q=[0.025, 0.5, 0.975]).to_pandas())
 
 ```
 
@@ -906,6 +860,8 @@ pnbRE.draw(True)
 
 ```
 
+Try ChatGPT?
+
 Google's Gemini AI is convinced that a negative binomial regression with random slopes and intercepts is possible in Python, but:
 
 * the Lmer function does not allow for neg binomial regression models. 
@@ -915,7 +871,7 @@ Google's Gemini AI is convinced that a negative binomial regression with random 
 Therefore, we only fit the negative binomial regression model within the Bayesian framework. This is a category where R takes the win over Python!
 
 
-### GLMM Bayesian (bambi) models-- Python
+### GLMM Bayesian (bambi) models
 
 By default, the prior distributions of random slopes and intercepts are correlated in "brm". If the correlation is non-significant, you may want to remove that correlation to simplify your model. To remove the correlation, change the random effects term from "(1 + TreatmentF|Location)" to " (1 + TreatmentF||Location)" (has an extra vertical line), which makes them independent. (TRUE FOR BAMBI??)
 
@@ -923,10 +879,16 @@ You'll notice that the parameter estimates are slightly different from the frequ
 
 Again, notice the subtle differences between "brms" and "bambi".
 
-```{python nbBambi2}
+"At the time random effects (apologies to those who hate the term :smile:) were implemented in Bambi, it was not that straightforward to put a non-diagonal correlation matrix in PyMC. Or at least it was not that simple to me. **So the default is to not use correlated intercept and slopes**, and that explains why you can’t see them in the posterior."
+From: 
+https://discourse.pymc.io/t/bambi-model-correlated-intercept-slopes/16054/2
+
+NOTE: Google Gemini says that the default IS correlated intercept, slopes. (May 21, 2025). Be careful using A.I.!
+
+```{python nbBambi2setup}
 # https://bambinos.github.io/bambi/notebooks/negative_binomial.html
 import bambi as bmb
-bambi2nb = bmb.Model("nYSB ~ Treatment + (Treatment|Location) + offset(log(DaysOfCatch))", 
+model_bmb2nb = bmb.Model("nYSB ~ Treatment + (Treatment|Location) + offset(log(DaysOfCatch))",
                     datP, family="negativebinomial",
                     priors = {
                         "Intercept": bmb.Prior("Normal", mu = 0, sigma = 2),
@@ -935,98 +897,103 @@ bambi2nb = bmb.Model("nYSB ~ Treatment + (Treatment|Location) + offset(log(DaysO
                         "1|Location": bmb.Prior("Normal", mu = 0, sigma = bmb.Prior("HalfCauchy", beta = 1)),
                         "Treatment|Location": bmb.Prior("Normal", mu = 0, sigma = bmb.Prior("HalfCauchy", beta = 1))
                     })
-resbambi2nb = bambi2nb.fit(target_accept = 0.90, tune = 500, draws=2000, chains=6, random_seed = 5000)
+
+```
+```{python nbBambi2fit, eval =F}
+# https://bambinos.github.io/bambi/notebooks/negative_binomial.html
+import bambi as bmb
+idata_bmb2nb = model_bmb2nb.fit(target_accept = 0.90, tune = 500, draws=2000, chains=6, random_seed = 5000)
 # 
+# remove the first n draws (burn-in)
+# idata_bmb2nb.sel(draw=slice(100, None))
+
+## plot of location-specific RE's
+# posterior = az.extract(idata_bmb2nb, num_samples=500)
+# _, ax = plt.subplots()
+# 
+# idata_bmb2nb.posterior.plot.scatter(
+#     x="1|Location", y="Treatment|Location",
+#     hue="Location__factor_dim",
+#     add_colorbar=False,
+#     add_legend=False,
+#     cmap="tab20",
+#     edgecolors=None,
+# )                      
+# 
+# ax.axhline(c="0.25", ls="--")
+# ax.axvline(c="0.25", ls="--")
+# ax.set_xlabel("Location-specific intercept")
+# ax.set_ylabel("Location-specific slope");
+# plt.show()
+
+# quick diagnostics
+# az.plot_trace(idata_bmb2nb, backend_kwargs={"layout": "constrained"}, legend=True,
+# var_names = ["Intercept", "Treatment", "alpha", "1|Location_sigma", "Treatment|Location_sigma"]);
+# plt.show()
+# 
+# az.plot_trace(idata_bmb2nb, backend_kwargs={"layout": "constrained"}, legend=True,
+# var_names = ["1|Location", "Treatment|Location"]);
+# plt.show()
+
 
 import pickle # to save bambi object to file.
-filename = 'output/resbambi2nb.pkl'
+filename = 'output/idata_bmb2nb.pkl'
 # save bambi object to file.
 with open(filename, 'wb') as file:
-    pickle.dump(resbambi2nb, file)
-    
+    pickle.dump(idata_bmb2nb, file)
     
 ```
-```{python nbBambiOutput2}
+```{python nbBambi2Output, cache = T}
 import arviz as az
 import matplotlib.pyplot as plt 
 import pickle
 
 # Load the object from the file
-filename = 'output/resbambi2nb.pkl'
+filename = 'output/idata_bmb2nb.pkl'
 with open(filename, 'rb') as file:
-    resbambi2nb = pickle.load(file)
+    idata_bmb2nb = pickle.load(file)
     
 
 # to see priors:
-bambi2nb
+# model_bmb2nb
 
-# summary stats
-print(az.summary(resbambi2nb,  # kind="stats"))
+## to see data variables:
+idata_bmb2nb.posterior.data_vars
+
+# summary stats (exclude actual location-specific RE variables)
+print(az.summary(idata_bmb2nb,  
                  var_names=["Intercept", "Treatment", "alpha", "1|Location_sigma", "Treatment|Location_sigma"]))
 
-# quick diagnostics
-az.plot_trace(resbambi2nb, backend_kwargs={"layout": "constrained"}, legend=True,
-var_names = ["Intercept", "Treatment", "alpha", "1|Location_sigma", "Treatment|Location_sigma"]);
-plt.show()
-
-az.plot_trace(resbambi2nb, backend_kwargs={"layout": "constrained"}, legend=True, 
-var_names = ["1|Location", "Treatment|Location"]);
-plt.show()
-
-```
-```{python nbBambiOutput2b}
-
-# CALC TR!
-b1 = resbambi2nb.posterior["Treatment"].stack(sample=("chain", "draw")).to_dataframe(name = "trtA")
-import numpy as np
-
+# CALC TR:
+b1 = idata_bmb2nb.posterior["Treatment"].stack(sample=("chain", "draw")).to_dataframe(name = "trtA")
 TR2nb= 100 * (1 - np.exp(b1['trtA']))
-TR2nb.quantile(q=[0.025, 0.5, 0.975])
-outTR2nb = {'TR': [round(TR2nb.quantile(q=0.5))], 
-    'lowerCI': [round(TR2nb.quantile(q=0.025))], 
-    'upperCI': [round(TR2nb.quantile(q=0.975))]}
-print(outTR2nb)
-
-# post = idata.posterior
-# post
-# post["log_tau"] = np.log(post["tau"])
-# idata.posterior
-# post.mean() # to get mean TR
-# post["mlogtau"] = post["log_tau"].rolling({"draw": 50}).mean()
+print(TR2nb.quantile(q=[0.025, 0.5, 0.975]))
 
 
-# plot predictions!!!
-# predictions
-# fig, ax = plt.subplots(figsize=(7, 3), dpi=120)
-# bmb.interpret.plot_predictions(bambi1nb, resbambi1nb, average_by = ["Treatment"]); #,"Village"]);
+## plot predictions:
+# Make predictions of the mean without offset effect:
+new_data = datP.copy()
+new_data["DaysOfCatch"] = 1
+predictions = model_bmb2nb.predict(idata_bmb2nb, data=new_data, kind = "response_params", inplace = False)
+post = predictions.posterior
+new_data["preds"] = post.mean(dim=["chain", "draw"])["mu"].values
+new_data["lowerCI"] = post.quantile(dim=["chain", "draw"], q = 0.025)["mu"].values
+new_data["upperCI"] = post.quantile(dim=["chain", "draw"], q = 0.975)["mu"].values
 
-newdata = datP
-newdata['DaysOfCatch'] = 1
-
-# Plot the data
-idata = bambi2nb.predict(resbambi2nb, kind="response_params", data=newdata, inplace = False)
-# idata = model.predict(fitted, kind='pps', inplace=False)
-
-
-# stacked = az.extract(idata)
-# stacked
-# stacked.mu.values
-# idata.observed_data.nYSB
-
-# bayes_p2nb <- ggplot(tmp, 
-#        aes(x = DATI, y = Estimate, color = TreatmentF)) + 
-#   geom_line() + 
-#   geom_ribbon(aes(ymin = `Q2.5`, ymax = `Q97.5`, fill = TreatmentF),  # regression line and CI
-#                     alpha = 0.3) +
-#   geom_point(data = mean_cts, 
-#              aes(DATI, mean_mothsperday, color = TreatmentF), size = 1.1) +
-#   facet_wrap(~Location, scales = "free_y") + 
-#   scale_color_manual(values = mycolors[]) +
-#   scale_fill_manual(values = mycolors[]) +
-#   labs(title = "Bayesian neg. binomial GLM predictions",
-#        subtitle = "Lines are predictions, points are the data")
-# print(bayes_p2nb)
-
+plot2nb = (ggplot(new_data, 
+                aes(x = 'DATI', y='preds', color = 'Treatment')) +
+        geom_line() +
+        geom_ribbon(aes(ymin = 'lowerCI', ymax = 'upperCI', fill = 'Treatment'),
+              alpha = 0.3) +
+        geom_point(aes(x='DATI', y='mothsperday', color = 'Treatment'), 
+            data = mean_cts, size = 1.1) +
+        facet_wrap(['Location'], scales = "free_y") +
+        scale_color_manual(values = mycolors) +
+        scale_fill_manual(values = mycolors) +
+        labs(title = "Bayes neg binom GLMM (Location)",
+             subtitle = "Lines are predictions, points are the data"))
+plot2nb.draw(True)
+plot2nb.save(filename='plot2nb.png', path='./output/')
 
 ```
 
@@ -1111,7 +1078,7 @@ with open(filename, 'wb') as file:
 
 
 ```
-```{python nbPyMC1, eval = F}
+```{python nbPyMC1tmp, eval = F}
 # code kept here for comparison; to make above more efficient (eventually)
 with pm.Model(coords = c) as model_pymc1nb:
     # Set the data, and convert to NumPy arrays (to use matrix multiplication
@@ -1165,94 +1132,116 @@ print(az.summary(idata_pymc2nb, var_names=["TR"]))
 
 ## GLMM: RE for location, crossed SamplingDate
 
-### Crossed GLMM mathematical model
-
-Model to be filled in.
-
-#### Bayesian crossed GLMM
-
-Model to be filled in.
-
 ### Crossed GLMM frequentist fit
 
-Code to be filled in.
+Not done because relies on the "lmer" wrapper.
 
 ### Crossed GLMM Bayes (bambi) version
 
-```{python nbBambi3}
+Output is slightly different from "brms" output, especially the predictions for Loc9. Differences might be due to correlated versus not correlated RE's for location.
+
+```{python nbBambi3setup}
 import bambi as bmb
-bambi3nb = bmb.Model("nYSB ~ Treatment + +(Treatment|Location) +  (Treatment|Location:SamplingDateC) + offset(log(DaysOfCatch))", 
+model_bmb3nb = bmb.Model("nYSB ~ Treatment + (Treatment|Location) +  (1|SamplingDateC) + offset(log(DaysOfCatch))", 
                     datP, family="negativebinomial",
                     priors = {
                         "Intercept": bmb.Prior("Normal", mu = 0, sigma = 2),
                         "Treatment": bmb.Prior("Normal", mu = 0, sigma = 2),
                         "alpha": bmb.Prior("HalfCauchy", beta = 1),
-                        "1|Location:SamplingDateC": bmb.Prior("Normal", mu = 0, sigma = bmb.Prior("HalfCauchy", beta = 1)),
-                        "Treatment|Location:SamplingDateC": bmb.Prior("Normal", mu = 0, sigma = bmb.Prior("HalfCauchy", beta = 1))
+                        "1|Location": bmb.Prior("Normal", mu = 0, 
+                        sigma = bmb.Prior("HalfCauchy", beta = 1)),
+                        "Treatment|Location": bmb.Prior("Normal", mu = 0, 
+                        sigma = bmb.Prior("HalfCauchy", beta = 1)),
+                        "1|SamplingDateC": bmb.Prior("Normal", mu = 0, 
+                        sigma = bmb.Prior("HalfCauchy", beta = 1))
                     })
-idata_bambi3nb = bambi3nb.fit(target_accept = 0.90, tune = 500, draws=2000, chains=6, random_seed = 5000)
-# 
-
-import pickle # to save bambi object to file.
-filename = 'output/idata_bambi3nb.pkl'
-# save bambi object to file.
-with open(filename, 'wb') as file:
-    pickle.dump(idata_bambi3nb, file)
-    
     
 ```
-```{python nbBambiOutput3}
+```{python nbBambi3fit, eval = F}
+import bambi as bmb
+
+idata_bmb3nb = model_bmb3nb.fit(target_accept = 0.90, tune = 500, draws=2000, chains=6, random_seed = 5000)
+# 
+
+# # quick diagnostics
+# az.plot_trace(idata_bmb3nb, backend_kwargs={"layout": "constrained"}, legend=True,
+# var_names = ["Intercept", "Treatment", "alpha", "1|Location_sigma", "Treatment|Location_sigma", "1|SamplingDateC_sigma"]);
+# plt.show()
+# 
+# az.plot_trace(idata_bmb3nb, backend_kwargs={"layout": "constrained"}, legend=True,
+# var_names = ["1|SamplingDateC", "Treatment|Location"]);
+# plt.show()
+
+
+import pickle # to save bambi object to file.
+filename = 'output/idata_bmb3nb.pkl'
+# save bambi object to file.
+with open(filename, 'wb') as file:
+    pickle.dump(idata_bmb3nb, file)
+    
+```
+```{python nbBambi3Output, cache = T}
 import arviz as az
 import matplotlib.pyplot as plt 
 import pickle
 
 # Load the object from the file
-filename = 'output/idata_bambi3nb.pkl'
+filename = 'output/idata_bmb3nb.pkl'
 with open(filename, 'rb') as file:
-    idata_bambi3nb = pickle.load(file)
+    idata_bmb3nb = pickle.load(file)
     
 
 # to see priors:
-bambi3nb
+model_bmb3nb
 
 ## to see data variables:
-idata_bambi3nb.posterior.data_vars
+idata_bmb3nb.posterior.data_vars
 
-# summary stats
-print(az.summary(idata_bambi3nb,  # kind="stats"))
-                 var_names=["Intercept", "Treatment", "alpha", "1|Location:SamplingDateC_sigma", "Treatment|Location:SamplingDateC_sigma"]))
+# summary stats-- don't print for all because dont' want to see RE's
+print(az.summary(idata_bmb3nb,  
+                 var_names=["Intercept", "Treatment", "alpha", "1|Location_sigma", "Treatment|Location_sigma", "1|SamplingDateC_sigma"]))
 
-# quick diagnostics
-az.plot_trace(idata_bambi3nb, backend_kwargs={"layout": "constrained"}, legend=True,
-var_names = ["Intercept", "Treatment", "alpha", "1|Location:SamplingDateC_sigma", "Treatment|Location:SamplingDateC_sigma"]);
-plt.show()
 
-az.plot_trace(idata_bambi3nb, backend_kwargs={"layout": "constrained"}, legend=False, 
-var_names = ["1|Location:SamplingDateC", "Treatment|Location:SamplingDateC"]);
-plt.show()
-
-```
-```{python nbBambiOutput3b}
-
-# CALC TR!
-b1 = idata_bambi3nb.posterior["Treatment"].stack(sample=("chain", "draw")).to_dataframe(name = "trtA")
-import numpy as np
-
+# CALC TR:
+b1 = idata_bmb3nb.posterior["Treatment"].stack(sample=("chain", "draw")).to_dataframe(name = "trtA")
 TR3nb= 100 * (1 - np.exp(b1['trtA']))
-TR3nb.quantile(q=[0.025, 0.5, 0.975])
-outTR3nb = {'TR': [round(TR3nb.quantile(q=0.5))], 
-    'lowerCI': [round(TR3nb.quantile(q=0.025))], 
-    'upperCI': [round(TR3nb.quantile(q=0.975))]}
-print(outTR3nb)
+print(TR3nb.quantile(q=[0.025, 0.5, 0.975]))
 
 
-# plot predictions!!!
+## plot predictions:
+# Make predictions of the mean without offset effect:
+new_data3nb = datP.copy()
+new_data3nb["DaysOfCatch"] = 1
+predictions3nb = model_bmb3nb.predict(idata_bmb3nb, data=new_data3nb, kind = "response_params", inplace = False)
+post3nb = predictions3nb.posterior
+
+new_data3nb["preds"] = post3nb.mean(dim=["chain", "draw"])["mu"].values
+new_data3nb["lowerCI"] = post3nb.quantile(dim=["chain", "draw"], q = 0.025)["mu"].values
+new_data3nb["upperCI"] = post3nb.quantile(dim=["chain", "draw"], q = 0.975)["mu"].values
+new_data3nb.describe()
+plot3nb = (ggplot(new_data3nb, 
+                aes(x = 'DATI', y='preds', color = 'Treatment')) +
+        geom_line() +
+        geom_ribbon(aes(ymin = 'lowerCI', ymax = 'upperCI', fill = 'Treatment'),
+              alpha = 0.3) +
+        geom_point(aes(x='DATI', y='mothsperday', color = 'Treatment'), 
+            data = mean_cts, size = 1.1) +
+        facet_wrap(['Location'], scales = "free_y") +
+        scale_color_manual(values = mycolors) +
+        scale_fill_manual(values = mycolors) +
+        labs(title = "Bayes neg binom GLMM (Location, Date)",
+             subtitle = "Lines are predictions, points are the data"))
+plot3nb.draw(True)
+plot3nb.save(filename='plot3nb.png', path='./output/')
+
 
 ```
 
 ### Crossed GLMM Bayes (PyMC) version
 
-```{python nbPyMCsetup3}
+To be filled in later.
+
+```{python nbPyMCsetup3, eval = F}
 # NB Bayes:
 #https://discourse.pymc.io/t/biased-results-from-poisson-regression-model/4349/5
 import numpy as np
@@ -1329,7 +1318,7 @@ with open(filename, 'wb') as file:
 
 ```
 
-```{python nbPyMCOutput3}
+```{python nbPyMCOutput3, eval = F}
 
 # Load the object from the file
 import pickle
@@ -1357,93 +1346,131 @@ print(az.summary(idata_pymc3nb, var_names=["TR"]))
 
 Now we are in the territory where we have to fit the models in a Bayesian framework. If our response variable was continuous (i.e., the regression model was based on a Normal distribution), then we could still use maximum likelihood estimation.
 
-### Gaussian Process Bayes (brms) version
+### Gaussian Process Bayes (bambi) version
 
 * Use numeric version of sampling date for better algorithm stability. Still, we have a warning about a divergent transition. Ideally, we would tweak the model and look at the data carefully so fix this warning, but because we are working with made up data, we will not worry abotu the warning for now.
 
-```{r, eval =F}
-summary(datR$numericDate) # check max before fitting, in case seasons don't line up
-brm4nb <- brm(formula = nYSB ~ TreatmentF + offset(log(DaysOfCatch)) + 
-                    (1 + TreatmentF||Location) + 
-              gp(numericDate, by =Location), 
-                  control = list(adapt_delta = 0.9),
-              data = datR, 
-              family = negbinomial,
-              prior = c(set_prior("normal(0,2)", class = "b"),
-                        set_prior("cauchy(0,1)", class = "shape"), # == half-cauchy
-                        set_prior("normal(0,2)", class = "Intercept"),
-                        set_prior("cauchy(0,1)", class = "sd"),
-                        set_prior("cauchy(0,1)", class = "lscale", 
-                                  coef = "gpnumericDateLocationLoc1"),
-                        set_prior("cauchy(0,1)", class = "lscale", 
-                                  coef = "gpnumericDateLocationLoc2"),
-                        set_prior("cauchy(0,1)", class = "lscale", coef = "gpnumericDateLocationLoc3"),
-                        set_prior("cauchy(0,1)", class = "lscale", coef = "gpnumericDateLocationLoc4"),
-                        set_prior("cauchy(0,1)", class = "lscale", coef = "gpnumericDateLocationLoc5"),
-                        set_prior("cauchy(0,1)", class = "lscale", coef = "gpnumericDateLocationLoc6"),
-                        set_prior("cauchy(0,1)", class = "lscale", coef = "gpnumericDateLocationLoc7"),
-                        set_prior("cauchy(0,1)", class = "lscale", coef = "gpnumericDateLocationLoc8"),
-                        set_prior("cauchy(0,1)", class = "lscale", coef = "gpnumericDateLocationLoc9"),
-                        set_prior("cauchy(0,1)", class = "lscale", coef = "gpnumericDateLocationLoc10"),
-                        set_prior("normal(0,2)", class = "sdgp")),
-                        # set_prior("lkj(2)", class = "cor")),
-              warmup = 1000, iter = 5000, 
-              seed = 5000,
-              chains = nCores, cores = nCores) 
-saveRDS(brm4nb, "../output/brm4nb.RDS")
-```
-```{r}
-brm4nb <- readRDS("output/brm4nb.RDS")
-summary(brm4nb)
-# bayes_R2(brm4nb) # 0.824
+* Different from "brms"-- I do not estimate separeate parameters for each Location-- that option was causing many divergent warnings.
 
-# prior_summary(brm4nb)
-# prior_summary(brm4nb, all = FALSE)
+* Can only do "hsgp" version that is dimension reduction version. Here, we have only 10 assessments per date-location, so we are already working with limited dimensions.
+
+From the hsgp documentation (https://www.pymc.io/projects/examples/en/latest/gaussian_processes/HSGP-Basic.html): "For smaller data sets, the full unapproximated GP may still be more efficient."
+
+```{python nbBambi4setup}
+import bambi as bmb
+# https://bambinos.github.io/bambi/notebooks/hsgp_1d.html
+prior_hsgp = {
+    "sigma": bmb.Prior("HalfCauchy", beta=1), # amplitude
+    "ell": bmb.Prior("HalfCauchy", beta=1) # lengthscale
+}
+
+model_bmb4nb = bmb.Model("nYSB ~ Treatment + (Treatment|Location) +  hsgp(numericDate, by=Location, m=6, c=1, share_cov=True) + offset(log(DaysOfCatch))", 
+                    datP, family="negativebinomial",
+                    priors = {
+                        "Intercept": bmb.Prior("Normal", mu = 0, sigma = 2),
+                        "Treatment": bmb.Prior("Normal", mu = 0, sigma = 2),
+                        "alpha": bmb.Prior("HalfCauchy", beta = 1),
+                        "1|Location": bmb.Prior("Normal", mu = 0, 
+                        sigma = bmb.Prior("HalfCauchy", beta = 1)),
+                        "Treatment|Location": bmb.Prior("Normal", mu = 0, 
+                        sigma = bmb.Prior("HalfCauchy", beta = 1)),
+             "hsgp(numericDate, by=Location, m=6, c=1, share_cov=True)": prior_hsgp
+                    })
+model_bmb4nb.set_alias({"hsgp(numericDate, by=Location, m=6, c=1, share_cov=True)": "hsgp"})
+# model_bmb4nb
+    
+```
+```{python nbBambi4fit, eval = F}
+import bambi as bmb
+
+idata_bmb4nb = model_bmb4nb.fit(target_accept = 0.90, chains=4, random_seed = 5000)
 # 
-```
+print(idata_bmb4nb.sample_stats["diverging"].sum().to_numpy())
 
-```{r}
-library(ggmcmc) # ggs()
-# CALC TR
-modtranformed <- ggs(brm4nb) # transform MCMC output into a table
-beta1 <- modtranformed %>% 
-  filter(Parameter == "b_TreatmentFtrtA", # our beta1
-         Iteration > 500) # remove burn-in
-TR = 100 * (1 - exp(beta1$value))
-bayesTR_4nb <- data.frame(TR = round(median(TR), 1), 
-           lowerCI = round(quantile(TR, 0.025), 1),
-          upperCI = round(quantile(TR, 0.975), 1))   
-knitr::kable(bayesTR_4nb)
+## check convergence:
+az.plot_trace(
+    idata_bmb4nb, 
+    var_names=["hsgp_weights", "hsgp_sigma", "hsgp_ell", "alpha"], 
+    backend_kwargs={"layout": "constrained"}
+);
+plt.show()
 
-# plot predictions:
-library(tidybayes) # add_predicted_draws()
-predsbrm <- fitted(brm4nb,
-                   scale = "linear",
-                   newdata = datR  %>% mutate(DaysOfCatch = 1))
-# dim(exp(predsbrm))
-# head(predsbrm)
-# I used linear scale (link response) in the fitted values and then exponeniate
-# because it intuitively is easier to think about moths per day (i.e., response scale),
-# but I want the resolution that is had at the linear scale.
-# (If I chose response scale, Id' get lots of 0's which aren't informative. 
-# Give it a try!)
-tmp <- cbind(datR, exp(predsbrm))
-bayes_p4nb <- ggplot(tmp, 
-       aes(x = DATI, y = Estimate, color = TreatmentF)) +  
-  geom_line() + 
-  geom_ribbon(aes(ymin = `Q2.5`, ymax = `Q97.5`, fill = TreatmentF),  # regression line and CI
-                    alpha = 0.3) +
-  geom_point(data = mean_cts, 
-             aes(DATI, mean_mothsperday, color = TreatmentF), 
-             size = 1.1) +
-  facet_wrap(~Location, scales = "free_y") + 
-  scale_color_manual(values = mycolors[]) +
-  scale_fill_manual(values = mycolors[]) +
-  labs(title = "Bayesian neg binomial GP GLMM predictions",
-       subtitle = "Lines are predictions, points are the data")
-print(bayes_p4nb)
+import pickle # to save bambi object to file.
+filename = 'output/idata_bmb4nb.pkl'
+# save bambi object to file.
+with open(filename, 'wb') as file:
+    pickle.dump(idata_bmb4nb, file)
+
 
 ```
+```{python nbBambi4Output, cache = T}
+
+import arviz as az
+import matplotlib.pyplot as plt 
+import pickle
+
+# Load the object from the file
+filename = 'output/idata_bmb4nb.pkl'
+with open(filename, 'rb') as file:
+    idata_bmb4nb = pickle.load(file)
+    
+
+# to see priors:
+# model_bmb4nb
+
+## to see data variables:
+idata_bmb4nb.posterior.data_vars
+
+# summary stats-- don't print for all because dont' want to see RE's
+print(az.summary(idata_bmb4nb,  
+                 var_names=["Intercept", "Treatment", "alpha",
+                 "1|Location_sigma", "Treatment|Location_sigma", 
+                 "hsgp_sigma", "hsgp_ell"]))
+
+
+# CALC TR:
+b1 = idata_bmb4nb.posterior["Treatment"].stack(sample=("chain", "draw")).to_dataframe(name = "trtA")
+TR4nb= 100 * (1 - np.exp(b1['trtA']))
+print(round(TR4nb.quantile(q=[0.025, 0.5, 0.975])))
+
+
+# ## plot predictions:
+# # Make predictions of the mean without offset effect:
+# new_data4nb = datP.copy()
+# new_data4nb["DaysOfCatch"] = 1
+# predictions4nb = model_bmb4nb.predict(idata_bmb4nb, data=new_data4nb, kind = "response_params", inplace = False)
+# # predictions4nb
+# post4nb = predictions4nb.posterior
+# # post
+# new_data4nb["preds"] = post4nb.mean(dim=["chain", "draw"])["mu"].values
+# new_data4nb["lowerCI"] = post4nb.quantile(dim=["chain", "draw"], q = 0.025)["mu"].values
+# new_data4nb["upperCI"] = post4nb.quantile(dim=["chain", "draw"], q = 0.975)["mu"].values
+# 
+# ## code is being buggy-- save new_data4nb and reload instead of knitting:
+# with open("output/new_data4nb.pkl", 'wb') as file:
+#     pickle.dump(new_data4nb, file)
+
+
+with open("output/new_data4nb.pkl", 'rb') as file:
+    new_data4nb = pickle.load(file)
+plot4nb = (ggplot(new_data4nb, 
+                aes(x = 'DATI', y='preds', color = 'Treatment')) +
+        geom_line() +
+        geom_ribbon(aes(ymin = 'lowerCI', ymax = 'upperCI', fill = 'Treatment'),
+              alpha = 0.3) +
+        geom_point(aes(x='DATI', y='mothsperday', color = 'Treatment'), 
+            data = mean_cts, size = 1.1) +
+        facet_wrap(['Location'], scales = "free_y") +
+        scale_color_manual(values = mycolors) +
+        scale_fill_manual(values = mycolors) +
+        labs(title = "Bayes neg binom GLMM with GP (Location, GP Date)",
+             subtitle = "Lines are predictions, points are the data"))
+plt.show(plot4nb)
+plot4nb.save(filename='plot4nb.png', path='./output/')
+
+
+```
+
 
 ## Summary of estimates
 
@@ -1451,175 +1478,44 @@ print(bayes_p4nb)
 
 Here, the trapping reduction estimates from all of the models are compared. As expected, the median TR estimates are very close from model to model, but the uncertainty in that estimate increase (i.e., the confidence/credible intervals get wider) when we properly account for the correlations in our data.
 
-```{r}
+```{python allTRestimates}
 
-# Framework = Frequentist, Bayes
-# Distribtuion = Poisson, NB
-# Model name: GLM, GLMM (Location), GLMM (Location, nested dates), GLMM (Location, GP for correlated dates)
-# Model description?
-# TR
-# lower CI (2.5%)
-# upper CI (97.5%)
-tableTR = bind_rows(
-data.frame(Framework = "Frequentist", Distribution = "Poisson", Model_name = "GLM",
-      round(TR_1p)),
-data.frame(Framework = "Frequentist", Distribution = "Neg Binomial", Model_name = "GLM",
-      round(TR_1nb)),
-data.frame(Framework = "Bayesian", Distribution = "Neg Binomial", Model_name = "GLM",
-      round(bayesTR_1nb)),
+data = np.array([round(TR1nb.quantile(q=[0.025, 0.5, 0.975])), 
+                 round(TR2nb.quantile(q=[0.025, 0.5, 0.975])), 
+                 round(TR3nb.quantile(q=[0.025, 0.5, 0.975])),
+                 round(TR4nb.quantile(q=[0.025, 0.5, 0.975]))])
 
-data.frame(Framework = "Frequentist", Distribution = "Poisson", Model_name = "GLMM (Location)",
-      round(TR_2p)),
-data.frame(Framework = "Frequentist", Distribution = "Neg Binomial", Model_name = "GLMM (Location)",
-      round(TR_2nb)),
-data.frame(Framework = "Bayesian", Distribution = "Neg Binomial", Model_name = "GLMM (Location)",
-      round(bayesTR_2nb)),
+df = pd.DataFrame(data, columns = ["TR", "lowerCI", "upperCI"])
+df["Model_name"] = ["GLM", "GLMM (location)", "GLMM (location, date)", "GLMM (location) with GP"]
+df["Distribution"] = ["Neg Binomial", "Neg Binomial", "Neg Binomial", "Neg Binomial"]
+df["Framework"] = ["Bayesian", "Bayesian", "Bayesian", "Bayesian"]
+print(df[["Framework", "Distribution", "Model_name", "TR", "lowerCI", "upperCI"]])
 
-data.frame(Framework = "Frequentist", Distribution = "Poisson", Model_name = "GLMM (Location, nested Date)",
-      round(TR_3p)),
-data.frame(Framework = "Frequentist", Distribution = "Neg Binomial", Model_name = "GLMM (Location, nested Date)",
-      round(TR_3nb)),
-data.frame(Framework = "Bayesian", Distribution = "Neg Binomial", Model_name = "GLMM (Location, nested Date)",
-      round(bayesTR_3nb)),
-
-data.frame(Framework = "Bayesian", Distribution = "Neg Binomial", Model_name = "GLMM (Location, Gaussian Process Date)",
-      round(bayesTR_4nb))
-)
-rownames(tableTR) <- NULL
-knitr::kable(tableTR)
 ```
 
 ### Compare coefficients
 
 Because TR is a non-linear function of $\beta_1$, the differences int he model output get slightly distorted from the transformation. Thereofre, the $\beta_1$ coefficients are displayed as well:
 
-```{r}
+```{python allBetas}
 
-# Framework = Frequentist, Bayes
-# Distribtuion = Poisson, NB
-# Model name: GLM, GLMM (Location), GLMM (Location, nested dates), GLMM (Location, GP for correlated dates)
-# Model description?
-# TR
-# lower CI (2.5%)
-# upper CI (97.5%)
-tableBeta = bind_rows(
-data.frame(Framework = "Frequentist", Distribution = "Poisson", 
-      Model_name = "GLM",
-      Estimate = round(summary(mod1p)$coefficients["TreatmentFtrt A", "Estimate"], 2),
-      SE = round(summary(mod1p)$coefficients["TreatmentFtrt A", "Std. Error"], 3)),
+dfB = pd.concat([az.summary(idata_bmb1nb, var_names=["Treatment"])[["mean", "sd"]],
+az.summary(idata_bmb2nb, var_names=["Treatment"])[["mean", "sd"]]], ignore_index=True)
 
-data.frame(Framework = "Frequentist", Distribution = "Neg Binomial",
-           Model_name = "GLM",
-      Estimate = round(summary(mod1nb)$coefficients["TreatmentFtrt A", "Estimate"], 2),
-      SE = round(summary(mod1nb)$coefficients["TreatmentFtrt A", "Std. Error"], 3)),
+dfB = pd.concat([dfB,
+az.summary(idata_bmb3nb, var_names=["Treatment"])[["mean", "sd"]]], ignore_index=True)
+dfB = pd.concat([dfB,
+az.summary(idata_bmb4nb, var_names=["Treatment"])[["mean", "sd"]]], ignore_index=True)
+dfB
 
-data.frame(Framework = "Bayesian", Distribution = "Neg Binomial", 
-           Model_name = "GLM",
-           Estimate = round(summary(brm1nb)$fixed["TreatmenttrtA", "Estimate"], 2),
-      SE = round(summary(brm1nb)$fixed["TreatmenttrtA", "Est.Error"], 3)),
+dfB["Model_name"] = ["GLM", "GLMM (location)", "GLMM (location, date)", "GLMM (location) with GP"]
+dfB["Distribution"] = ["Neg Binomial", "Neg Binomial", "Neg Binomial", "Neg Binomial"]
+dfB["Framework"] = ["Bayesian", "Bayesian", "Bayesian", "Bayesian"]
+print(dfB[["Framework", "Distribution", "Model_name", "mean", "sd"]])
 
-
-data.frame(Framework = "Frequentist", Distribution = "Poisson", 
-           Model_name = "GLMM (Location)",
-      Estimate = round(summary(mod2p)$coefficients["TreatmentFtrt A", "Estimate"], 2),
-      SE = round(summary(mod2p)$coefficients["TreatmentFtrt A", "Std. Error"], 3)),
-
-data.frame(Framework = "Frequentist", Distribution = "Neg Binomial",
-           Model_name = "GLMM (Location)",
-      Estimate = round(summary(mod2nb)$coefficients["TreatmentFtrt A", "Estimate"], 2),
-      SE = round(summary(mod2nb)$coefficients["TreatmentFtrt A", "Std. Error"], 3)),
-
-data.frame(Framework = "Bayesian", Distribution = "Neg Binomial", 
-           Model_name = "GLMM (Location)",
-           Estimate = round(summary(brm2nb)$fixed["TreatmentFtrtA", "Estimate"], 2),
-      SE = round(summary(brm2nb)$fixed["TreatmentFtrtA", "Est.Error"], 3)),
-
-
-data.frame(Framework = "Frequentist", Distribution = "Poisson", 
-           Model_name = "GLMM (Location, nested Date)",
-      Estimate = round(summary(mod3p)$coefficients["TreatmentFtrt A", "Estimate"], 2),
-      SE = round(summary(mod3p)$coefficients["TreatmentFtrt A", "Std. Error"], 3)),
-
-data.frame(Framework = "Frequentist", Distribution = "Neg Binomial",
-           Model_name = "GLMM (Location, nested Date)",
-      Estimate = round(summary(mod3nb)$coefficients["TreatmentFtrt A", "Estimate"], 2),
-      SE = round(summary(mod3nb)$coefficients["TreatmentFtrt A", "Std. Error"], 3)),
-
-data.frame(Framework = "Bayesian", Distribution = "Neg Binomial", Model_name = "GLMM (Location, nested Date)",
-           Estimate = round(summary(brm3nb)$fixed["TreatmentFtrtA", "Estimate"], 2),
-      SE = round(summary(brm3nb)$fixed["TreatmentFtrtA", "Est.Error"], 3)),
-
-data.frame(Framework = "Bayesian", Distribution = "Neg Binomial", Model_name = "GLMM (Location, Gaussian Process Date)",
-           Estimate = round(summary(brm4nb)$fixed["TreatmentFtrtA", "Estimate"], 2),
-      SE = round(summary(brm4nb)$fixed["TreatmentFtrtA", "Est.Error"], 3))
-)
-
-rownames(tableBeta) <- NULL
-knitr::kable(tableBeta)
 ```
-
 
 
 ### Plot comparisons
 
-#### GLM's
-
-In the side-by-side comparison, you can see the wider confidence intervals for the negative binomial distribution, compared to the Poisson.
-
-```{r all_plots1}
-cowplot::plot_grid(p1p_glm + theme(legend.position="none"), 
-                   p1nb_glm + theme(legend.position="none"))
-```
-
-Side-by-side comparison of the frequentist vs Bayes negative binomial GLM predictions.
-
-```{r all_plots1b}
-cowplot::plot_grid(p1nb_glm + theme(legend.position="none"),
-                   bayes_p1nb + theme(legend.position="none"))
-```
-
-#### GLMM's (Location RE)
-
-Side-by-side comparison of the frequentist Poisson vs negative  binomial GLMM (Location RE) predictions.
-
-```{r all_plots2}
-cowplot::plot_grid(p2p_glmm + theme(legend.position="none"), 
-                   p2nb_glmm + theme(legend.position="none"))
-```
-
-Side-by-side comparison of the frequentist vs Bayes negative binomial GLMM (Location RE) predictions.
-
-```{r all_plots2b}
-cowplot::plot_grid(p2nb_glmm + theme(legend.position="none"),
-                   bayes_p2nb + theme(legend.position="none"))
-```
-
-
-#### GLMM's (Location RE, nested Date)
-
-Note: These models are a great fit to the data that we have! But, they are overly confident and will not be good at predicting at new locations and new sampling dates.
-
-Side-by-side comparison of the frequentist Poisson vs negative  binomial GLMM (Location RE) predictions.
-
-```{r all_plots3}
-cowplot::plot_grid(p3p_glmm + theme(legend.position="none"), 
-                   p3nb_glmm + theme(legend.position="none"))
-```
-
-Side-by-side comparison of the frequentist vs Bayes negative binomial GLMM (Location RE) predictions.
-
-```{r all_plots3b}
-cowplot::plot_grid(p3nb_glmm + theme(legend.position="none"),
-                   bayes_p3nb + theme(legend.position="none"))
-```
-
-
-#### GLMM's: nested Date vs Gaussian Process Date
-
-Once we properly account for the correlations in our sampling dates, we have much more uncertainty in our overall TR predictions (see table above) , and the predicted counts are "smoothed" over time for some of the locations.
-
-```{r all_plots4}
-cowplot::plot_grid(bayes_p3nb + theme(legend.position="none"),
-                   bayes_p4nb + theme(legend.position="none"))
-```
-
+Unfortunately, a drawback of using plotnine module is that you cannot readily draw figures sid-by-side.
