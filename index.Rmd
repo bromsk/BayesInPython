@@ -12,7 +12,7 @@ github-repo: rstudio/BayesInPython
 description: "This is a tutorial for R users to convert their code into Python. In particular, fitting GLMMs, hierchical BAyesian models, and non-linear Bayesian models."
 ---
 
-```{r, include=FALSE, message=F, warning=FALSE, results = "hide", echo=F}
+```{r, eval = F, include=FALSE, message=F, warning=FALSE, results = "hide", echo=F}
 ## to create the website:
 bookdown::render_book("index.Rmd")
 ```

@@ -80,3 +80,14 @@ summary-of-estimates-1
 compare-tr-estimates-1
 compare-coefficients-1
 plot-comparisons-1
+NonlinearR
+generalized-logistic-curve
+bayesian-model
+fitting-models-with-the-brms-package
+no-re-no-gp
+intercept-re-no-gp
+intercept-re-a-re-no-gp
+intercept-re-a-re-with-gp-same-for-all-loc
+intercept-a-re-with-gp-diff-for-each-loc
+intercept-a-b-m-re-with-gp-diff-for-each-loc
+model-our-case-study-data

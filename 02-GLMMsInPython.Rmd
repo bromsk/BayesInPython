@@ -29,7 +29,7 @@ library(reticulate)
 # You may have to install the packages if you have not used them before:
 # code chunk is here for easy retrieval
 # replace module name as needed.
-!pip install patchworklib
+!pip install dotenv
 
 # installing googlemaps needs a modification:
 # !pip install  --use-pep517 googlemaps
@@ -63,7 +63,7 @@ import gmplot ## ggmap
 
 
 ```
-```{python readdatPy}
+```{python readdatPy, results = "hide"}
 
 import pandas as pd
 
@@ -256,7 +256,7 @@ When completing an analysis, I may skip around in my script quite a bit. Therefo
 
 Here is what the data look like. Columns: Location, Treatment, TrapID, Longitude, Latitude, AssessmentNumber, and SamplingDate should be self-explanatory... TransplantDate is the date that the rice seedlings were transplanted into the field; DispInstallDate is the treatment installation date; TrapInstallDate is the trap installation date; "nYSB" are the moth counts (number of YSB moths); DaysOfCatch is the number of days since the trap was previously sampled  or the number of days since trap installation if it is assessment number 1; DATI is days after trap installation; DADI is days after dispenser installation; and DAT is days after transplant. Some of these columns will be discussed more later.
 
-```{python display_dataPy}
+```{python display_dataPy, results = "hide"}
 # check data values: 
 datP.info()
 
@@ -274,6 +274,7 @@ The data are the moth counts collected at each trap (average per day), within ea
 
 ```{python plotMothsPy, fig.width = 8, fig.height = 6}
 from plotnine import * # using ggplot in Python
+import matplotlib.pyplot as plt 
 
 
 pmoths = (ggplot(datP, aes(x = 'DATI', y='mothsperday', color = 'Treatment')) +
@@ -285,14 +286,17 @@ pmoths = (ggplot(datP, aes(x = 'DATI', y='mothsperday', color = 'Treatment')) +
              y = "Moth counts per trap per day",
              x = "Days after trap installation (DATI)",
              color = "Treatment"))
+
 pmoths.draw(True)
+# plt.show(pmoths)
+
 ```
 
 ### Trap locations
 
 Trial locations in relation to each other. Some trial locations are closer to each other than others.
 
-```{python trapLocs, cache = T}
+```{python trapLocs, cache = T, eval = F}
 
 # get API key (keep hidden though!)
 import os
@@ -306,9 +310,35 @@ gmap1 = gmplot.GoogleMapPlotter(datP['Latitude'].mean(),
 
 gmap1.scatter(datP['Latitude'], datP['Longitude'], color='blue', size=2000, marker=False)
 
+plt.show(gmap1)
 # Pass the absolute path
-gmap1.draw( "test_map.html" )
+plt.show("test_map.html")
+
+gmap1.draw('map.html')
+
+
+import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+center = "-6.89557222,108.6845701099"
+zoom = 7
+size = "600x400"
+
+url = f"https://maps.googleapis.com/maps/api/staticmap?center={center}&zoom={zoom}&size={size}&key={api_key}"
+
+response = requests.get(url)
+
+if response.status_code == 200:
+    with open("static_map.png", "wb") as file:
+        file.write(response.content)
+    print("Static map image saved successfully!")
+else:
+    print(f"Error generating static map: {response.status_code}")
 #
+
 ```
 
 Within each location, the treatment traps have a slightly different alignment:
@@ -316,7 +346,7 @@ Within each location, the treatment traps have a slightly different alignment:
 ```{python plotTrapLocsPy, cache = T}
 
 coords = datP[['Location', 'Treatment', 'TrapID', 'Latitude', 'Longitude']].drop_duplicates()
-coords.describe(include = 'all')
+# coords.describe(include = 'all')
 
 
 pcoords = (ggplot(datP, aes(x = 'Longitude', y='Latitude', color = 'Treatment')) +
@@ -330,7 +360,9 @@ pcoords = (ggplot(datP, aes(x = 'Longitude', y='Latitude', color = 'Treatment'))
   scale_x_continuous(expand = (0.3, 0)) +
   scale_y_continuous(expand = (0.3, 0)) +
   labs(title = "Trap ID's at each location"))
+
 pcoords.draw(True)
+# plt.show(pcoords)
 
 ```
 
@@ -358,6 +390,7 @@ pdates = (ggplot(dates) +
        caption = "Black points are transplant dates; Grey points are trap installation dates") )
   
 pdates.draw(True)
+# plt.show(pdates)
 
 ```
 
@@ -1465,7 +1498,9 @@ plot4nb = (ggplot(new_data4nb,
         scale_fill_manual(values = mycolors) +
         labs(title = "Bayes neg binom GLMM with GP (Location, GP Date)",
              subtitle = "Lines are predictions, points are the data"))
-plt.show(plot4nb)
+# plt.show(plot4nb) ## doesn't knit
+plot4nb.draw(True)
+
 plot4nb.save(filename='plot4nb.png', path='./output/')
 
 

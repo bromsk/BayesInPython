@@ -1,7 +1,7 @@
 --- 
 title: "Bayesian models in R and Python"
 author: "Kristin Broms"
-date: "2025-05-22"
+date: "2025-05-29"
 site: bookdown::bookdown_site
 output: bookdown::gitbook
 documentclass: book
@@ -11,6 +11,8 @@ link-citations: yes
 github-repo: rstudio/BayesInPython
 description: "This is a tutorial for R users to convert their code into Python. In particular, fitting GLMMs, hierchical BAyesian models, and non-linear Bayesian models."
 ---
+
+
 
 # Introduction {#intro}
 
