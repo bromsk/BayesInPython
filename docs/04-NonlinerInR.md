@@ -577,13 +577,7 @@ Setting priors in a nonlinear model is non-trivial!!
 
 ### intercept, A, B, M RE, with GP (DIFF for each loc)
 
-<img src="04-NonlinerInR_files/figure-html/simdata6-1.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata6-2.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata6-3.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata6-4.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata6-5.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata6-6.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata6-7.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata6-8.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata6-9.png" width="100%" />
-
-```
-## [1] 0
-```
-
-<img src="04-NonlinerInR_files/figure-html/simdata6-10.png" width="100%" />
+<img src="04-NonlinerInR_files/figure-html/simdata6-1.png" width="100%" />
 
 
 ```
@@ -1050,12 +1044,4 @@ Use constant B, M instead.
 ```
 
 <img src="04-NonlinerInR_files/figure-html/outputR-1.png" width="100%" />
-
-```
-##  num [1:672, 1:4] -0.363 -0.33 -0.301 0.598 1.498 ...
-##  - attr(*, "dimnames")=List of 2
-##   ..$ : NULL
-##   ..$ : chr [1:4] "Estimate" "Est.Error" "Q2.5" "Q97.5"
-```
-
 <img src="04-NonlinerInR_files/figure-html/predsR-1.png" width="100%" />

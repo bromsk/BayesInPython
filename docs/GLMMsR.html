@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 2 GLMM’s in R | Bayesian models in R and Python</title>
+  <title>Chapter 3 GLMM’s in R | Bayesian models in R and Python</title>
   <meta name="description" content="This is a tutorial for R users to convert their code into Python. In particular, fitting GLMMs, hierchical BAyesian models, and non-linear Bayesian models." />
   <meta name="generator" content="bookdown 0.43 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 2 GLMM’s in R | Bayesian models in R and Python" />
+  <meta property="og:title" content="Chapter 3 GLMM’s in R | Bayesian models in R and Python" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="This is a tutorial for R users to convert their code into Python. In particular, fitting GLMMs, hierchical BAyesian models, and non-linear Bayesian models." />
   <meta name="github-repo" content="rstudio/BayesInPython" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 2 GLMM’s in R | Bayesian models in R and Python" />
+  <meta name="twitter:title" content="Chapter 3 GLMM’s in R | Bayesian models in R and Python" />
   
   <meta name="twitter:description" content="This is a tutorial for R users to convert their code into Python. In particular, fitting GLMMs, hierchical BAyesian models, and non-linear Bayesian models." />
   
@@ -23,14 +23,14 @@
 <meta name="author" content="Kristin Broms" />
 
 
-<meta name="date" content="2025-05-29" />
+<meta name="date" content="2025-06-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="index.html"/>
+<link rel="prev" href="mathematical-models.html"/>
 <link rel="next" href="GLMMsPython.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
@@ -80,107 +80,130 @@
 <ul>
 <li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#case-study-objectives"><i class="fa fa-check"></i><b>1.1.1</b> Case study objectives</a></li>
 </ul></li>
-<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#outline"><i class="fa fa-check"></i><b>1.2</b> Outline</a></li>
 </ul></li>
-<li class="chapter" data-level="2" data-path="GLMMsR.html"><a href="GLMMsR.html"><i class="fa fa-check"></i><b>2</b> GLMM’s in R</a>
+<li class="chapter" data-level="2" data-path="mathematical-models.html"><a href="mathematical-models.html"><i class="fa fa-check"></i><b>2</b> Mathematical models</a>
 <ul>
-<li class="chapter" data-level="2.1" data-path="GLMMsR.html"><a href="GLMMsR.html#data-exploration"><i class="fa fa-check"></i><b>2.1</b> Data Exploration</a>
+<li class="chapter" data-level="2.1" data-path="mathematical-models.html"><a href="mathematical-models.html#basic-glm-models"><i class="fa fa-check"></i><b>2.1</b> Basic GLM models</a>
 <ul>
-<li class="chapter" data-level="2.1.1" data-path="GLMMsR.html"><a href="GLMMsR.html#moth-counts"><i class="fa fa-check"></i><b>2.1.1</b> Moth counts</a></li>
-<li class="chapter" data-level="2.1.2" data-path="GLMMsR.html"><a href="GLMMsR.html#trap-locations"><i class="fa fa-check"></i><b>2.1.2</b> Trap locations</a></li>
-<li class="chapter" data-level="2.1.3" data-path="GLMMsR.html"><a href="GLMMsR.html#timeline"><i class="fa fa-check"></i><b>2.1.3</b> Timeline</a></li>
+<li class="chapter" data-level="2.1.1" data-path="mathematical-models.html"><a href="mathematical-models.html#poisson-regression-model"><i class="fa fa-check"></i><b>2.1.1</b> Poisson regression model</a></li>
+<li class="chapter" data-level="2.1.2" data-path="mathematical-models.html"><a href="mathematical-models.html#negative-binomial-regression-model"><i class="fa fa-check"></i><b>2.1.2</b> Negative binomial regression model</a></li>
+<li class="chapter" data-level="2.1.3" data-path="mathematical-models.html"><a href="mathematical-models.html#bayesian-model"><i class="fa fa-check"></i><b>2.1.3</b> Bayesian model</a></li>
+<li class="chapter" data-level="2.1.4" data-path="mathematical-models.html"><a href="mathematical-models.html#trapping-reduction-defined"><i class="fa fa-check"></i><b>2.1.4</b> Trapping reduction defined</a></li>
 </ul></li>
-<li class="chapter" data-level="2.2" data-path="GLMMsR.html"><a href="GLMMsR.html#basic-glm-models"><i class="fa fa-check"></i><b>2.2</b> Basic GLM models</a>
+<li class="chapter" data-level="2.2" data-path="mathematical-models.html"><a href="mathematical-models.html#glmm-random-effects-re-for-locations"><i class="fa fa-check"></i><b>2.2</b> GLMM: Random effects (RE) for locations</a>
 <ul>
-<li class="chapter" data-level="2.2.1" data-path="GLMMsR.html"><a href="GLMMsR.html#mathematical-model"><i class="fa fa-check"></i><b>2.2.1</b> Mathematical model</a></li>
-<li class="chapter" data-level="2.2.2" data-path="GLMMsR.html"><a href="GLMMsR.html#fitting-the-frequentist-models"><i class="fa fa-check"></i><b>2.2.2</b> Fitting the frequentist models</a></li>
-<li class="chapter" data-level="2.2.3" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-brms-model-fit"><i class="fa fa-check"></i><b>2.2.3</b> Bayesian (brms) model fit</a></li>
-<li class="chapter" data-level="2.2.4" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-rjags-model-fit"><i class="fa fa-check"></i><b>2.2.4</b> Bayesian (rjags) model fit</a></li>
+<li class="chapter" data-level="2.2.1" data-path="mathematical-models.html"><a href="mathematical-models.html#glmm-mathematical-model"><i class="fa fa-check"></i><b>2.2.1</b> GLMM mathematical model</a></li>
+<li class="chapter" data-level="2.2.2" data-path="mathematical-models.html"><a href="mathematical-models.html#bayesian-version"><i class="fa fa-check"></i><b>2.2.2</b> Bayesian version</a></li>
 </ul></li>
-<li class="chapter" data-level="2.3" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-random-effect-re-for-locations"><i class="fa fa-check"></i><b>2.3</b> GLMM: Random effect (RE) for locations</a>
+<li class="chapter" data-level="2.3" data-path="mathematical-models.html"><a href="mathematical-models.html#glmm-re-for-location-samplingdate"><i class="fa fa-check"></i><b>2.3</b> GLMM: RE for Location, SamplingDate</a>
 <ul>
-<li class="chapter" data-level="2.3.1" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-mathematical-model"><i class="fa fa-check"></i><b>2.3.1</b> GLMM mathematical model</a></li>
-<li class="chapter" data-level="2.3.2" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-frequentist-fit"><i class="fa fa-check"></i><b>2.3.2</b> GLMM frequentist fit</a></li>
-<li class="chapter" data-level="2.3.3" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-bayes-brms-version"><i class="fa fa-check"></i><b>2.3.3</b> GLMM Bayes (brms) version</a></li>
-<li class="chapter" data-level="2.3.4" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-bayes-rjags-model-fit"><i class="fa fa-check"></i><b>2.3.4</b> GLMM Bayes (rjags) model fit</a></li>
+<li class="chapter" data-level="2.3.1" data-path="mathematical-models.html"><a href="mathematical-models.html#frequentist-version"><i class="fa fa-check"></i><b>2.3.1</b> Frequentist version</a></li>
+<li class="chapter" data-level="2.3.2" data-path="mathematical-models.html"><a href="mathematical-models.html#bayesian-version-1"><i class="fa fa-check"></i><b>2.3.2</b> Bayesian version</a></li>
 </ul></li>
-<li class="chapter" data-level="2.4" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-re-for-location-samplingdate"><i class="fa fa-check"></i><b>2.4</b> GLMM: RE for Location, SamplingDate</a>
+<li class="chapter" data-level="2.4" data-path="mathematical-models.html"><a href="mathematical-models.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date"><i class="fa fa-check"></i><b>2.4</b> GLMM with Gaussian Processes: RE for Trial, GP for Date</a>
 <ul>
-<li class="chapter" data-level="2.4.1" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-mathematical-model"><i class="fa fa-check"></i><b>2.4.1</b> Crossed GLMM mathematical model</a></li>
-<li class="chapter" data-level="2.4.2" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-frequentist-fit"><i class="fa fa-check"></i><b>2.4.2</b> Crossed GLMM frequentist fit</a></li>
-<li class="chapter" data-level="2.4.3" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-bayes-brms-version"><i class="fa fa-check"></i><b>2.4.3</b> Crossed GLMM Bayes (brms) version</a></li>
-</ul></li>
-<li class="chapter" data-level="2.5" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date"><i class="fa fa-check"></i><b>2.5</b> GLMM with Gaussian Processes: RE for Trial, GP for Date</a>
-<ul>
-<li class="chapter" data-level="2.5.1" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-mathematical-model-1"><i class="fa fa-check"></i><b>2.5.1</b> Bayesian mathematical model</a></li>
-<li class="chapter" data-level="2.5.2" data-path="GLMMsR.html"><a href="GLMMsR.html#gaussian-process-bayes-brms-version"><i class="fa fa-check"></i><b>2.5.2</b> Gaussian Process Bayes (brms) version</a></li>
-</ul></li>
-<li class="chapter" data-level="2.6" data-path="GLMMsR.html"><a href="GLMMsR.html#summary-of-estimates"><i class="fa fa-check"></i><b>2.6</b> Summary of estimates</a>
-<ul>
-<li class="chapter" data-level="2.6.1" data-path="GLMMsR.html"><a href="GLMMsR.html#compare-tr-estimates"><i class="fa fa-check"></i><b>2.6.1</b> Compare TR estimates</a></li>
-<li class="chapter" data-level="2.6.2" data-path="GLMMsR.html"><a href="GLMMsR.html#compare-coefficients"><i class="fa fa-check"></i><b>2.6.2</b> Compare coefficients</a></li>
-<li class="chapter" data-level="2.6.3" data-path="GLMMsR.html"><a href="GLMMsR.html#plot-comparisons"><i class="fa fa-check"></i><b>2.6.3</b> Plot comparisons</a></li>
+<li class="chapter" data-level="2.4.1" data-path="mathematical-models.html"><a href="mathematical-models.html#bayesian-mathematical-model"><i class="fa fa-check"></i><b>2.4.1</b> Bayesian mathematical model</a></li>
+<li class="chapter" data-level="2.4.2" data-path="mathematical-models.html"><a href="mathematical-models.html#gaussian-process-bayes-brms-version"><i class="fa fa-check"></i><b>2.4.2</b> Gaussian Process Bayes (brms) version</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="3" data-path="GLMMsPython.html"><a href="GLMMsPython.html"><i class="fa fa-check"></i><b>3</b> GLMM’s in Python</a>
+<li class="chapter" data-level="3" data-path="GLMMsR.html"><a href="GLMMsR.html"><i class="fa fa-check"></i><b>3</b> GLMM’s in R</a>
 <ul>
-<li class="chapter" data-level="3.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#getting-started-with-python"><i class="fa fa-check"></i><b>3.1</b> Getting started with Python</a>
+<li class="chapter" data-level="3.1" data-path="GLMMsR.html"><a href="GLMMsR.html#data-exploration"><i class="fa fa-check"></i><b>3.1</b> Data Exploration</a>
 <ul>
-<li class="chapter" data-level="3.1.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#python-modules"><i class="fa fa-check"></i><b>3.1.1</b> Python modules</a></li>
+<li class="chapter" data-level="3.1.1" data-path="GLMMsR.html"><a href="GLMMsR.html#moth-counts"><i class="fa fa-check"></i><b>3.1.1</b> Moth counts</a></li>
+<li class="chapter" data-level="3.1.2" data-path="GLMMsR.html"><a href="GLMMsR.html#trap-locations"><i class="fa fa-check"></i><b>3.1.2</b> Trap locations</a></li>
+<li class="chapter" data-level="3.1.3" data-path="GLMMsR.html"><a href="GLMMsR.html#timeline"><i class="fa fa-check"></i><b>3.1.3</b> Timeline</a></li>
 </ul></li>
-<li class="chapter" data-level="3.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#set-up"><i class="fa fa-check"></i><b>3.2</b> Set up</a></li>
-<li class="chapter" data-level="3.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#outline-1"><i class="fa fa-check"></i><b>3.3</b> Outline</a></li>
-<li class="chapter" data-level="3.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#data-exploration-1"><i class="fa fa-check"></i><b>3.4</b> Data Exploration</a>
+<li class="chapter" data-level="3.2" data-path="GLMMsR.html"><a href="GLMMsR.html#basic-glm-models-1"><i class="fa fa-check"></i><b>3.2</b> Basic GLM models</a>
 <ul>
-<li class="chapter" data-level="3.4.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#moth-counts-1"><i class="fa fa-check"></i><b>3.4.1</b> Moth counts</a></li>
-<li class="chapter" data-level="3.4.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#trap-locations-1"><i class="fa fa-check"></i><b>3.4.2</b> Trap locations</a></li>
-<li class="chapter" data-level="3.4.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#timeline-1"><i class="fa fa-check"></i><b>3.4.3</b> Timeline</a></li>
+<li class="chapter" data-level="3.2.1" data-path="GLMMsR.html"><a href="GLMMsR.html#fitting-the-frequentist-models"><i class="fa fa-check"></i><b>3.2.1</b> Fitting the frequentist models</a></li>
+<li class="chapter" data-level="3.2.2" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-brms-model-fit"><i class="fa fa-check"></i><b>3.2.2</b> Bayesian (brms) model fit</a></li>
+<li class="chapter" data-level="3.2.3" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-rjags-model-fit"><i class="fa fa-check"></i><b>3.2.3</b> Bayesian (rjags) model fit</a></li>
 </ul></li>
-<li class="chapter" data-level="3.5" data-path="GLMMsPython.html"><a href="GLMMsPython.html#basic-glm-models-1"><i class="fa fa-check"></i><b>3.5</b> Basic GLM models</a>
+<li class="chapter" data-level="3.3" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-random-effect-re-for-locations"><i class="fa fa-check"></i><b>3.3</b> GLMM: Random effect (RE) for locations</a>
 <ul>
-<li class="chapter" data-level="3.5.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#mathematical-model-1"><i class="fa fa-check"></i><b>3.5.1</b> Mathematical model</a></li>
-<li class="chapter" data-level="3.5.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#fitting-the-frequentist-models-1"><i class="fa fa-check"></i><b>3.5.2</b> Fitting the frequentist models</a></li>
-<li class="chapter" data-level="3.5.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#bayesian-bambi-models-python"><i class="fa fa-check"></i><b>3.5.3</b> Bayesian (bambi) models– Python</a></li>
-<li class="chapter" data-level="3.5.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#bayesian-pymc-models-python"><i class="fa fa-check"></i><b>3.5.4</b> Bayesian (PyMC) models– Python</a></li>
+<li class="chapter" data-level="3.3.1" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-mathematical-model-1"><i class="fa fa-check"></i><b>3.3.1</b> GLMM mathematical model</a></li>
+<li class="chapter" data-level="3.3.2" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-frequentist-fit"><i class="fa fa-check"></i><b>3.3.2</b> GLMM frequentist fit</a></li>
+<li class="chapter" data-level="3.3.3" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-bayes-brms-version"><i class="fa fa-check"></i><b>3.3.3</b> GLMM Bayes (brms) version</a></li>
+<li class="chapter" data-level="3.3.4" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-bayes-rjags-model-fit"><i class="fa fa-check"></i><b>3.3.4</b> GLMM Bayes (rjags) model fit</a></li>
 </ul></li>
-<li class="chapter" data-level="3.6" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-random-effect-re-for-locations-1"><i class="fa fa-check"></i><b>3.6</b> GLMM: Random effect (RE) for locations</a>
+<li class="chapter" data-level="3.4" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-re-for-location-samplingdate-1"><i class="fa fa-check"></i><b>3.4</b> GLMM: RE for Location, SamplingDate</a>
 <ul>
-<li class="chapter" data-level="3.6.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-mathematical-model-1"><i class="fa fa-check"></i><b>3.6.1</b> GLMM mathematical model</a></li>
-<li class="chapter" data-level="3.6.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-frequentist-fit-1"><i class="fa fa-check"></i><b>3.6.2</b> GLMM frequentist fit</a></li>
-<li class="chapter" data-level="3.6.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-bayesian-bambi-models"><i class="fa fa-check"></i><b>3.6.3</b> GLMM Bayesian (bambi) models</a></li>
-<li class="chapter" data-level="3.6.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-bayesian-pymc-models-python"><i class="fa fa-check"></i><b>3.6.4</b> GLMM Bayesian (PyMC) models– Python</a></li>
+<li class="chapter" data-level="3.4.1" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-mathematical-model"><i class="fa fa-check"></i><b>3.4.1</b> Crossed GLMM mathematical model</a></li>
+<li class="chapter" data-level="3.4.2" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-frequentist-fit"><i class="fa fa-check"></i><b>3.4.2</b> Crossed GLMM frequentist fit</a></li>
+<li class="chapter" data-level="3.4.3" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-bayes-brms-version"><i class="fa fa-check"></i><b>3.4.3</b> Crossed GLMM Bayes (brms) version</a></li>
 </ul></li>
-<li class="chapter" data-level="3.7" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-re-for-location-crossed-samplingdate"><i class="fa fa-check"></i><b>3.7</b> GLMM: RE for location, crossed SamplingDate</a>
+<li class="chapter" data-level="3.5" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date-1"><i class="fa fa-check"></i><b>3.5</b> GLMM with Gaussian Processes: RE for Trial, GP for Date</a>
 <ul>
-<li class="chapter" data-level="3.7.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-frequentist-fit-1"><i class="fa fa-check"></i><b>3.7.1</b> Crossed GLMM frequentist fit</a></li>
-<li class="chapter" data-level="3.7.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-bayes-bambi-version"><i class="fa fa-check"></i><b>3.7.2</b> Crossed GLMM Bayes (bambi) version</a></li>
-<li class="chapter" data-level="3.7.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-bayes-pymc-version"><i class="fa fa-check"></i><b>3.7.3</b> Crossed GLMM Bayes (PyMC) version</a></li>
+<li class="chapter" data-level="3.5.1" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-mathematical-model-1"><i class="fa fa-check"></i><b>3.5.1</b> Bayesian mathematical model</a></li>
+<li class="chapter" data-level="3.5.2" data-path="GLMMsR.html"><a href="GLMMsR.html#gaussian-process-bayes-brms-version-1"><i class="fa fa-check"></i><b>3.5.2</b> Gaussian Process Bayes (brms) version</a></li>
 </ul></li>
-<li class="chapter" data-level="3.8" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date-1"><i class="fa fa-check"></i><b>3.8</b> GLMM with Gaussian Processes: RE for Trial, GP for Date</a>
+<li class="chapter" data-level="3.6" data-path="GLMMsR.html"><a href="GLMMsR.html#summary-of-estimates"><i class="fa fa-check"></i><b>3.6</b> Summary of estimates</a>
 <ul>
-<li class="chapter" data-level="3.8.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#gaussian-process-bayes-bambi-version"><i class="fa fa-check"></i><b>3.8.1</b> Gaussian Process Bayes (bambi) version</a></li>
-</ul></li>
-<li class="chapter" data-level="3.9" data-path="GLMMsPython.html"><a href="GLMMsPython.html#summary-of-estimates-1"><i class="fa fa-check"></i><b>3.9</b> Summary of estimates</a>
-<ul>
-<li class="chapter" data-level="3.9.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#compare-tr-estimates-1"><i class="fa fa-check"></i><b>3.9.1</b> Compare TR estimates</a></li>
-<li class="chapter" data-level="3.9.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#compare-coefficients-1"><i class="fa fa-check"></i><b>3.9.2</b> Compare coefficients</a></li>
-<li class="chapter" data-level="3.9.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#plot-comparisons-1"><i class="fa fa-check"></i><b>3.9.3</b> Plot comparisons</a></li>
+<li class="chapter" data-level="3.6.1" data-path="GLMMsR.html"><a href="GLMMsR.html#compare-tr-estimates"><i class="fa fa-check"></i><b>3.6.1</b> Compare TR estimates</a></li>
+<li class="chapter" data-level="3.6.2" data-path="GLMMsR.html"><a href="GLMMsR.html#compare-coefficients"><i class="fa fa-check"></i><b>3.6.2</b> Compare coefficients</a></li>
+<li class="chapter" data-level="3.6.3" data-path="GLMMsR.html"><a href="GLMMsR.html#plot-comparisons"><i class="fa fa-check"></i><b>3.6.3</b> Plot comparisons</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="NonlinearR.html"><a href="NonlinearR.html"><i class="fa fa-check"></i><b>4</b> Nonlinear Bayesian Models in R</a>
+<li class="chapter" data-level="4" data-path="GLMMsPython.html"><a href="GLMMsPython.html"><i class="fa fa-check"></i><b>4</b> GLMM’s in Python</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="NonlinearR.html"><a href="NonlinearR.html#generalized-logistic-curve"><i class="fa fa-check"></i><b>4.1</b> Generalized Logistic Curve</a></li>
-<li class="chapter" data-level="4.2" data-path="NonlinearR.html"><a href="NonlinearR.html#bayesian-model"><i class="fa fa-check"></i><b>4.2</b> Bayesian model</a></li>
-<li class="chapter" data-level="4.3" data-path="NonlinearR.html"><a href="NonlinearR.html#fitting-models-with-the-brms-package"><i class="fa fa-check"></i><b>4.3</b> Fitting models with the brms package</a>
+<li class="chapter" data-level="4.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#getting-started-with-python"><i class="fa fa-check"></i><b>4.1</b> Getting started with Python</a>
 <ul>
-<li class="chapter" data-level="4.3.1" data-path="NonlinearR.html"><a href="NonlinearR.html#no-re-no-gp"><i class="fa fa-check"></i><b>4.3.1</b> no RE, no GP</a></li>
-<li class="chapter" data-level="4.3.2" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-no-gp"><i class="fa fa-check"></i><b>4.3.2</b> intercept RE, no GP</a></li>
-<li class="chapter" data-level="4.3.3" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-a-re-no-gp"><i class="fa fa-check"></i><b>4.3.3</b> intercept RE, A RE, no GP</a></li>
-<li class="chapter" data-level="4.3.4" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-a-re-with-gp-same-for-all-loc"><i class="fa fa-check"></i><b>4.3.4</b> intercept RE, A RE, WITH GP (same for all loc)</a></li>
-<li class="chapter" data-level="4.3.5" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-a-re-with-gp-diff-for-each-loc"><i class="fa fa-check"></i><b>4.3.5</b> intercept, A RE, with GP (DIFF for each loc)</a></li>
-<li class="chapter" data-level="4.3.6" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-a-b-m-re-with-gp-diff-for-each-loc"><i class="fa fa-check"></i><b>4.3.6</b> intercept, A, B, M RE, with GP (DIFF for each loc)</a></li>
+<li class="chapter" data-level="4.1.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#python-modules"><i class="fa fa-check"></i><b>4.1.1</b> Python modules</a></li>
 </ul></li>
-<li class="chapter" data-level="4.4" data-path="NonlinearR.html"><a href="NonlinearR.html#model-our-case-study-data"><i class="fa fa-check"></i><b>4.4</b> Model our case study data</a></li>
+<li class="chapter" data-level="4.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#set-up"><i class="fa fa-check"></i><b>4.2</b> Set up</a></li>
+<li class="chapter" data-level="4.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#outline"><i class="fa fa-check"></i><b>4.3</b> Outline</a></li>
+<li class="chapter" data-level="4.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#data-exploration-1"><i class="fa fa-check"></i><b>4.4</b> Data Exploration</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#moth-counts-1"><i class="fa fa-check"></i><b>4.4.1</b> Moth counts</a></li>
+<li class="chapter" data-level="4.4.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#trap-locations-1"><i class="fa fa-check"></i><b>4.4.2</b> Trap locations</a></li>
+<li class="chapter" data-level="4.4.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#timeline-1"><i class="fa fa-check"></i><b>4.4.3</b> Timeline</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="GLMMsPython.html"><a href="GLMMsPython.html#basic-glm-models-2"><i class="fa fa-check"></i><b>4.5</b> Basic GLM models</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#mathematical-model"><i class="fa fa-check"></i><b>4.5.1</b> Mathematical model</a></li>
+<li class="chapter" data-level="4.5.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#fitting-the-frequentist-models-1"><i class="fa fa-check"></i><b>4.5.2</b> Fitting the frequentist models</a></li>
+<li class="chapter" data-level="4.5.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#bayesian-bambi-models-python"><i class="fa fa-check"></i><b>4.5.3</b> Bayesian (bambi) models– Python</a></li>
+<li class="chapter" data-level="4.5.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#bayesian-pymc-models-python"><i class="fa fa-check"></i><b>4.5.4</b> Bayesian (PyMC) models– Python</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-random-effect-re-for-locations-1"><i class="fa fa-check"></i><b>4.6</b> GLMM: Random effect (RE) for locations</a>
+<ul>
+<li class="chapter" data-level="4.6.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-mathematical-model-2"><i class="fa fa-check"></i><b>4.6.1</b> GLMM mathematical model</a></li>
+<li class="chapter" data-level="4.6.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-frequentist-fit-1"><i class="fa fa-check"></i><b>4.6.2</b> GLMM frequentist fit</a></li>
+<li class="chapter" data-level="4.6.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-bayesian-bambi-models"><i class="fa fa-check"></i><b>4.6.3</b> GLMM Bayesian (bambi) models</a></li>
+<li class="chapter" data-level="4.6.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-bayesian-pymc-models-python"><i class="fa fa-check"></i><b>4.6.4</b> GLMM Bayesian (PyMC) models– Python</a></li>
+</ul></li>
+<li class="chapter" data-level="4.7" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-re-for-location-crossed-samplingdate"><i class="fa fa-check"></i><b>4.7</b> GLMM: RE for location, crossed SamplingDate</a>
+<ul>
+<li class="chapter" data-level="4.7.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-frequentist-fit-1"><i class="fa fa-check"></i><b>4.7.1</b> Crossed GLMM frequentist fit</a></li>
+<li class="chapter" data-level="4.7.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-bayes-bambi-version"><i class="fa fa-check"></i><b>4.7.2</b> Crossed GLMM Bayes (bambi) version</a></li>
+<li class="chapter" data-level="4.7.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-bayes-pymc-version"><i class="fa fa-check"></i><b>4.7.3</b> Crossed GLMM Bayes (PyMC) version</a></li>
+</ul></li>
+<li class="chapter" data-level="4.8" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date-2"><i class="fa fa-check"></i><b>4.8</b> GLMM with Gaussian Processes: RE for Trial, GP for Date</a>
+<ul>
+<li class="chapter" data-level="4.8.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#gaussian-process-bayes-bambi-version"><i class="fa fa-check"></i><b>4.8.1</b> Gaussian Process Bayes (bambi) version</a></li>
+</ul></li>
+<li class="chapter" data-level="4.9" data-path="GLMMsPython.html"><a href="GLMMsPython.html#summary-of-estimates-1"><i class="fa fa-check"></i><b>4.9</b> Summary of estimates</a>
+<ul>
+<li class="chapter" data-level="4.9.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#compare-tr-estimates-1"><i class="fa fa-check"></i><b>4.9.1</b> Compare TR estimates</a></li>
+<li class="chapter" data-level="4.9.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#compare-coefficients-1"><i class="fa fa-check"></i><b>4.9.2</b> Compare coefficients</a></li>
+<li class="chapter" data-level="4.9.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#plot-comparisons-1"><i class="fa fa-check"></i><b>4.9.3</b> Plot comparisons</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="NonlinearR.html"><a href="NonlinearR.html"><i class="fa fa-check"></i><b>5</b> Nonlinear Bayesian Models in R</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="NonlinearR.html"><a href="NonlinearR.html#generalized-logistic-curve"><i class="fa fa-check"></i><b>5.1</b> Generalized Logistic Curve</a></li>
+<li class="chapter" data-level="5.2" data-path="NonlinearR.html"><a href="NonlinearR.html#bayesian-model-1"><i class="fa fa-check"></i><b>5.2</b> Bayesian model</a></li>
+<li class="chapter" data-level="5.3" data-path="NonlinearR.html"><a href="NonlinearR.html#fitting-models-with-the-brms-package"><i class="fa fa-check"></i><b>5.3</b> Fitting models with the brms package</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="NonlinearR.html"><a href="NonlinearR.html#no-re-no-gp"><i class="fa fa-check"></i><b>5.3.1</b> no RE, no GP</a></li>
+<li class="chapter" data-level="5.3.2" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-no-gp"><i class="fa fa-check"></i><b>5.3.2</b> intercept RE, no GP</a></li>
+<li class="chapter" data-level="5.3.3" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-a-re-no-gp"><i class="fa fa-check"></i><b>5.3.3</b> intercept RE, A RE, no GP</a></li>
+<li class="chapter" data-level="5.3.4" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-a-re-with-gp-same-for-all-loc"><i class="fa fa-check"></i><b>5.3.4</b> intercept RE, A RE, WITH GP (same for all loc)</a></li>
+<li class="chapter" data-level="5.3.5" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-a-re-with-gp-diff-for-each-loc"><i class="fa fa-check"></i><b>5.3.5</b> intercept, A RE, with GP (DIFF for each loc)</a></li>
+<li class="chapter" data-level="5.3.6" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-a-b-m-re-with-gp-diff-for-each-loc"><i class="fa fa-check"></i><b>5.3.6</b> intercept, A, B, M RE, with GP (DIFF for each loc)</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="NonlinearR.html"><a href="NonlinearR.html#model-our-case-study-data"><i class="fa fa-check"></i><b>5.4</b> Model our case study data</a></li>
 </ul></li>
 </ul>
 
@@ -199,13 +222,13 @@
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="GLMMsR" class="section level1 hasAnchor" number="2">
-<h1><span class="header-section-number">Chapter 2</span> GLMM’s in R<a href="GLMMsR.html#GLMMsR" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="GLMMsR" class="section level1 hasAnchor" number="3">
+<h1><span class="header-section-number">Chapter 3</span> GLMM’s in R<a href="GLMMsR.html#GLMMsR" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>When completing an analysis, I may skip around in my script quite a bit. Therefore, I like all packages loaded, and all data uploaded and manipulated at the start of my script.</p>
-<div id="data-exploration" class="section level2 hasAnchor" number="2.1">
-<h2><span class="header-section-number">2.1</span> Data Exploration<a href="GLMMsR.html#data-exploration" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div id="moth-counts" class="section level3 hasAnchor" number="2.1.1">
-<h3><span class="header-section-number">2.1.1</span> Moth counts<a href="GLMMsR.html#moth-counts" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="data-exploration" class="section level2 hasAnchor" number="3.1">
+<h2><span class="header-section-number">3.1</span> Data Exploration<a href="GLMMsR.html#data-exploration" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="moth-counts" class="section level3 hasAnchor" number="3.1.1">
+<h3><span class="header-section-number">3.1.1</span> Moth counts<a href="GLMMsR.html#moth-counts" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Here is what the data look like. Columns: Location, Treatment, TrapID, Longitude, Latitude, AssessmentNumber, and SamplingDate should be self-explanatory… TransplantDate is the date that the rice seedlings were transplanted into the field; DispInstallDate is the treatment installation date; TrapInstallDate is the trap installation date; “nYSB” are the moth counts (number of YSB moths); DaysOfCatch is the number of days since the trap was previously sampled or the number of days since trap installation if it is assessment number 1; DATI is days after trap installation; DADI is days after dispenser installation; and DAT is days after transplant. Some of these columns will be discussed more later.</p>
 <pre><code>##    Location          Treatment             TrapID        Longitude    
 ##  Length:672         Length:672         Min.   :101.0   Min.   :106.5  
@@ -304,87 +327,27 @@
 ## $DAT
 ## NULL</code></pre>
 <p>The data are the moth counts collected at each trap (average per day), within each location and throughout the season. Note how the y-axis changes for each plot in the figure.</p>
-<p><img src="01-GLMMsInR_files/figure-html/plotMoths-1.png" width="100%" /></p>
+<p><img src="02-GLMMsInR_files/figure-html/plotMoths-1.png" width="100%" /></p>
 </div>
-<div id="trap-locations" class="section level3 hasAnchor" number="2.1.2">
-<h3><span class="header-section-number">2.1.2</span> Trap locations<a href="GLMMsR.html#trap-locations" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="trap-locations" class="section level3 hasAnchor" number="3.1.2">
+<h3><span class="header-section-number">3.1.2</span> Trap locations<a href="GLMMsR.html#trap-locations" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Trial locations in relation to each other. Some trial locations are closer to each other than others.</p>
-<p><img src="01-GLMMsInR_files/figure-html/unnamed-chunk-2-1.png" width="100%" /></p>
+<p><img src="02-GLMMsInR_files/figure-html/unnamed-chunk-2-1.png" width="100%" /></p>
 <p>Within each location, the treatment traps have a slightly different alignment:</p>
-<p><img src="01-GLMMsInR_files/figure-html/unnamed-chunk-3-1.png" width="100%" /></p>
+<p><img src="02-GLMMsInR_files/figure-html/unnamed-chunk-3-1.png" width="100%" /></p>
 </div>
-<div id="timeline" class="section level3 hasAnchor" number="2.1.3">
-<h3><span class="header-section-number">2.1.3</span> Timeline<a href="GLMMsR.html#timeline" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p><img src="01-GLMMsInR_files/figure-html/timeline-1.png" width="100%" /></p>
+<div id="timeline" class="section level3 hasAnchor" number="3.1.3">
+<h3><span class="header-section-number">3.1.3</span> Timeline<a href="GLMMsR.html#timeline" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><img src="02-GLMMsInR_files/figure-html/timeline-1.png" width="100%" /></p>
 <p>Note that not all traps are installed on exactly the same day; not all locations have rice transplanted on exactly the same day; and not all traps are sampled on exactly the same day.</p>
 </div>
 </div>
-<div id="basic-glm-models" class="section level2 hasAnchor" number="2.2">
-<h2><span class="header-section-number">2.2</span> Basic GLM models<a href="GLMMsR.html#basic-glm-models" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="basic-glm-models-1" class="section level2 hasAnchor" number="3.2">
+<h2><span class="header-section-number">3.2</span> Basic GLM models<a href="GLMMsR.html#basic-glm-models-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>To start, we ignore all the spatial and temporal relationships in the data and assume each data point is independent and identically distributed (iid). <strong>This is not a good model for the data!</strong> It is just our starting off point.</p>
 <p>When building hierarchical Bayesian models, it is always a good idea to start simple, make sure everything works as expected, and then build up.</p>
-<div id="mathematical-model" class="section level3 hasAnchor" number="2.2.1">
-<h3><span class="header-section-number">2.2.1</span> Mathematical model<a href="GLMMsR.html#mathematical-model" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Our response variable is a count, therefore we use either a Poisson or negative binomial distribution as the basis for our model. These models are known as generalized linear models (GLMs).</p>
-<p>The model must also include an offset to account for the varying time intervals between sample. (If the traps are left unchecked for more days, we naturally expect the trap to have more moths. This varying effort is accounted for by the offset.)</p>
-<div id="poisson-regression-model" class="section level4 hasAnchor" number="2.2.1.1">
-<h4><span class="header-section-number">2.2.1.1</span> Poisson regression model<a href="GLMMsR.html#poisson-regression-model" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<p>We start with a poisson version of our regression model:</p>
-<p><span class="math display">\[
-y_i \sim Pois(\lambda_i) \\
-log(\lambda_i ) = \beta_0 + \beta_1 x_{A,i} + \mbox{ln} \left(DaysOfCatch_i\right)
-\]</span></p>
-<p>where, for data samples <span class="math inline">\(i = 1, ..., N\)</span>,</p>
-<p><span class="math inline">\(y_i\)</span> is moth count <span class="math inline">\(i\)</span>,</p>
-<p><span class="math inline">\(\lambda_i\)</span> is the expected moth count for sample <span class="math inline">\(i\)</span>,</p>
-<p><span class="math inline">\(\beta_0\)</span> is the intercept of the model. Here, it is the basis for the expected moth count for our control treatment.</p>
-<p><span class="math inline">\(\beta_1\)</span> is the expected difference in moth counts between the control group and the treatment A group,</p>
-<p><span class="math inline">\(x_{i}\)</span> is an indicator variable that equals 1 if sample <span class="math inline">\(i\)</span> is from a treatment A field and equals 0 otherwise, and</p>
-<p><span class="math inline">\(\left(DaysOfCatch_i\right)\)</span> is the offset to account for the varying time interval between samples. This is necessary because with a longer time interval, more moths will fly into the trap.</p>
-</div>
-<div id="negative-binomial-regression-model" class="section level4 hasAnchor" number="2.2.1.2">
-<h4><span class="header-section-number">2.2.1.2</span> Negative binomial regression model<a href="GLMMsR.html#negative-binomial-regression-model" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<p>In ecology, there is always additional variability in our data than what the Poisson distribution allows. To account for the additional variability in our model, we switch to a negative binomial distribution:</p>
-<p><span class="math display">\[
-y_i \sim NegBinom(\lambda_i, \phi) \\
-log(\lambda_i ) = \beta_0 + \beta_1 x_{i} + \mbox{ln} \left(DaysOfCatch_i\right)
-\]</span></p>
-<p>“Negative binomial regression is used to model count data for which the variance is higher than the mean.” (<a href="https://www.pymc.io/projects/examples/en/latest/generalized_linear_models/GLM-negative-binomial-regression.html" class="uri">https://www.pymc.io/projects/examples/en/latest/generalized_linear_models/GLM-negative-binomial-regression.html</a>)</p>
-<p>For the negative binomial regression, all variables and parameters are defined as before, but the model has an additional parameter, <span class="math inline">\(\phi\)</span>, that allows for the additional variation. The negative binomial distribution and regression model can be written in many ways. In our models, <span class="math inline">\(\phi\)</span> is defined through the following formula where the variance associated with an expected moth count, <span class="math inline">\(\lambda\)</span>, is:</p>
-<p><span class="math display">\[
-Var(\lambda) = \lambda + \phi \cdot\lambda^2
-\]</span></p>
-<p>(For a Poisson distribution, <span class="math inline">\(Var(\lambda) = \lambda\)</span>.)</p>
-</div>
-<div id="bayesian-mathematical-model" class="section level4 hasAnchor" number="2.2.1.3">
-<h4><span class="header-section-number">2.2.1.3</span> Bayesian mathematical model<a href="GLMMsR.html#bayesian-mathematical-model" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<p>I also fit these models using a Bayesian framework, again to build our foundation for the more complex models that come later.</p>
-<p>For the Bayesian models, I only show the more complex negative binomial version.</p>
-<p>To make our models Bayesian, we add priors to our parameters:</p>
-<p><span class="math display">\[
-y_i \sim NegBinom(\lambda_i, \phi) \\
-log(\lambda_i ) = \beta_0 + \beta_1 x_{A,i} + \mbox{ln} \left(DaysOfCatch_i\right) \\
-\beta_0 \sim Normal(0, 2) \\
-\beta_1 \sim Normal(0, 2) \\
-\phi \sim HalfCauchy(0,1)
-\]</span></p>
-<p>The models use slightly informative priors. When working on a log-scale (e.g., with Poisson or negative binomial distributions), this often becomes essential to avoid parameter estimates on the boundaries. (See Hooten and Hobbs for a good discussion on this issue.)</p>
-</div>
-<div id="trapping-reduction-defined" class="section level4 hasAnchor" number="2.2.1.4">
-<h4><span class="header-section-number">2.2.1.4</span> Trapping reduction defined<a href="GLMMsR.html#trapping-reduction-defined" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<p>The primary metric of interest from these models is a derived parameter that we call trapping reduction (TR):</p>
-<p><span class="math display">\[
-TR = 100 - 100 e ^{(-\beta_1)}
-\]</span></p>
-<p>To obtain a 95% confidence interval for TR (for the frequentist version of our model), we use the following approximation:</p>
-<p><span class="math display">\[
-TR = 100 - 100 e ^{(-\beta_1 \pm 2 \cdot SE(\beta_1))}
-\]</span></p>
-<p>For the Bayesian version, the derived parameter is sampled as part of the MCMC iterations, and the 95% credible interval is the 2.5%, 97.5% quantiles of its resulting distribution.</p>
-</div>
-</div>
-<div id="fitting-the-frequentist-models" class="section level3 hasAnchor" number="2.2.2">
-<h3><span class="header-section-number">2.2.2</span> Fitting the frequentist models<a href="GLMMsR.html#fitting-the-frequentist-models" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="fitting-the-frequentist-models" class="section level3 hasAnchor" number="3.2.1">
+<h3><span class="header-section-number">3.2.1</span> Fitting the frequentist models<a href="GLMMsR.html#fitting-the-frequentist-models" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Note: when I predict for new data, I set DaysOfCatch = 1, and then I compare to the moths per day variable (mothsperday = nYSB / DaysOfCatch). I want to exclude any patterns related to the varying time intervals.</p>
 <p>These models show a very tight confidence intervals for our predictions. But also, the residual deviance is MUCH greater than the degree of freedom, indicating a lack of fit. The plot of the predictions overlaid on the data also demonstrate the lack of fit.</p>
 <pre><code>## 
@@ -406,7 +369,7 @@ TR = 100 - 100 e ^{(-\beta_1 \pm 2 \cdot SE(\beta_1))}
 ## AIC: 28072
 ## 
 ## Number of Fisher Scoring iterations: 6</code></pre>
-<p><img src="01-GLMMsInR_files/figure-html/pois1-1.png" width="100%" /></p>
+<p><img src="02-GLMMsInR_files/figure-html/pois1-1.png" width="100%" /></p>
 <p>The model is such a bad fit to the data, it is hard to even tell what is going on in the plot above.</p>
 <p>For the negative binomial model, our confidence intervals are a little wider, but we are still ignoring all the correlations in our data. And the plot of the predictions again indicates the lack of fit.</p>
 <pre><code>## 
@@ -434,10 +397,10 @@ TR = 100 - 100 e ^{(-\beta_1 \pm 2 \cdot SE(\beta_1))}
 ##           Std. Err.:  0.0352 
 ## 
 ##  2 x log-likelihood:  -4877.5410</code></pre>
-<p><img src="01-GLMMsInR_files/figure-html/nb1-1.png" width="100%" /></p>
+<p><img src="02-GLMMsInR_files/figure-html/nb1-1.png" width="100%" /></p>
 </div>
-<div id="bayesian-brms-model-fit" class="section level3 hasAnchor" number="2.2.3">
-<h3><span class="header-section-number">2.2.3</span> Bayesian (brms) model fit<a href="GLMMsR.html#bayesian-brms-model-fit" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="bayesian-brms-model-fit" class="section level3 hasAnchor" number="3.2.2">
+<h3><span class="header-section-number">3.2.2</span> Bayesian (brms) model fit<a href="GLMMsR.html#bayesian-brms-model-fit" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>In R, I fit the Bayesian models using the “brms” package. I find this package very intuitive and it has fast, efficient algorithms based on Stan.</p>
 <p>Because the models take a few minutes to fit, I usually fit them when I am initially running through my code, save them, and then only load the model fit when rendering the Rmarkdown file and creating the resulting figures.</p>
 <p>The prior_summary command is helpful if you do not know what a parameter is called in ‘brms’. Here, I used the command to find out what they called their <span class="math inline">\(\phi\)</span> parameter. (They call it the shape parameter.)</p>
@@ -494,13 +457,13 @@ TR = 100 - 100 e ^{(-\beta_1 \pm 2 \cdot SE(\beta_1))}
 ##  2 x log-likelihood:  -4877.5410</code></pre>
 <pre><code>##        TR lowerCI upperCI
 ## 2.5% 88.5      86    90.5</code></pre>
-<p><img src="01-GLMMsInR_files/figure-html/unnamed-chunk-7-1.png" width="100%" /></p>
+<p><img src="02-GLMMsInR_files/figure-html/unnamed-chunk-7-1.png" width="100%" /></p>
 </div>
-<div id="bayesian-rjags-model-fit" class="section level3 hasAnchor" number="2.2.4">
-<h3><span class="header-section-number">2.2.4</span> Bayesian (rjags) model fit<a href="GLMMsR.html#bayesian-rjags-model-fit" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>I also fit the Bayesian models using the “rjags” package. Eventually, I fit complex non-linear, hierarchical Bayesian models and for those models, I need mroe flexibility than “brms” provides. Because it is good practice to build up to the complex models, I am also fitting these simpler models with the rjags package.</p>
-<div id="poisson-model-in-jags" class="section level4 hasAnchor" number="2.2.4.1">
-<h4><span class="header-section-number">2.2.4.1</span> Poisson model in jags<a href="GLMMsR.html#poisson-model-in-jags" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="bayesian-rjags-model-fit" class="section level3 hasAnchor" number="3.2.3">
+<h3><span class="header-section-number">3.2.3</span> Bayesian (rjags) model fit<a href="GLMMsR.html#bayesian-rjags-model-fit" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>I also fit the Bayesian models using the <code>rjags</code> package. Eventually, I fit complex non-linear, hierarchical Bayesian models and for those models, I need more flexibility than <code>brms</code> provides. Because it is good practice to build up to the complex models, I am also fitting these simpler models with the rjags package.</p>
+<div id="poisson-model-in-jags" class="section level4 hasAnchor" number="3.2.3.1">
+<h4><span class="header-section-number">3.2.3.1</span> Poisson model in jags<a href="GLMMsR.html#poisson-model-in-jags" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <pre><code>## Compiling model graph
 ##    Resolving undeclared variables
 ##    Allocating nodes
@@ -520,16 +483,16 @@ TR = 100 - 100 e ^{(-\beta_1 \pm 2 \cdot SE(\beta_1))}
 ##    plus standard error of the mean:
 ## 
 ##      Mean       SD  Naive SE Time-series SE
-## TR 88.532 0.305172 0.0068239      0.0068239
-## b0  1.396 0.008441 0.0001888      0.0001888
-## b1 -2.166 0.026598 0.0005948      0.0005948
+## TR 88.532 0.302677 0.0067681      0.0067681
+## b0  1.396 0.008451 0.0001890      0.0001890
+## b1 -2.166 0.026401 0.0005903      0.0005903
 ## 
 ## 2. Quantiles for each variable:
 ## 
 ##      2.5%    25%    50%    75%  97.5%
-## TR 87.939 88.319 88.531 88.751 89.112
-## b0  1.379  1.390  1.396  1.402  1.412
-## b1 -2.218 -2.185 -2.166 -2.147 -2.115</code></pre>
+## TR 87.931 88.331 88.536 88.734 89.111
+## b0  1.381  1.391  1.396  1.402  1.413
+## b1 -2.217 -2.183 -2.166 -2.148 -2.114</code></pre>
 <pre><code>## 
 ## Call:
 ## glm(formula = nYSB ~ TreatmentF, family = poisson, data = datR, 
@@ -549,12 +512,12 @@ TR = 100 - 100 e ^{(-\beta_1 \pm 2 \cdot SE(\beta_1))}
 ## AIC: 28072
 ## 
 ## Number of Fisher Scoring iterations: 6</code></pre>
-<p><img src="01-GLMMsInR_files/figure-html/jagsOut1p-1.png" width="100%" /></p>
+<p><img src="02-GLMMsInR_files/figure-html/jagsOut1p-1.png" width="100%" /></p>
 </div>
-<div id="nb-model-in-jags" class="section level4 hasAnchor" number="2.2.4.2">
-<h4><span class="header-section-number">2.2.4.2</span> NB model in jags<a href="GLMMsR.html#nb-model-in-jags" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="nb-model-in-jags" class="section level4 hasAnchor" number="3.2.3.2">
+<h4><span class="header-section-number">3.2.3.2</span> NB model in jags<a href="GLMMsR.html#nb-model-in-jags" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Here I also use the matrix form of <span class="math inline">\(X\beta\)</span>.</p>
-<p>Note that jags uses a different parameterization than R., so there is an extra line of code to make them match. Also, I coded my model in matrix form here– this paramaterization of the priors is equivalent to the Poisson model above. I include both for comparison.</p>
+<p>Note that jags uses a different parameterization than R., so there is an extra line of code to make them match. Also, I coded my model in matrix form here– this parameterization of the priors is equivalent to the Poisson model above. I include both for comparison.</p>
 <pre><code>## Compiling model graph
 ##    Resolving undeclared variables
 ##    Allocating nodes
@@ -586,17 +549,17 @@ TR = 100 - 100 e ^{(-\beta_1 \pm 2 \cdot SE(\beta_1))}
 ## beta[1]  1.265  1.3509  1.3943  1.4402  1.5256
 ## beta[2] -2.336 -2.2146 -2.1479 -2.0841 -1.9427
 ## r        0.590  0.6335  0.6565  0.6801  0.7274</code></pre>
-<p><img src="01-GLMMsInR_files/figure-html/jagsOut1nb-1.png" width="100%" /></p>
+<p><img src="02-GLMMsInR_files/figure-html/jagsOut1nb-1.png" width="100%" /></p>
 <p>This model is not yet fully converged, so some differences from R output are expected.</p>
 </div>
 </div>
 </div>
-<div id="glmm-random-effect-re-for-locations" class="section level2 hasAnchor" number="2.3">
-<h2><span class="header-section-number">2.3</span> GLMM: Random effect (RE) for locations<a href="GLMMsR.html#glmm-random-effect-re-for-locations" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="glmm-random-effect-re-for-locations" class="section level2 hasAnchor" number="3.3">
+<h2><span class="header-section-number">3.3</span> GLMM: Random effect (RE) for locations<a href="GLMMsR.html#glmm-random-effect-re-for-locations" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The first fix we make to the model is acknowledging that overall average moth pressure varies from location to location (see Fig 1 of moth counts). To make this fix, we add a location random effect (RE) and our model becomes a generalized linear mixed-effects model (GLMM or GLMER).</p>
 <p>We also want to acknowledge that the treatment effect may vary from location to location– sometimes we see a big difference in moth counts between control and treatment fields, and sometimes the difference is smaller. For inference though, we are only interested in the larger picture, which is the overall trapping reduction. (We are not interested in what happens at these exact locations per se, we are more interested in the average treatment effect.) Therefore, we also add a treatment random effect.</p>
-<div id="glmm-mathematical-model" class="section level3 hasAnchor" number="2.3.1">
-<h3><span class="header-section-number">2.3.1</span> GLMM mathematical model<a href="GLMMsR.html#glmm-mathematical-model" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="glmm-mathematical-model-1" class="section level3 hasAnchor" number="3.3.1">
+<h3><span class="header-section-number">3.3.1</span> GLMM mathematical model<a href="GLMMsR.html#glmm-mathematical-model-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>I only show the Poisson version of the model, the NB version is a straightforward extension.</p>
 <p><span class="math display">\[
 y_{ik} \sim Pois(\lambda_{ik}) \\
@@ -614,8 +577,8 @@ log(\lambda_{ik} ) = \beta_0 + \beta_1 x_{A,i} + \gamma_{0k} x_{ik}  + \gamma_{1
 <p><span class="math inline">\(\gamma_{1k}\)</span> is the random slope associated with location <span class="math inline">\(k\)</span>, which leads to different treatment effects at each location. All <span class="math inline">\(\gamma_{1k}\)</span> come from an iid Normal distribution, and</p>
 <p><span class="math inline">\(x_{ik}\)</span> is an indicator variable that equals 1 if moth count <span class="math inline">\(i\)</span> is associated with location <span class="math inline">\(k\)</span> and 0 otherwise.</p>
 <p>OK, technically I should be introducing matrices here because <span class="math inline">\(k = 1,..., K=10\)</span> locations, so we need a new indicator variable for each location, but I’m going to be lazy and write it like this for now.</p>
-<div id="bayesian-glmm-mathematical-model" class="section level4 hasAnchor" number="2.3.1.1">
-<h4><span class="header-section-number">2.3.1.1</span> Bayesian GLMM mathematical model<a href="GLMMsR.html#bayesian-glmm-mathematical-model" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="bayesian-glmm-mathematical-model" class="section level4 hasAnchor" number="3.3.1.1">
+<h4><span class="header-section-number">3.3.1.1</span> Bayesian GLMM mathematical model<a href="GLMMsR.html#bayesian-glmm-mathematical-model" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Here is the same model with a Bayesian framework and using a negative binomial regression:</p>
 <p>To make our models Bayesian, we add priors to our parameters:</p>
 <p><span class="math display">\[
@@ -630,8 +593,8 @@ log(\lambda_{ik} ) = \beta_0 + \beta_1 x_{A,i} + \gamma_{0k} x_{ik}  + \gamma_{1
 \phi \sim HalfCauchy(0,1) \\
 \]</span></p>
 </div>
-<div id="bayesian-glmm-matrix-version" class="section level4 hasAnchor" number="2.3.1.2">
-<h4><span class="header-section-number">2.3.1.2</span> Bayesian GLMM – Matrix version<a href="GLMMsR.html#bayesian-glmm-matrix-version" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="bayesian-glmm-matrix-version" class="section level4 hasAnchor" number="3.3.1.2">
+<h4><span class="header-section-number">3.3.1.2</span> Bayesian GLMM – Matrix version<a href="GLMMsR.html#bayesian-glmm-matrix-version" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>I DO write the Bayesian version in matrix form because it matches the coding (and is more correct given the need for a <span class="math inline">\(KxK\)</span> <span class="math inline">\(Z\)</span> design matrix):</p>
 <p><span class="math display">\[
 \mathbf{Y} \sim NegBinom(\boldsymbol\lambda, \phi) \\
@@ -643,8 +606,8 @@ log(\boldsymbol\lambda) = \mathbf{X}\boldsymbol\beta + \mathbf{Z}\boldsymbol\gam
 \]</span></p>
 </div>
 </div>
-<div id="glmm-frequentist-fit" class="section level3 hasAnchor" number="2.3.2">
-<h3><span class="header-section-number">2.3.2</span> GLMM frequentist fit<a href="GLMMsR.html#glmm-frequentist-fit" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="glmm-frequentist-fit" class="section level3 hasAnchor" number="3.3.2">
+<h3><span class="header-section-number">3.3.2</span> GLMM frequentist fit<a href="GLMMsR.html#glmm-frequentist-fit" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>A couple of notes here. R always gets mad when you ask for SE’s for predictions from a GLMM. Technically, you need to run simulations to get them and then they still come with an asterisk related to their reliability. (This is a reason to use the Bayesian model– credible intervals are never based on approximations!)</p>
 <p>When we plot our predictions, we see that we now have better estimates for the overall mean at each location, and we see how much they vary from location to location, but there is a strong temporal pattern at each location that we are missing.</p>
 <pre><code>## Generalized linear mixed model fit by maximum likelihood (Laplace
@@ -693,7 +656,7 @@ log(\boldsymbol\lambda) = \mathbf{X}\boldsymbol\beta + \mathbf{Z}\boldsymbol\gam
 </tr>
 </tbody>
 </table>
-<p><img src="01-GLMMsInR_files/figure-html/pois2-1.png" width="100%" /></p>
+<p><img src="02-GLMMsInR_files/figure-html/pois2-1.png" width="100%" /></p>
 <pre><code>## Generalized linear mixed model fit by maximum likelihood (Laplace
 ##   Approximation) [glmerMod]
 ##  Family: Negative Binomial(1.5338)  ( log )
@@ -740,11 +703,11 @@ log(\boldsymbol\lambda) = \mathbf{X}\boldsymbol\beta + \mathbf{Z}\boldsymbol\gam
 </tr>
 </tbody>
 </table>
-<p><img src="01-GLMMsInR_files/figure-html/nb2-1.png" width="100%" /></p>
+<p><img src="02-GLMMsInR_files/figure-html/nb2-1.png" width="100%" /></p>
 </div>
-<div id="glmm-bayes-brms-version" class="section level3 hasAnchor" number="2.3.3">
-<h3><span class="header-section-number">2.3.3</span> GLMM Bayes (brms) version<a href="GLMMsR.html#glmm-bayes-brms-version" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>By default, the prior distributions of random slopes and intercepts are correlated in “brm”, which matches the “GLMM” frequentist fit. If the correlation is non-significant, you may want to remove that correlation to simplify your model. To remove the correlation, change the random effects term from “(1 + TreatmentF|Location)” to ” (1 + TreatmentF||Location)” (has an extra vertical line), which makes them independent.</p>
+<div id="glmm-bayes-brms-version" class="section level3 hasAnchor" number="3.3.3">
+<h3><span class="header-section-number">3.3.3</span> GLMM Bayes (brms) version<a href="GLMMsR.html#glmm-bayes-brms-version" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>By default, the prior distributions of random slopes and intercepts are correlated in <code>brm</code>, which matches the “GLMM” frequentist fit. If the correlation is non-significant, you may want to remove that correlation to simplify your model. To remove the correlation, change the random effects term from “(1 + TreatmentF|Location)” to ” (1 + TreatmentF||Location)” (has an extra vertical line), which makes them independent.</p>
 <p>You’ll notice that the parameter estimates are slightly different from the frequentist NB model fit here– the more complicated your model is, the more likely you will find this is true with slightly different versions of your model (here, adding priors and fitting with a different algorithm).</p>
 <pre><code>##  Family: negbinomial 
 ##   Links: mu = log; shape = identity 
@@ -794,16 +757,16 @@ log(\boldsymbol\lambda) = \mathbf{X}\boldsymbol\beta + \mathbf{Z}\boldsymbol\gam
 </tr>
 </tbody>
 </table>
-<p><img src="01-GLMMsInR_files/figure-html/unnamed-chunk-9-1.png" width="100%" /></p>
+<p><img src="02-GLMMsInR_files/figure-html/unnamed-chunk-9-1.png" width="100%" /></p>
 </div>
-<div id="glmm-bayes-rjags-model-fit" class="section level3 hasAnchor" number="2.3.4">
-<h3><span class="header-section-number">2.3.4</span> GLMM Bayes (rjags) model fit<a href="GLMMsR.html#glmm-bayes-rjags-model-fit" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div id="poisson-model-in-jags-1" class="section level4 hasAnchor" number="2.3.4.1">
-<h4><span class="header-section-number">2.3.4.1</span> Poisson model in jags<a href="GLMMsR.html#poisson-model-in-jags-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="glmm-bayes-rjags-model-fit" class="section level3 hasAnchor" number="3.3.4">
+<h3><span class="header-section-number">3.3.4</span> GLMM Bayes (rjags) model fit<a href="GLMMsR.html#glmm-bayes-rjags-model-fit" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="poisson-model-in-jags-1" class="section level4 hasAnchor" number="3.3.4.1">
+<h4><span class="header-section-number">3.3.4.1</span> Poisson model in jags<a href="GLMMsR.html#poisson-model-in-jags-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Does not converge well without correlated RE’s.</p>
 <p>Also, need correlated RE’s to match glmer and “brms”…
 adapted from:
-<a href="https://people.ucsc.edu/~abrsvn/general_correlated_ranefs_bayes_jags.r" class="uri">https://people.ucsc.edu/~abrsvn/general_correlated_ranefs_bayes_jags.r</a></p>
+<a href="https://people.ucsc.edu/~abrsvn/general_correlated_ranefs_bayes_jags.r">https://people.ucsc.edu/~abrsvn/general_correlated_ranefs_bayes_jags.r</a></p>
 <pre><code>## Compiling model graph
 ##    Resolving undeclared variables
 ##    Allocating nodes
@@ -814,23 +777,23 @@ adapted from:
 <pre><code>## Initializing model</code></pre>
 <p>**Need to add RE’s for predictions!!</p>
 </div>
-<div id="nb-model-in-jags-1" class="section level4 hasAnchor" number="2.3.4.2">
-<h4><span class="header-section-number">2.3.4.2</span> NB model in jags<a href="GLMMsR.html#nb-model-in-jags-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="nb-model-in-jags-1" class="section level4 hasAnchor" number="3.3.4.2">
+<h4><span class="header-section-number">3.3.4.2</span> NB model in jags<a href="GLMMsR.html#nb-model-in-jags-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Not done.</p>
 </div>
 </div>
 </div>
-<div id="glmm-re-for-location-samplingdate" class="section level2 hasAnchor" number="2.4">
-<h2><span class="header-section-number">2.4</span> GLMM: RE for Location, SamplingDate<a href="GLMMsR.html#glmm-re-for-location-samplingdate" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="glmm-re-for-location-samplingdate-1" class="section level2 hasAnchor" number="3.4">
+<h2><span class="header-section-number">3.4</span> GLMM: RE for Location, SamplingDate<a href="GLMMsR.html#glmm-re-for-location-samplingdate-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>In this version of the model, we acknowledge that sampling on different days of the season adds to the variability of the moth counts, and that counts from the same sampling date are more similar than for a different date. In this model, however, the correlation between sampling dates is ignored.</p>
 <p>This model is included here because it is important to think about whether you have nested or crossed random effects (if applicable). Here, we are assuming crossed random effects because Java island is fairly homogeneous in terms of weather and ecosystem so it may make sense for all samples from one date to be grouped together. However, one could also argue for nested RE’s for this case study.</p>
 <p>This model allows us to include sampling date in our model as a random effect and still fit the model quickly in a frequentist framework.</p>
 <p>Include dates because samples within a date will be more similar than samples across all dates at a location. But only include random intercepts.</p>
 <p>The predictions now mimic the spatial patterns we see over time.</p>
-<p>Nested vs crossed good reference:
+<p>Good nested vs crossed reference:
 <a href="https://stats.stackexchange.com/questions/228800/crossed-vs-nested-random-effects-how-do-they-differ-and-how-are-they-specified" class="uri">https://stats.stackexchange.com/questions/228800/crossed-vs-nested-random-effects-how-do-they-differ-and-how-are-they-specified</a></p>
-<div id="crossed-glmm-mathematical-model" class="section level3 hasAnchor" number="2.4.1">
-<h3><span class="header-section-number">2.4.1</span> Crossed GLMM mathematical model<a href="GLMMsR.html#crossed-glmm-mathematical-model" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="crossed-glmm-mathematical-model" class="section level3 hasAnchor" number="3.4.1">
+<h3><span class="header-section-number">3.4.1</span> Crossed GLMM mathematical model<a href="GLMMsR.html#crossed-glmm-mathematical-model" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>I only show the Poisson version of the model, the NB version is a straightforward extension.</p>
 <p><span class="math display">\[
 y_{ik} \sim Pois(\lambda_{ik}) \\
@@ -851,8 +814,8 @@ log(\lambda_{ij} ) = \beta_0 + \beta_1 x_{A,i} + \gamma_{0k} x_{ik}  + \gamma_{1
 <p><span class="math inline">\(x_{ik}\)</span> is an indicator variable that equals 1 if moth count <span class="math inline">\(i\)</span> is associated with location <span class="math inline">\(k\)</span> and 0 otherwise,</p>
 <p><span class="math inline">\(\gamma_{00j}\)</span> is the random intercept associated with date-location <span class="math inline">\(j\)</span>, which leads to different background moth pressures for each date, and</p>
 <p><span class="math inline">\(x_{ij}\)</span> is an indicator variable that equals 1 if moth count <span class="math inline">\(i\)</span> is associated with date-location <span class="math inline">\(j\)</span> and 0 otherwise.</p>
-<div id="bayesian-glmm-matrix-version-1" class="section level4 hasAnchor" number="2.4.1.1">
-<h4><span class="header-section-number">2.4.1.1</span> Bayesian GLMM – Matrix version<a href="GLMMsR.html#bayesian-glmm-matrix-version-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="bayesian-glmm-matrix-version-1" class="section level4 hasAnchor" number="3.4.1.1">
+<h4><span class="header-section-number">3.4.1.1</span> Bayesian GLMM – Matrix version<a href="GLMMsR.html#bayesian-glmm-matrix-version-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p><span class="math display">\[
 \mathbf{Y} \sim NegBinom(\boldsymbol\lambda, \phi) \\
 log(\boldsymbol\lambda) = \mathbf{X}\boldsymbol\beta + \mathbf{Z}\boldsymbol\gamma  + \mathbf{z_{00}}\gamma_{00}  + \mbox{ln} \left(\bf{DaysOfCatch}\right) \\
@@ -865,13 +828,13 @@ log(\boldsymbol\lambda) = \mathbf{X}\boldsymbol\beta + \mathbf{Z}\boldsymbol\gam
 \]</span></p>
 </div>
 </div>
-<div id="crossed-glmm-frequentist-fit" class="section level3 hasAnchor" number="2.4.2">
-<h3><span class="header-section-number">2.4.2</span> Crossed GLMM frequentist fit<a href="GLMMsR.html#crossed-glmm-frequentist-fit" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p><img src="01-GLMMsInR_files/figure-html/pois3-1.png" width="100%" />
-<img src="01-GLMMsInR_files/figure-html/nb3-1.png" width="100%" /></p>
+<div id="crossed-glmm-frequentist-fit" class="section level3 hasAnchor" number="3.4.2">
+<h3><span class="header-section-number">3.4.2</span> Crossed GLMM frequentist fit<a href="GLMMsR.html#crossed-glmm-frequentist-fit" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><img src="02-GLMMsInR_files/figure-html/pois3-1.png" width="100%" />
+<img src="02-GLMMsInR_files/figure-html/nb3-1.png" width="100%" /></p>
 </div>
-<div id="crossed-glmm-bayes-brms-version" class="section level3 hasAnchor" number="2.4.3">
-<h3><span class="header-section-number">2.4.3</span> Crossed GLMM Bayes (brms) version<a href="GLMMsR.html#crossed-glmm-bayes-brms-version" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="crossed-glmm-bayes-brms-version" class="section level3 hasAnchor" number="3.4.3">
+<h3><span class="header-section-number">3.4.3</span> Crossed GLMM Bayes (brms) version<a href="GLMMsR.html#crossed-glmm-bayes-brms-version" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <pre><code>##  Family: negbinomial 
 ##   Links: mu = log; shape = identity 
 ## Formula: nYSB ~ TreatmentF + offset(log(DaysOfCatch)) + (1 + TreatmentF | Location) + (1 | SamplingDateC) 
@@ -906,14 +869,14 @@ log(\boldsymbol\lambda) = \mathbf{X}\boldsymbol\beta + \mathbf{Z}\boldsymbol\gam
 ## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 ## and Tail_ESS are effective sample size measures, and Rhat is the potential
 ## scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
-<p><img src="01-GLMMsInR_files/figure-html/unnamed-chunk-12-1.png" width="100%" /></p>
+<p><img src="02-GLMMsInR_files/figure-html/unnamed-chunk-12-1.png" width="100%" /></p>
 </div>
 </div>
-<div id="glmm-with-gaussian-processes-re-for-trial-gp-for-date" class="section level2 hasAnchor" number="2.5">
-<h2><span class="header-section-number">2.5</span> GLMM with Gaussian Processes: RE for Trial, GP for Date<a href="GLMMsR.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="glmm-with-gaussian-processes-re-for-trial-gp-for-date-1" class="section level2 hasAnchor" number="3.5">
+<h2><span class="header-section-number">3.5</span> GLMM with Gaussian Processes: RE for Trial, GP for Date<a href="GLMMsR.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Now we are in the territory where we have to fit the models in a Bayesian framework. If our response variable was continuous (i.e., the regression model was based on a Normal distribution), then we could still use maximum likelihood estimation.</p>
-<div id="bayesian-mathematical-model-1" class="section level3 hasAnchor" number="2.5.1">
-<h3><span class="header-section-number">2.5.1</span> Bayesian mathematical model<a href="GLMMsR.html#bayesian-mathematical-model-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="bayesian-mathematical-model-1" class="section level3 hasAnchor" number="3.5.1">
+<h3><span class="header-section-number">3.5.1</span> Bayesian mathematical model<a href="GLMMsR.html#bayesian-mathematical-model-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p><span class="math display">\[
 y_{ijk} \sim NegBinom(\lambda_{ijk}, r) \\
 log(\lambda_{ijk} ) = \beta_0 + \beta_1 x_{A,i} + \gamma_{0k} x_{ik}  + \gamma_{1k} x_{A,i} x_{ik}  + GP_{ijk}  + \mbox{ln} \left(DaysOfCatch_i\right) \\
@@ -941,8 +904,8 @@ r \sim HalfCauchy(0,1) \\
 <p><span class="math inline">\(l\)</span> = lscale (differnt for each location)</p>
 <p><span class="math inline">\(\phi\)</span> = sdgp</p>
 </div>
-<div id="gaussian-process-bayes-brms-version" class="section level3 hasAnchor" number="2.5.2">
-<h3><span class="header-section-number">2.5.2</span> Gaussian Process Bayes (brms) version<a href="GLMMsR.html#gaussian-process-bayes-brms-version" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="gaussian-process-bayes-brms-version-1" class="section level3 hasAnchor" number="3.5.2">
+<h3><span class="header-section-number">3.5.2</span> Gaussian Process Bayes (brms) version<a href="GLMMsR.html#gaussian-process-bayes-brms-version-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <ul>
 <li><p>Use numeric version of sampling date for better algorithm stability. Still, we have a warning about a divergent transition. Ideally, we would tweak the model and look at the data carefully so fix this warning, but because we are working with made up data, we will not worry about the warning for now.</p></li>
 <li><p>Using squared-exponential covariance function (quite typical choice).</p></li>
@@ -1140,17 +1103,17 @@ r \sim HalfCauchy(0,1) \\
 </tr>
 </tbody>
 </table>
-<p><img src="01-GLMMsInR_files/figure-html/unnamed-chunk-16-1.png" width="100%" /></p>
+<p><img src="02-GLMMsInR_files/figure-html/unnamed-chunk-16-1.png" width="100%" /></p>
 </div>
 </div>
-<div id="summary-of-estimates" class="section level2 hasAnchor" number="2.6">
-<h2><span class="header-section-number">2.6</span> Summary of estimates<a href="GLMMsR.html#summary-of-estimates" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div id="compare-tr-estimates" class="section level3 hasAnchor" number="2.6.1">
-<h3><span class="header-section-number">2.6.1</span> Compare TR estimates<a href="GLMMsR.html#compare-tr-estimates" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="summary-of-estimates" class="section level2 hasAnchor" number="3.6">
+<h2><span class="header-section-number">3.6</span> Summary of estimates<a href="GLMMsR.html#summary-of-estimates" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="compare-tr-estimates" class="section level3 hasAnchor" number="3.6.1">
+<h3><span class="header-section-number">3.6.1</span> Compare TR estimates<a href="GLMMsR.html#compare-tr-estimates" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Here, the trapping reduction estimates from all of the models are compared. As expected, the median TR estimates are very close from model to model, but the uncertainty in that estimate increase (i.e., the confidence/credible intervals get wider) when we properly account for the correlations in our data.</p>
 <table class="table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
 <caption>
-<span id="tab:compareTR">Table 2.1: </span><span id="tab:compareTR">Table 2.2: </span>Comparison of derived TR estimates from each model fit.
+<span id="tab:compareTR">Table 3.1: </span><span id="tab:compareTR">Table 3.2: </span>Comparison of derived TR estimates from each model fit.
 </caption>
 <thead>
 <tr>
@@ -1398,12 +1361,12 @@ GLMM (Location, Gaussian Process Date)
 </tbody>
 </table>
 </div>
-<div id="compare-coefficients" class="section level3 hasAnchor" number="2.6.2">
-<h3><span class="header-section-number">2.6.2</span> Compare coefficients<a href="GLMMsR.html#compare-coefficients" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="compare-coefficients" class="section level3 hasAnchor" number="3.6.2">
+<h3><span class="header-section-number">3.6.2</span> Compare coefficients<a href="GLMMsR.html#compare-coefficients" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Because TR is a non-linear function of <span class="math inline">\(\beta_1\)</span>, the differences int he model output get slightly distorted from the transformation. Thereofre, the <span class="math inline">\(\beta_1\)</span> coefficients are displayed as well:</p>
 <table class="table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
 <caption>
-<span id="tab:compareBetas">Table 2.3: </span><span id="tab:compareBetas">Table 2.4: </span>Comparison of regression coefficient estimates from each model fit.
+<span id="tab:compareBetas">Table 3.3: </span><span id="tab:compareBetas">Table 3.4: </span>Comparison of regression coefficient estimates from each model fit.
 </caption>
 <thead>
 <tr>
@@ -1618,34 +1581,34 @@ GLMM (Location, Gaussian Process Date)
 </tbody>
 </table>
 </div>
-<div id="plot-comparisons" class="section level3 hasAnchor" number="2.6.3">
-<h3><span class="header-section-number">2.6.3</span> Plot comparisons<a href="GLMMsR.html#plot-comparisons" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div id="glms" class="section level4 hasAnchor" number="2.6.3.1">
-<h4><span class="header-section-number">2.6.3.1</span> GLM’s<a href="GLMMsR.html#glms" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="plot-comparisons" class="section level3 hasAnchor" number="3.6.3">
+<h3><span class="header-section-number">3.6.3</span> Plot comparisons<a href="GLMMsR.html#plot-comparisons" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="glms" class="section level4 hasAnchor" number="3.6.3.1">
+<h4><span class="header-section-number">3.6.3.1</span> GLM’s<a href="GLMMsR.html#glms" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>In the side-by-side comparison, you can see the wider confidence intervals for the negative binomial distribution, compared to the Poisson.</p>
-<p><img src="01-GLMMsInR_files/figure-html/all_plots1-1.png" width="100%" /></p>
+<p><img src="02-GLMMsInR_files/figure-html/all_plots1-1.png" width="100%" /></p>
 <p>Side-by-side comparison of the frequentist vs Bayes negative binomial GLM predictions.</p>
-<p><img src="01-GLMMsInR_files/figure-html/all_plots1b-1.png" width="100%" /></p>
+<p><img src="02-GLMMsInR_files/figure-html/all_plots1b-1.png" width="100%" /></p>
 </div>
-<div id="glmms-location-re" class="section level4 hasAnchor" number="2.6.3.2">
-<h4><span class="header-section-number">2.6.3.2</span> GLMM’s (Location RE)<a href="GLMMsR.html#glmms-location-re" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="glmms-location-re" class="section level4 hasAnchor" number="3.6.3.2">
+<h4><span class="header-section-number">3.6.3.2</span> GLMM’s (Location RE)<a href="GLMMsR.html#glmms-location-re" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Side-by-side comparison of the frequentist Poisson vs negative binomial GLMM (Location RE) predictions.</p>
-<p><img src="01-GLMMsInR_files/figure-html/all_plots2-1.png" width="100%" /></p>
+<p><img src="02-GLMMsInR_files/figure-html/all_plots2-1.png" width="100%" /></p>
 <p>Side-by-side comparison of the frequentist vs Bayes negative binomial GLMM (Location RE) predictions.</p>
-<p><img src="01-GLMMsInR_files/figure-html/all_plots2b-1.png" width="100%" /></p>
+<p><img src="02-GLMMsInR_files/figure-html/all_plots2b-1.png" width="100%" /></p>
 </div>
-<div id="glmms-location-re-nested-date" class="section level4 hasAnchor" number="2.6.3.3">
-<h4><span class="header-section-number">2.6.3.3</span> GLMM’s (Location RE, nested Date)<a href="GLMMsR.html#glmms-location-re-nested-date" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="glmms-location-re-nested-date" class="section level4 hasAnchor" number="3.6.3.3">
+<h4><span class="header-section-number">3.6.3.3</span> GLMM’s (Location RE, nested Date)<a href="GLMMsR.html#glmms-location-re-nested-date" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Note: These models are a great fit to the data that we have! But, they are overly confident and will not be good at predicting at new locations and new sampling dates.</p>
 <p>Side-by-side comparison of the frequentist Poisson vs negative binomial GLMM (Location RE) predictions.</p>
-<p><img src="01-GLMMsInR_files/figure-html/all_plots3-1.png" width="100%" /></p>
+<p><img src="02-GLMMsInR_files/figure-html/all_plots3-1.png" width="100%" /></p>
 <p>Side-by-side comparison of the frequentist vs Bayes negative binomial GLMM (Location RE) predictions.</p>
-<p><img src="01-GLMMsInR_files/figure-html/all_plots3b-1.png" width="100%" /></p>
+<p><img src="02-GLMMsInR_files/figure-html/all_plots3b-1.png" width="100%" /></p>
 </div>
-<div id="glmms-nested-date-vs-gaussian-process-date" class="section level4 hasAnchor" number="2.6.3.4">
-<h4><span class="header-section-number">2.6.3.4</span> GLMM’s: nested Date vs Gaussian Process Date<a href="GLMMsR.html#glmms-nested-date-vs-gaussian-process-date" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="glmms-nested-date-vs-gaussian-process-date" class="section level4 hasAnchor" number="3.6.3.4">
+<h4><span class="header-section-number">3.6.3.4</span> GLMM’s: nested Date vs Gaussian Process Date<a href="GLMMsR.html#glmms-nested-date-vs-gaussian-process-date" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Once we properly account for the correlations in our sampling dates, we have much more uncertainty in our overall TR predictions (see table above) , and the predicted counts are “smoothed” over time for some of the locations.</p>
-<p><img src="01-GLMMsInR_files/figure-html/all_plots4-1.png" width="100%" /></p>
+<p><img src="02-GLMMsInR_files/figure-html/all_plots4-1.png" width="100%" /></p>
 
 </div>
 </div>
@@ -1656,7 +1619,7 @@ GLMM (Location, Gaussian Process Date)
           </div>
         </div>
       </div>
-<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="mathematical-models.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 <a href="GLMMsPython.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>

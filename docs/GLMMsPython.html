@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 3 GLMM’s in Python | Bayesian models in R and Python</title>
+  <title>Chapter 4 GLMM’s in Python | Bayesian models in R and Python</title>
   <meta name="description" content="This is a tutorial for R users to convert their code into Python. In particular, fitting GLMMs, hierchical BAyesian models, and non-linear Bayesian models." />
   <meta name="generator" content="bookdown 0.43 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 3 GLMM’s in Python | Bayesian models in R and Python" />
+  <meta property="og:title" content="Chapter 4 GLMM’s in Python | Bayesian models in R and Python" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="This is a tutorial for R users to convert their code into Python. In particular, fitting GLMMs, hierchical BAyesian models, and non-linear Bayesian models." />
   <meta name="github-repo" content="rstudio/BayesInPython" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 3 GLMM’s in Python | Bayesian models in R and Python" />
+  <meta name="twitter:title" content="Chapter 4 GLMM’s in Python | Bayesian models in R and Python" />
   
   <meta name="twitter:description" content="This is a tutorial for R users to convert their code into Python. In particular, fitting GLMMs, hierchical BAyesian models, and non-linear Bayesian models." />
   
@@ -23,7 +23,7 @@
 <meta name="author" content="Kristin Broms" />
 
 
-<meta name="date" content="2025-05-29" />
+<meta name="date" content="2025-06-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -80,107 +80,130 @@
 <ul>
 <li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#case-study-objectives"><i class="fa fa-check"></i><b>1.1.1</b> Case study objectives</a></li>
 </ul></li>
-<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#outline"><i class="fa fa-check"></i><b>1.2</b> Outline</a></li>
 </ul></li>
-<li class="chapter" data-level="2" data-path="GLMMsR.html"><a href="GLMMsR.html"><i class="fa fa-check"></i><b>2</b> GLMM’s in R</a>
+<li class="chapter" data-level="2" data-path="mathematical-models.html"><a href="mathematical-models.html"><i class="fa fa-check"></i><b>2</b> Mathematical models</a>
 <ul>
-<li class="chapter" data-level="2.1" data-path="GLMMsR.html"><a href="GLMMsR.html#data-exploration"><i class="fa fa-check"></i><b>2.1</b> Data Exploration</a>
+<li class="chapter" data-level="2.1" data-path="mathematical-models.html"><a href="mathematical-models.html#basic-glm-models"><i class="fa fa-check"></i><b>2.1</b> Basic GLM models</a>
 <ul>
-<li class="chapter" data-level="2.1.1" data-path="GLMMsR.html"><a href="GLMMsR.html#moth-counts"><i class="fa fa-check"></i><b>2.1.1</b> Moth counts</a></li>
-<li class="chapter" data-level="2.1.2" data-path="GLMMsR.html"><a href="GLMMsR.html#trap-locations"><i class="fa fa-check"></i><b>2.1.2</b> Trap locations</a></li>
-<li class="chapter" data-level="2.1.3" data-path="GLMMsR.html"><a href="GLMMsR.html#timeline"><i class="fa fa-check"></i><b>2.1.3</b> Timeline</a></li>
+<li class="chapter" data-level="2.1.1" data-path="mathematical-models.html"><a href="mathematical-models.html#poisson-regression-model"><i class="fa fa-check"></i><b>2.1.1</b> Poisson regression model</a></li>
+<li class="chapter" data-level="2.1.2" data-path="mathematical-models.html"><a href="mathematical-models.html#negative-binomial-regression-model"><i class="fa fa-check"></i><b>2.1.2</b> Negative binomial regression model</a></li>
+<li class="chapter" data-level="2.1.3" data-path="mathematical-models.html"><a href="mathematical-models.html#bayesian-model"><i class="fa fa-check"></i><b>2.1.3</b> Bayesian model</a></li>
+<li class="chapter" data-level="2.1.4" data-path="mathematical-models.html"><a href="mathematical-models.html#trapping-reduction-defined"><i class="fa fa-check"></i><b>2.1.4</b> Trapping reduction defined</a></li>
 </ul></li>
-<li class="chapter" data-level="2.2" data-path="GLMMsR.html"><a href="GLMMsR.html#basic-glm-models"><i class="fa fa-check"></i><b>2.2</b> Basic GLM models</a>
+<li class="chapter" data-level="2.2" data-path="mathematical-models.html"><a href="mathematical-models.html#glmm-random-effects-re-for-locations"><i class="fa fa-check"></i><b>2.2</b> GLMM: Random effects (RE) for locations</a>
 <ul>
-<li class="chapter" data-level="2.2.1" data-path="GLMMsR.html"><a href="GLMMsR.html#mathematical-model"><i class="fa fa-check"></i><b>2.2.1</b> Mathematical model</a></li>
-<li class="chapter" data-level="2.2.2" data-path="GLMMsR.html"><a href="GLMMsR.html#fitting-the-frequentist-models"><i class="fa fa-check"></i><b>2.2.2</b> Fitting the frequentist models</a></li>
-<li class="chapter" data-level="2.2.3" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-brms-model-fit"><i class="fa fa-check"></i><b>2.2.3</b> Bayesian (brms) model fit</a></li>
-<li class="chapter" data-level="2.2.4" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-rjags-model-fit"><i class="fa fa-check"></i><b>2.2.4</b> Bayesian (rjags) model fit</a></li>
+<li class="chapter" data-level="2.2.1" data-path="mathematical-models.html"><a href="mathematical-models.html#glmm-mathematical-model"><i class="fa fa-check"></i><b>2.2.1</b> GLMM mathematical model</a></li>
+<li class="chapter" data-level="2.2.2" data-path="mathematical-models.html"><a href="mathematical-models.html#bayesian-version"><i class="fa fa-check"></i><b>2.2.2</b> Bayesian version</a></li>
 </ul></li>
-<li class="chapter" data-level="2.3" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-random-effect-re-for-locations"><i class="fa fa-check"></i><b>2.3</b> GLMM: Random effect (RE) for locations</a>
+<li class="chapter" data-level="2.3" data-path="mathematical-models.html"><a href="mathematical-models.html#glmm-re-for-location-samplingdate"><i class="fa fa-check"></i><b>2.3</b> GLMM: RE for Location, SamplingDate</a>
 <ul>
-<li class="chapter" data-level="2.3.1" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-mathematical-model"><i class="fa fa-check"></i><b>2.3.1</b> GLMM mathematical model</a></li>
-<li class="chapter" data-level="2.3.2" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-frequentist-fit"><i class="fa fa-check"></i><b>2.3.2</b> GLMM frequentist fit</a></li>
-<li class="chapter" data-level="2.3.3" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-bayes-brms-version"><i class="fa fa-check"></i><b>2.3.3</b> GLMM Bayes (brms) version</a></li>
-<li class="chapter" data-level="2.3.4" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-bayes-rjags-model-fit"><i class="fa fa-check"></i><b>2.3.4</b> GLMM Bayes (rjags) model fit</a></li>
+<li class="chapter" data-level="2.3.1" data-path="mathematical-models.html"><a href="mathematical-models.html#frequentist-version"><i class="fa fa-check"></i><b>2.3.1</b> Frequentist version</a></li>
+<li class="chapter" data-level="2.3.2" data-path="mathematical-models.html"><a href="mathematical-models.html#bayesian-version-1"><i class="fa fa-check"></i><b>2.3.2</b> Bayesian version</a></li>
 </ul></li>
-<li class="chapter" data-level="2.4" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-re-for-location-samplingdate"><i class="fa fa-check"></i><b>2.4</b> GLMM: RE for Location, SamplingDate</a>
+<li class="chapter" data-level="2.4" data-path="mathematical-models.html"><a href="mathematical-models.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date"><i class="fa fa-check"></i><b>2.4</b> GLMM with Gaussian Processes: RE for Trial, GP for Date</a>
 <ul>
-<li class="chapter" data-level="2.4.1" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-mathematical-model"><i class="fa fa-check"></i><b>2.4.1</b> Crossed GLMM mathematical model</a></li>
-<li class="chapter" data-level="2.4.2" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-frequentist-fit"><i class="fa fa-check"></i><b>2.4.2</b> Crossed GLMM frequentist fit</a></li>
-<li class="chapter" data-level="2.4.3" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-bayes-brms-version"><i class="fa fa-check"></i><b>2.4.3</b> Crossed GLMM Bayes (brms) version</a></li>
-</ul></li>
-<li class="chapter" data-level="2.5" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date"><i class="fa fa-check"></i><b>2.5</b> GLMM with Gaussian Processes: RE for Trial, GP for Date</a>
-<ul>
-<li class="chapter" data-level="2.5.1" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-mathematical-model-1"><i class="fa fa-check"></i><b>2.5.1</b> Bayesian mathematical model</a></li>
-<li class="chapter" data-level="2.5.2" data-path="GLMMsR.html"><a href="GLMMsR.html#gaussian-process-bayes-brms-version"><i class="fa fa-check"></i><b>2.5.2</b> Gaussian Process Bayes (brms) version</a></li>
-</ul></li>
-<li class="chapter" data-level="2.6" data-path="GLMMsR.html"><a href="GLMMsR.html#summary-of-estimates"><i class="fa fa-check"></i><b>2.6</b> Summary of estimates</a>
-<ul>
-<li class="chapter" data-level="2.6.1" data-path="GLMMsR.html"><a href="GLMMsR.html#compare-tr-estimates"><i class="fa fa-check"></i><b>2.6.1</b> Compare TR estimates</a></li>
-<li class="chapter" data-level="2.6.2" data-path="GLMMsR.html"><a href="GLMMsR.html#compare-coefficients"><i class="fa fa-check"></i><b>2.6.2</b> Compare coefficients</a></li>
-<li class="chapter" data-level="2.6.3" data-path="GLMMsR.html"><a href="GLMMsR.html#plot-comparisons"><i class="fa fa-check"></i><b>2.6.3</b> Plot comparisons</a></li>
+<li class="chapter" data-level="2.4.1" data-path="mathematical-models.html"><a href="mathematical-models.html#bayesian-mathematical-model"><i class="fa fa-check"></i><b>2.4.1</b> Bayesian mathematical model</a></li>
+<li class="chapter" data-level="2.4.2" data-path="mathematical-models.html"><a href="mathematical-models.html#gaussian-process-bayes-brms-version"><i class="fa fa-check"></i><b>2.4.2</b> Gaussian Process Bayes (brms) version</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="3" data-path="GLMMsPython.html"><a href="GLMMsPython.html"><i class="fa fa-check"></i><b>3</b> GLMM’s in Python</a>
+<li class="chapter" data-level="3" data-path="GLMMsR.html"><a href="GLMMsR.html"><i class="fa fa-check"></i><b>3</b> GLMM’s in R</a>
 <ul>
-<li class="chapter" data-level="3.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#getting-started-with-python"><i class="fa fa-check"></i><b>3.1</b> Getting started with Python</a>
+<li class="chapter" data-level="3.1" data-path="GLMMsR.html"><a href="GLMMsR.html#data-exploration"><i class="fa fa-check"></i><b>3.1</b> Data Exploration</a>
 <ul>
-<li class="chapter" data-level="3.1.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#python-modules"><i class="fa fa-check"></i><b>3.1.1</b> Python modules</a></li>
+<li class="chapter" data-level="3.1.1" data-path="GLMMsR.html"><a href="GLMMsR.html#moth-counts"><i class="fa fa-check"></i><b>3.1.1</b> Moth counts</a></li>
+<li class="chapter" data-level="3.1.2" data-path="GLMMsR.html"><a href="GLMMsR.html#trap-locations"><i class="fa fa-check"></i><b>3.1.2</b> Trap locations</a></li>
+<li class="chapter" data-level="3.1.3" data-path="GLMMsR.html"><a href="GLMMsR.html#timeline"><i class="fa fa-check"></i><b>3.1.3</b> Timeline</a></li>
 </ul></li>
-<li class="chapter" data-level="3.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#set-up"><i class="fa fa-check"></i><b>3.2</b> Set up</a></li>
-<li class="chapter" data-level="3.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#outline-1"><i class="fa fa-check"></i><b>3.3</b> Outline</a></li>
-<li class="chapter" data-level="3.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#data-exploration-1"><i class="fa fa-check"></i><b>3.4</b> Data Exploration</a>
+<li class="chapter" data-level="3.2" data-path="GLMMsR.html"><a href="GLMMsR.html#basic-glm-models-1"><i class="fa fa-check"></i><b>3.2</b> Basic GLM models</a>
 <ul>
-<li class="chapter" data-level="3.4.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#moth-counts-1"><i class="fa fa-check"></i><b>3.4.1</b> Moth counts</a></li>
-<li class="chapter" data-level="3.4.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#trap-locations-1"><i class="fa fa-check"></i><b>3.4.2</b> Trap locations</a></li>
-<li class="chapter" data-level="3.4.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#timeline-1"><i class="fa fa-check"></i><b>3.4.3</b> Timeline</a></li>
+<li class="chapter" data-level="3.2.1" data-path="GLMMsR.html"><a href="GLMMsR.html#fitting-the-frequentist-models"><i class="fa fa-check"></i><b>3.2.1</b> Fitting the frequentist models</a></li>
+<li class="chapter" data-level="3.2.2" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-brms-model-fit"><i class="fa fa-check"></i><b>3.2.2</b> Bayesian (brms) model fit</a></li>
+<li class="chapter" data-level="3.2.3" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-rjags-model-fit"><i class="fa fa-check"></i><b>3.2.3</b> Bayesian (rjags) model fit</a></li>
 </ul></li>
-<li class="chapter" data-level="3.5" data-path="GLMMsPython.html"><a href="GLMMsPython.html#basic-glm-models-1"><i class="fa fa-check"></i><b>3.5</b> Basic GLM models</a>
+<li class="chapter" data-level="3.3" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-random-effect-re-for-locations"><i class="fa fa-check"></i><b>3.3</b> GLMM: Random effect (RE) for locations</a>
 <ul>
-<li class="chapter" data-level="3.5.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#mathematical-model-1"><i class="fa fa-check"></i><b>3.5.1</b> Mathematical model</a></li>
-<li class="chapter" data-level="3.5.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#fitting-the-frequentist-models-1"><i class="fa fa-check"></i><b>3.5.2</b> Fitting the frequentist models</a></li>
-<li class="chapter" data-level="3.5.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#bayesian-bambi-models-python"><i class="fa fa-check"></i><b>3.5.3</b> Bayesian (bambi) models– Python</a></li>
-<li class="chapter" data-level="3.5.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#bayesian-pymc-models-python"><i class="fa fa-check"></i><b>3.5.4</b> Bayesian (PyMC) models– Python</a></li>
+<li class="chapter" data-level="3.3.1" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-mathematical-model-1"><i class="fa fa-check"></i><b>3.3.1</b> GLMM mathematical model</a></li>
+<li class="chapter" data-level="3.3.2" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-frequentist-fit"><i class="fa fa-check"></i><b>3.3.2</b> GLMM frequentist fit</a></li>
+<li class="chapter" data-level="3.3.3" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-bayes-brms-version"><i class="fa fa-check"></i><b>3.3.3</b> GLMM Bayes (brms) version</a></li>
+<li class="chapter" data-level="3.3.4" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-bayes-rjags-model-fit"><i class="fa fa-check"></i><b>3.3.4</b> GLMM Bayes (rjags) model fit</a></li>
 </ul></li>
-<li class="chapter" data-level="3.6" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-random-effect-re-for-locations-1"><i class="fa fa-check"></i><b>3.6</b> GLMM: Random effect (RE) for locations</a>
+<li class="chapter" data-level="3.4" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-re-for-location-samplingdate-1"><i class="fa fa-check"></i><b>3.4</b> GLMM: RE for Location, SamplingDate</a>
 <ul>
-<li class="chapter" data-level="3.6.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-mathematical-model-1"><i class="fa fa-check"></i><b>3.6.1</b> GLMM mathematical model</a></li>
-<li class="chapter" data-level="3.6.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-frequentist-fit-1"><i class="fa fa-check"></i><b>3.6.2</b> GLMM frequentist fit</a></li>
-<li class="chapter" data-level="3.6.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-bayesian-bambi-models"><i class="fa fa-check"></i><b>3.6.3</b> GLMM Bayesian (bambi) models</a></li>
-<li class="chapter" data-level="3.6.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-bayesian-pymc-models-python"><i class="fa fa-check"></i><b>3.6.4</b> GLMM Bayesian (PyMC) models– Python</a></li>
+<li class="chapter" data-level="3.4.1" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-mathematical-model"><i class="fa fa-check"></i><b>3.4.1</b> Crossed GLMM mathematical model</a></li>
+<li class="chapter" data-level="3.4.2" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-frequentist-fit"><i class="fa fa-check"></i><b>3.4.2</b> Crossed GLMM frequentist fit</a></li>
+<li class="chapter" data-level="3.4.3" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-bayes-brms-version"><i class="fa fa-check"></i><b>3.4.3</b> Crossed GLMM Bayes (brms) version</a></li>
 </ul></li>
-<li class="chapter" data-level="3.7" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-re-for-location-crossed-samplingdate"><i class="fa fa-check"></i><b>3.7</b> GLMM: RE for location, crossed SamplingDate</a>
+<li class="chapter" data-level="3.5" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date-1"><i class="fa fa-check"></i><b>3.5</b> GLMM with Gaussian Processes: RE for Trial, GP for Date</a>
 <ul>
-<li class="chapter" data-level="3.7.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-frequentist-fit-1"><i class="fa fa-check"></i><b>3.7.1</b> Crossed GLMM frequentist fit</a></li>
-<li class="chapter" data-level="3.7.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-bayes-bambi-version"><i class="fa fa-check"></i><b>3.7.2</b> Crossed GLMM Bayes (bambi) version</a></li>
-<li class="chapter" data-level="3.7.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-bayes-pymc-version"><i class="fa fa-check"></i><b>3.7.3</b> Crossed GLMM Bayes (PyMC) version</a></li>
+<li class="chapter" data-level="3.5.1" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-mathematical-model-1"><i class="fa fa-check"></i><b>3.5.1</b> Bayesian mathematical model</a></li>
+<li class="chapter" data-level="3.5.2" data-path="GLMMsR.html"><a href="GLMMsR.html#gaussian-process-bayes-brms-version-1"><i class="fa fa-check"></i><b>3.5.2</b> Gaussian Process Bayes (brms) version</a></li>
 </ul></li>
-<li class="chapter" data-level="3.8" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date-1"><i class="fa fa-check"></i><b>3.8</b> GLMM with Gaussian Processes: RE for Trial, GP for Date</a>
+<li class="chapter" data-level="3.6" data-path="GLMMsR.html"><a href="GLMMsR.html#summary-of-estimates"><i class="fa fa-check"></i><b>3.6</b> Summary of estimates</a>
 <ul>
-<li class="chapter" data-level="3.8.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#gaussian-process-bayes-bambi-version"><i class="fa fa-check"></i><b>3.8.1</b> Gaussian Process Bayes (bambi) version</a></li>
-</ul></li>
-<li class="chapter" data-level="3.9" data-path="GLMMsPython.html"><a href="GLMMsPython.html#summary-of-estimates-1"><i class="fa fa-check"></i><b>3.9</b> Summary of estimates</a>
-<ul>
-<li class="chapter" data-level="3.9.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#compare-tr-estimates-1"><i class="fa fa-check"></i><b>3.9.1</b> Compare TR estimates</a></li>
-<li class="chapter" data-level="3.9.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#compare-coefficients-1"><i class="fa fa-check"></i><b>3.9.2</b> Compare coefficients</a></li>
-<li class="chapter" data-level="3.9.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#plot-comparisons-1"><i class="fa fa-check"></i><b>3.9.3</b> Plot comparisons</a></li>
+<li class="chapter" data-level="3.6.1" data-path="GLMMsR.html"><a href="GLMMsR.html#compare-tr-estimates"><i class="fa fa-check"></i><b>3.6.1</b> Compare TR estimates</a></li>
+<li class="chapter" data-level="3.6.2" data-path="GLMMsR.html"><a href="GLMMsR.html#compare-coefficients"><i class="fa fa-check"></i><b>3.6.2</b> Compare coefficients</a></li>
+<li class="chapter" data-level="3.6.3" data-path="GLMMsR.html"><a href="GLMMsR.html#plot-comparisons"><i class="fa fa-check"></i><b>3.6.3</b> Plot comparisons</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="NonlinearR.html"><a href="NonlinearR.html"><i class="fa fa-check"></i><b>4</b> Nonlinear Bayesian Models in R</a>
+<li class="chapter" data-level="4" data-path="GLMMsPython.html"><a href="GLMMsPython.html"><i class="fa fa-check"></i><b>4</b> GLMM’s in Python</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="NonlinearR.html"><a href="NonlinearR.html#generalized-logistic-curve"><i class="fa fa-check"></i><b>4.1</b> Generalized Logistic Curve</a></li>
-<li class="chapter" data-level="4.2" data-path="NonlinearR.html"><a href="NonlinearR.html#bayesian-model"><i class="fa fa-check"></i><b>4.2</b> Bayesian model</a></li>
-<li class="chapter" data-level="4.3" data-path="NonlinearR.html"><a href="NonlinearR.html#fitting-models-with-the-brms-package"><i class="fa fa-check"></i><b>4.3</b> Fitting models with the brms package</a>
+<li class="chapter" data-level="4.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#getting-started-with-python"><i class="fa fa-check"></i><b>4.1</b> Getting started with Python</a>
 <ul>
-<li class="chapter" data-level="4.3.1" data-path="NonlinearR.html"><a href="NonlinearR.html#no-re-no-gp"><i class="fa fa-check"></i><b>4.3.1</b> no RE, no GP</a></li>
-<li class="chapter" data-level="4.3.2" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-no-gp"><i class="fa fa-check"></i><b>4.3.2</b> intercept RE, no GP</a></li>
-<li class="chapter" data-level="4.3.3" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-a-re-no-gp"><i class="fa fa-check"></i><b>4.3.3</b> intercept RE, A RE, no GP</a></li>
-<li class="chapter" data-level="4.3.4" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-a-re-with-gp-same-for-all-loc"><i class="fa fa-check"></i><b>4.3.4</b> intercept RE, A RE, WITH GP (same for all loc)</a></li>
-<li class="chapter" data-level="4.3.5" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-a-re-with-gp-diff-for-each-loc"><i class="fa fa-check"></i><b>4.3.5</b> intercept, A RE, with GP (DIFF for each loc)</a></li>
-<li class="chapter" data-level="4.3.6" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-a-b-m-re-with-gp-diff-for-each-loc"><i class="fa fa-check"></i><b>4.3.6</b> intercept, A, B, M RE, with GP (DIFF for each loc)</a></li>
+<li class="chapter" data-level="4.1.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#python-modules"><i class="fa fa-check"></i><b>4.1.1</b> Python modules</a></li>
 </ul></li>
-<li class="chapter" data-level="4.4" data-path="NonlinearR.html"><a href="NonlinearR.html#model-our-case-study-data"><i class="fa fa-check"></i><b>4.4</b> Model our case study data</a></li>
+<li class="chapter" data-level="4.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#set-up"><i class="fa fa-check"></i><b>4.2</b> Set up</a></li>
+<li class="chapter" data-level="4.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#outline"><i class="fa fa-check"></i><b>4.3</b> Outline</a></li>
+<li class="chapter" data-level="4.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#data-exploration-1"><i class="fa fa-check"></i><b>4.4</b> Data Exploration</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#moth-counts-1"><i class="fa fa-check"></i><b>4.4.1</b> Moth counts</a></li>
+<li class="chapter" data-level="4.4.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#trap-locations-1"><i class="fa fa-check"></i><b>4.4.2</b> Trap locations</a></li>
+<li class="chapter" data-level="4.4.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#timeline-1"><i class="fa fa-check"></i><b>4.4.3</b> Timeline</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="GLMMsPython.html"><a href="GLMMsPython.html#basic-glm-models-2"><i class="fa fa-check"></i><b>4.5</b> Basic GLM models</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#mathematical-model"><i class="fa fa-check"></i><b>4.5.1</b> Mathematical model</a></li>
+<li class="chapter" data-level="4.5.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#fitting-the-frequentist-models-1"><i class="fa fa-check"></i><b>4.5.2</b> Fitting the frequentist models</a></li>
+<li class="chapter" data-level="4.5.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#bayesian-bambi-models-python"><i class="fa fa-check"></i><b>4.5.3</b> Bayesian (bambi) models– Python</a></li>
+<li class="chapter" data-level="4.5.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#bayesian-pymc-models-python"><i class="fa fa-check"></i><b>4.5.4</b> Bayesian (PyMC) models– Python</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-random-effect-re-for-locations-1"><i class="fa fa-check"></i><b>4.6</b> GLMM: Random effect (RE) for locations</a>
+<ul>
+<li class="chapter" data-level="4.6.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-mathematical-model-2"><i class="fa fa-check"></i><b>4.6.1</b> GLMM mathematical model</a></li>
+<li class="chapter" data-level="4.6.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-frequentist-fit-1"><i class="fa fa-check"></i><b>4.6.2</b> GLMM frequentist fit</a></li>
+<li class="chapter" data-level="4.6.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-bayesian-bambi-models"><i class="fa fa-check"></i><b>4.6.3</b> GLMM Bayesian (bambi) models</a></li>
+<li class="chapter" data-level="4.6.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-bayesian-pymc-models-python"><i class="fa fa-check"></i><b>4.6.4</b> GLMM Bayesian (PyMC) models– Python</a></li>
+</ul></li>
+<li class="chapter" data-level="4.7" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-re-for-location-crossed-samplingdate"><i class="fa fa-check"></i><b>4.7</b> GLMM: RE for location, crossed SamplingDate</a>
+<ul>
+<li class="chapter" data-level="4.7.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-frequentist-fit-1"><i class="fa fa-check"></i><b>4.7.1</b> Crossed GLMM frequentist fit</a></li>
+<li class="chapter" data-level="4.7.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-bayes-bambi-version"><i class="fa fa-check"></i><b>4.7.2</b> Crossed GLMM Bayes (bambi) version</a></li>
+<li class="chapter" data-level="4.7.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-bayes-pymc-version"><i class="fa fa-check"></i><b>4.7.3</b> Crossed GLMM Bayes (PyMC) version</a></li>
+</ul></li>
+<li class="chapter" data-level="4.8" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date-2"><i class="fa fa-check"></i><b>4.8</b> GLMM with Gaussian Processes: RE for Trial, GP for Date</a>
+<ul>
+<li class="chapter" data-level="4.8.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#gaussian-process-bayes-bambi-version"><i class="fa fa-check"></i><b>4.8.1</b> Gaussian Process Bayes (bambi) version</a></li>
+</ul></li>
+<li class="chapter" data-level="4.9" data-path="GLMMsPython.html"><a href="GLMMsPython.html#summary-of-estimates-1"><i class="fa fa-check"></i><b>4.9</b> Summary of estimates</a>
+<ul>
+<li class="chapter" data-level="4.9.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#compare-tr-estimates-1"><i class="fa fa-check"></i><b>4.9.1</b> Compare TR estimates</a></li>
+<li class="chapter" data-level="4.9.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#compare-coefficients-1"><i class="fa fa-check"></i><b>4.9.2</b> Compare coefficients</a></li>
+<li class="chapter" data-level="4.9.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#plot-comparisons-1"><i class="fa fa-check"></i><b>4.9.3</b> Plot comparisons</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="NonlinearR.html"><a href="NonlinearR.html"><i class="fa fa-check"></i><b>5</b> Nonlinear Bayesian Models in R</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="NonlinearR.html"><a href="NonlinearR.html#generalized-logistic-curve"><i class="fa fa-check"></i><b>5.1</b> Generalized Logistic Curve</a></li>
+<li class="chapter" data-level="5.2" data-path="NonlinearR.html"><a href="NonlinearR.html#bayesian-model-1"><i class="fa fa-check"></i><b>5.2</b> Bayesian model</a></li>
+<li class="chapter" data-level="5.3" data-path="NonlinearR.html"><a href="NonlinearR.html#fitting-models-with-the-brms-package"><i class="fa fa-check"></i><b>5.3</b> Fitting models with the brms package</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="NonlinearR.html"><a href="NonlinearR.html#no-re-no-gp"><i class="fa fa-check"></i><b>5.3.1</b> no RE, no GP</a></li>
+<li class="chapter" data-level="5.3.2" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-no-gp"><i class="fa fa-check"></i><b>5.3.2</b> intercept RE, no GP</a></li>
+<li class="chapter" data-level="5.3.3" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-a-re-no-gp"><i class="fa fa-check"></i><b>5.3.3</b> intercept RE, A RE, no GP</a></li>
+<li class="chapter" data-level="5.3.4" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-a-re-with-gp-same-for-all-loc"><i class="fa fa-check"></i><b>5.3.4</b> intercept RE, A RE, WITH GP (same for all loc)</a></li>
+<li class="chapter" data-level="5.3.5" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-a-re-with-gp-diff-for-each-loc"><i class="fa fa-check"></i><b>5.3.5</b> intercept, A RE, with GP (DIFF for each loc)</a></li>
+<li class="chapter" data-level="5.3.6" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-a-b-m-re-with-gp-diff-for-each-loc"><i class="fa fa-check"></i><b>5.3.6</b> intercept, A, B, M RE, with GP (DIFF for each loc)</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="NonlinearR.html"><a href="NonlinearR.html#model-our-case-study-data"><i class="fa fa-check"></i><b>5.4</b> Model our case study data</a></li>
 </ul></li>
 </ul>
 
@@ -199,10 +222,10 @@
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="GLMMsPython" class="section level1 hasAnchor" number="3">
-<h1><span class="header-section-number">Chapter 3</span> GLMM’s in Python<a href="GLMMsPython.html#GLMMsPython" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<div id="getting-started-with-python" class="section level2 hasAnchor" number="3.1">
-<h2><span class="header-section-number">3.1</span> Getting started with Python<a href="GLMMsPython.html#getting-started-with-python" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="GLMMsPython" class="section level1 hasAnchor" number="4">
+<h1><span class="header-section-number">Chapter 4</span> GLMM’s in Python<a href="GLMMsPython.html#GLMMsPython" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="getting-started-with-python" class="section level2 hasAnchor" number="4.1">
+<h2><span class="header-section-number">4.1</span> Getting started with Python<a href="GLMMsPython.html#getting-started-with-python" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Python is a lot more complicated than R!</p>
 <ol style="list-style-type: decimal">
 <li><p>Download Python.</p></li>
@@ -224,53 +247,53 @@
 <p>Primer on Python for R users:
 <a href="https://rstudio.github.io/reticulate/articles/python_primer.html" class="uri">https://rstudio.github.io/reticulate/articles/python_primer.html</a></p>
 <pre><code>## virtualenv: r-reticulate-BayesInPython</code></pre>
-<div id="python-modules" class="section level3 hasAnchor" number="3.1.1">
-<h3><span class="header-section-number">3.1.1</span> Python modules<a href="GLMMsPython.html#python-modules" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="python-modules" class="section level3 hasAnchor" number="4.1.1">
+<h3><span class="header-section-number">4.1.1</span> Python modules<a href="GLMMsPython.html#python-modules" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Python libraries or packages are called <em>modules</em>. To use them with reticulate, you first have to import them. The lines in the code chunk below must be called exactly once each for each new python module used; it does not need to re-run.</p>
 </div>
 </div>
-<div id="set-up" class="section level2 hasAnchor" number="3.2">
-<h2><span class="header-section-number">3.2</span> Set up<a href="GLMMsPython.html#set-up" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="set-up" class="section level2 hasAnchor" number="4.2">
+<h2><span class="header-section-number">4.2</span> Set up<a href="GLMMsPython.html#set-up" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>When completing an analysis, I may skip around in my script quite a bit. Therefore, I like all packages loaded, and all data uploaded and manipulated at the start of my script.</p>
 </div>
-<div id="outline-1" class="section level2 hasAnchor" number="3.3">
-<h2><span class="header-section-number">3.3</span> Outline<a href="GLMMsPython.html#outline-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="outline" class="section level2 hasAnchor" number="4.3">
+<h2><span class="header-section-number">4.3</span> Outline<a href="GLMMsPython.html#outline" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <ul>
 <li><p>Introduce the data to be used throughout the tutorial.</p></li>
 <li><p>Fit generalized linear models (GLMs, here Poisson and negative binomial regressions). Models are fit in both frequentist and Bayesian frameworks to lay the groundwork for the more complicated models.</p></li>
 <li><p>Fit generalized linear models with random effects (GLMMs) to allow for correlations in space and time. Models are fit in both frequentist and Bayesian frameworks.</p></li>
 </ul>
 </div>
-<div id="data-exploration-1" class="section level2 hasAnchor" number="3.4">
-<h2><span class="header-section-number">3.4</span> Data Exploration<a href="GLMMsPython.html#data-exploration-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div id="moth-counts-1" class="section level3 hasAnchor" number="3.4.1">
-<h3><span class="header-section-number">3.4.1</span> Moth counts<a href="GLMMsPython.html#moth-counts-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="data-exploration-1" class="section level2 hasAnchor" number="4.4">
+<h2><span class="header-section-number">4.4</span> Data Exploration<a href="GLMMsPython.html#data-exploration-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="moth-counts-1" class="section level3 hasAnchor" number="4.4.1">
+<h3><span class="header-section-number">4.4.1</span> Moth counts<a href="GLMMsPython.html#moth-counts-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Here is what the data look like. Columns: Location, Treatment, TrapID, Longitude, Latitude, AssessmentNumber, and SamplingDate should be self-explanatory… TransplantDate is the date that the rice seedlings were transplanted into the field; DispInstallDate is the treatment installation date; TrapInstallDate is the trap installation date; “nYSB” are the moth counts (number of YSB moths); DaysOfCatch is the number of days since the trap was previously sampled or the number of days since trap installation if it is assessment number 1; DATI is days after trap installation; DADI is days after dispenser installation; and DAT is days after transplant. Some of these columns will be discussed more later.</p>
 <p>The data are the moth counts collected at each trap (average per day), within each location and throughout the season. Note how the y-axis changes for each plot in the figure.</p>
-<p><img src="02-GLMMsInPython_files/figure-html/plotMothsPy-1.png" width="100%" /></p>
+<p><img src="03-GLMMsInPython_files/figure-html/plotMothsPy-1.png" width="100%" /></p>
 </div>
-<div id="trap-locations-1" class="section level3 hasAnchor" number="3.4.2">
-<h3><span class="header-section-number">3.4.2</span> Trap locations<a href="GLMMsPython.html#trap-locations-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="trap-locations-1" class="section level3 hasAnchor" number="4.4.2">
+<h3><span class="header-section-number">4.4.2</span> Trap locations<a href="GLMMsPython.html#trap-locations-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Trial locations in relation to each other. Some trial locations are closer to each other than others.</p>
 <p>Within each location, the treatment traps have a slightly different alignment:</p>
-<p><img src="02-GLMMsInPython_files/figure-html/plotTrapLocsPy-3.png" width="100%" /><img src="02-GLMMsInPython_files/figure-html/plotTrapLocsPy-4.png" width="100%" /></p>
+<p><img src="03-GLMMsInPython_files/figure-html/plotTrapLocsPy-3.png" width="100%" /><img src="03-GLMMsInPython_files/figure-html/plotTrapLocsPy-4.png" width="100%" /></p>
 </div>
-<div id="timeline-1" class="section level3 hasAnchor" number="3.4.3">
-<h3><span class="header-section-number">3.4.3</span> Timeline<a href="GLMMsPython.html#timeline-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p><img src="02-GLMMsInPython_files/figure-html/timelinePy-7.png" width="100%" /><img src="02-GLMMsInPython_files/figure-html/timelinePy-8.png" width="100%" /></p>
+<div id="timeline-1" class="section level3 hasAnchor" number="4.4.3">
+<h3><span class="header-section-number">4.4.3</span> Timeline<a href="GLMMsPython.html#timeline-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><img src="03-GLMMsInPython_files/figure-html/timelinePy-7.png" width="100%" /><img src="03-GLMMsInPython_files/figure-html/timelinePy-8.png" width="100%" /></p>
 <p>Note that not all traps are installed on exactly the same day; not all locations have rice transplanted on exactly the same day; and not all traps are sampled on exactly the same day.</p>
 </div>
 </div>
-<div id="basic-glm-models-1" class="section level2 hasAnchor" number="3.5">
-<h2><span class="header-section-number">3.5</span> Basic GLM models<a href="GLMMsPython.html#basic-glm-models-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="basic-glm-models-2" class="section level2 hasAnchor" number="4.5">
+<h2><span class="header-section-number">4.5</span> Basic GLM models<a href="GLMMsPython.html#basic-glm-models-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>To start, we ignore all the spatial and temporal relationships in the data and assume each data point is independent and identically distributed (iid). <strong>This is not a good model for the data!</strong> It is just our starting off point.</p>
 <p>When building hierarchical Bayesian models, it is always a good idea to start simple, make sure everything works as expected, and then build up.</p>
-<div id="mathematical-model-1" class="section level3 hasAnchor" number="3.5.1">
-<h3><span class="header-section-number">3.5.1</span> Mathematical model<a href="GLMMsPython.html#mathematical-model-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="mathematical-model" class="section level3 hasAnchor" number="4.5.1">
+<h3><span class="header-section-number">4.5.1</span> Mathematical model<a href="GLMMsPython.html#mathematical-model" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Our response variable is a count, therefore we use either a Poisson or negative binomial distribution as the basis for our model. These models are known as generalized linear models (GLMs).</p>
 <p>The model must also include an offset to account for the varying time intervals between sample. (If the traps are left unchecked for more days, we naturally expect the trap to have more moths. This varying effort is accounted for by the offset.)</p>
-<div id="poisson-regression-model-1" class="section level4 hasAnchor" number="3.5.1.1">
-<h4><span class="header-section-number">3.5.1.1</span> Poisson regression model<a href="GLMMsPython.html#poisson-regression-model-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="poisson-regression-model-1" class="section level4 hasAnchor" number="4.5.1.1">
+<h4><span class="header-section-number">4.5.1.1</span> Poisson regression model<a href="GLMMsPython.html#poisson-regression-model-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>We start with a poisson version of our regression model:</p>
 <p><span class="math display">\[
 y_i \sim Pois(\lambda_i) \\
@@ -284,8 +307,8 @@ log(\lambda_i ) = \beta_0 + \beta_1 x_{A,i} + \mbox{ln} \left(DaysOfCatch_i\righ
 <p><span class="math inline">\(x_{i}\)</span> is an indicator variable that equals 1 if sample <span class="math inline">\(i\)</span> is from a treatment A field and equals 0 otherwise, and</p>
 <p><span class="math inline">\(\left(DaysOfCatch_i\right)\)</span> is the offset to account for the varying time interval between samples. This is necessary because with a longer time interval, more moths will fly into the trap.</p>
 </div>
-<div id="negative-binomial-regression-model-1" class="section level4 hasAnchor" number="3.5.1.2">
-<h4><span class="header-section-number">3.5.1.2</span> Negative binomial regression model<a href="GLMMsPython.html#negative-binomial-regression-model-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="negative-binomial-regression-model-1" class="section level4 hasAnchor" number="4.5.1.2">
+<h4><span class="header-section-number">4.5.1.2</span> Negative binomial regression model<a href="GLMMsPython.html#negative-binomial-regression-model-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>In ecology, there is always additional variability in our data than what the Poisson distribution allows. To account for the additional variability in our model, we switch to a negative binomial distribution:</p>
 <p><span class="math display">\[
 y_i \sim NegBinom(\lambda_i, \phi) \\
@@ -298,8 +321,8 @@ Var(\lambda) = \lambda + \phi \cdot\lambda^2
 \]</span></p>
 <p>(For a Poisson distribution, <span class="math inline">\(Var(\lambda) = \lambda\)</span>.)</p>
 </div>
-<div id="bayesian-mathematical-model-2" class="section level4 hasAnchor" number="3.5.1.3">
-<h4><span class="header-section-number">3.5.1.3</span> Bayesian mathematical model<a href="GLMMsPython.html#bayesian-mathematical-model-2" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="bayesian-mathematical-model-2" class="section level4 hasAnchor" number="4.5.1.3">
+<h4><span class="header-section-number">4.5.1.3</span> Bayesian mathematical model<a href="GLMMsPython.html#bayesian-mathematical-model-2" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>I also fit these models using a Bayesian framework, again to build our foundation for the more complex models that come later.</p>
 <p>For the Bayesian models, I only show the more complex negative binomial version.</p>
 <p>To make our models Bayesian, we add priors to our parameters:</p>
@@ -312,8 +335,8 @@ log(\lambda_i ) = \beta_0 + \beta_1 x_{A,i} + \mbox{ln} \left(DaysOfCatch_i\righ
 \]</span></p>
 <p>The models use slightly informative priors. When working on a log-scale (e.g., with Poisson or negative binomial distributions), this often becomes essential to avoid parameter estimates on the boundaries. (See Hooten and Hobbs for a good discussion on this issue.)</p>
 </div>
-<div id="trapping-reduction-defined-1" class="section level4 hasAnchor" number="3.5.1.4">
-<h4><span class="header-section-number">3.5.1.4</span> Trapping reduction defined<a href="GLMMsPython.html#trapping-reduction-defined-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="trapping-reduction-defined-1" class="section level4 hasAnchor" number="4.5.1.4">
+<h4><span class="header-section-number">4.5.1.4</span> Trapping reduction defined<a href="GLMMsPython.html#trapping-reduction-defined-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>The primary metric of interest from these models is a derived parameter that we call trapping reduction (TR):</p>
 <p><span class="math display">\[
 TR = 100 - 100 e ^{(-\beta_1)}
@@ -325,8 +348,8 @@ TR = 100 - 100 e ^{(-\beta_1 \pm 2 \cdot SE(\beta_1))}
 <p>For the Bayesian version, the derived parameter is sampled as part of the MCMC iterations, and the 95% credible interval is the 2.5%, 97.5% quantiles of its resulting distribution.</p>
 </div>
 </div>
-<div id="fitting-the-frequentist-models-1" class="section level3 hasAnchor" number="3.5.2">
-<h3><span class="header-section-number">3.5.2</span> Fitting the frequentist models<a href="GLMMsPython.html#fitting-the-frequentist-models-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="fitting-the-frequentist-models-1" class="section level3 hasAnchor" number="4.5.2">
+<h3><span class="header-section-number">4.5.2</span> Fitting the frequentist models<a href="GLMMsPython.html#fitting-the-frequentist-models-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Note: when I predict for new data, I set DaysOfCatch = 1, and then I compare to the moths per day variable (mothsperday = nYSB / DaysOfCatch). I want to exclude any patterns related to the varying time intervals.</p>
 <p>These models show a very tight confidence intervals for our predictions. But also, the residual deviance is MUCH greater than the degree of freedom, indicating a lack of fit. The plot of the predictions overlaid on the data also demonstrate the lack of fit.</p>
 <p>These models are fit using the ‘statsmodels’ module because of its parallel syntax to R.</p>
@@ -337,8 +360,8 @@ TR = 100 - 100 e ^{(-\beta_1 \pm 2 \cdot SE(\beta_1))}
 ## Model Family:                 Poisson   Df Model:                            1
 ## Link Function:                    Log   Scale:                          1.0000
 ## Method:                          IRLS   Log-Likelihood:                -14034.
-## Date:                Thu, 22 May 2025   Deviance:                       25678.
-## Time:                        14:49:16   Pearson chi2:                 4.24e+04
+## Date:                Wed, 18 Jun 2025   Deviance:                       25678.
+## Time:                        14:59:50   Pearson chi2:                 4.24e+04
 ## No. Iterations:                     6   Pseudo R-squ. (CS):              1.000
 ## Covariance Type:            nonrobust                                         
 ## ======================================================================================
@@ -358,7 +381,7 @@ TR = 100 - 100 e ^{(-\beta_1 \pm 2 \cdot SE(\beta_1))}
 ## 50%      0.312790    0.016966    0.279536    0.346043
 ## 75%      1.396045    0.025359    1.379241    1.412849
 ## max      1.396045    0.025359    1.379241    1.412849</code></pre>
-<p><img src="02-GLMMsInPython_files/figure-html/pois1py-11.png" width="100%" /><img src="02-GLMMsInPython_files/figure-html/pois1py-12.png" width="100%" /></p>
+<p><img src="03-GLMMsInPython_files/figure-html/pois1py-11.png" width="100%" /><img src="03-GLMMsInPython_files/figure-html/pois1py-12.png" width="100%" /></p>
 <p>The model is such a bad fit to the data, it is hard to even tell what is going on in the plot above.</p>
 <p>For the negative binomial model, our confidence intervals are a little wider, but we are still ignoring all the correlations in our data. And the plot of the predictions again indicates the lack of fit.</p>
 <pre><code>## Optimization terminated successfully.
@@ -371,8 +394,8 @@ TR = 100 - 100 e ^{(-\beta_1 \pm 2 \cdot SE(\beta_1))}
 ## Dep. Variable:                   nYSB   No. Observations:                  672
 ## Model:               NegativeBinomial   Df Residuals:                      670
 ## Method:                           MLE   Df Model:                            1
-## Date:                Thu, 22 May 2025   Pseudo R-squ.:                 0.06445
-## Time:                        14:49:24   Log-Likelihood:                -2438.8
+## Date:                Wed, 18 Jun 2025   Pseudo R-squ.:                 0.06445
+## Time:                        14:59:57   Log-Likelihood:                -2438.8
 ## converged:                       True   LL-Null:                       -2606.8
 ## Covariance Type:            nonrobust   LLR p-value:                 4.739e-75
 ## ======================================================================================
@@ -393,16 +416,16 @@ TR = 100 - 100 e ^{(-\beta_1 \pm 2 \cdot SE(\beta_1))}
 ## 50%      0.320438    0.069947    0.183344    0.457531
 ## 75%      1.402260    0.071991    1.269172    1.535348
 ## max      1.402260    0.071991    1.269172    1.535348</code></pre>
-<p><img src="02-GLMMsInPython_files/figure-html/nb1py-15.png" width="100%" /><img src="02-GLMMsInPython_files/figure-html/nb1py-16.png" width="100%" /></p>
+<p><img src="03-GLMMsInPython_files/figure-html/nb1py-15.png" width="100%" /><img src="03-GLMMsInPython_files/figure-html/nb1py-16.png" width="100%" /></p>
 </div>
-<div id="bayesian-bambi-models-python" class="section level3 hasAnchor" number="3.5.3">
-<h3><span class="header-section-number">3.5.3</span> Bayesian (bambi) models– Python<a href="GLMMsPython.html#bayesian-bambi-models-python" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="bayesian-bambi-models-python" class="section level3 hasAnchor" number="4.5.3">
+<h3><span class="header-section-number">4.5.3</span> Bayesian (bambi) models– Python<a href="GLMMsPython.html#bayesian-bambi-models-python" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>“Bambi” is the Python module that is <em>very</em> similar to “brms” package in R. I’m pretty sure the defaults use different algorithms though (which may affect your results), so be sure to read up on the details of both!</p>
 <p>Because the models take a few minutes to fit, I usually fit them when I am initially running through my code, save them, and then only load the model fit when rendering the Rmarkdown file and creating the resulting figures.</p>
 <p>The prior_summary command is helpful if you do not know what a parameter is called in ‘brms’. Here, I used the command to find out what they called their <span class="math inline">\(\phi\)</span> parameter. (They call it the shape parameter.)</p>
 <p>“Bambi” created InferenceData objects. Read the reference guide– it is very helpful!
 <a href="https://python.arviz.org/en/latest/getting_started/WorkingWithInferenceData.html#" class="uri">https://python.arviz.org/en/latest/getting_started/WorkingWithInferenceData.html#</a></p>
-<p><img src="02-GLMMsInPython_files/figure-html/nbBambi1setup-19.png" width="100%" /></p>
+<p><img src="03-GLMMsInPython_files/figure-html/nbBambi1setup-19.png" width="100%" /></p>
 <pre><code>##                    mean     sd  hdi_3%  hdi_97%  mcse_mean  mcse_sd  ess_bulk  \
 ## alpha             0.656  0.035   0.588    0.721      0.000    0.000   17917.0   
 ## Intercept         1.402  0.067   1.276    1.530      0.000    0.001   18638.0   
@@ -806,7 +829,7 @@ Attributes:
     sampling_time:               17.945131063461304
     tuning_steps:                500
     modeling_interface:          bambi
-    modeling_interface_version:  0.15.0</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-c07c2004-623d-4f22-8faa-900e0b670513' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-c07c2004-623d-4f22-8faa-900e0b670513' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>chain</span>: 6</li><li><span class='xr-has-index'>draw</span>: 2000</li><li><span class='xr-has-index'>Treatment_dim</span>: 1</li><li><span class='xr-has-index'>__obs__</span>: 672</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-329926d6-f168-440d-8410-74368d1a1ebd' class='xr-section-summary-in' type='checkbox'  checked><label for='section-329926d6-f168-440d-8410-74368d1a1ebd' class='xr-section-summary' >Coordinates: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>chain</span></div><div class='xr-var-dims'>(chain)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5</div><input id='attrs-a1ae9ef8-b1f4-469c-9534-96e56489425b' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-a1ae9ef8-b1f4-469c-9534-96e56489425b' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9feaa83b-2787-4a79-89ba-3cc521d2f570' class='xr-var-data-in' type='checkbox'><label for='data-9feaa83b-2787-4a79-89ba-3cc521d2f570' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 1, 2, 3, 4, 5])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>draw</span></div><div class='xr-var-dims'>(draw)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 1996 1997 1998 1999</div><input id='attrs-c61f1877-7f0d-415b-ac90-3f7c2f93a09f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c61f1877-7f0d-415b-ac90-3f7c2f93a09f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9ab82f88-58e0-4add-9713-22d582494bd7' class='xr-var-data-in' type='checkbox'><label for='data-9ab82f88-58e0-4add-9713-22d582494bd7' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   0,    1,    2, ..., 1997, 1998, 1999])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>Treatment_dim</span></div><div class='xr-var-dims'>(Treatment_dim)</div><div class='xr-var-dtype'>&lt;U5</div><div class='xr-var-preview xr-preview'>&#x27;trt A&#x27;</div><input id='attrs-e6db0b83-b90e-4cdc-b604-24c71b0dc784' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e6db0b83-b90e-4cdc-b604-24c71b0dc784' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-c6e0ea38-e5f8-4f75-9154-4b96b22555da' class='xr-var-data-in' type='checkbox'><label for='data-c6e0ea38-e5f8-4f75-9154-4b96b22555da' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;trt A&#x27;], dtype=&#x27;&lt;U5&#x27;)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>__obs__</span></div><div class='xr-var-dims'>(__obs__)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 ... 667 668 669 670 671</div><input id='attrs-a0647bc0-fb9b-4710-831c-4f38e21c8128' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-a0647bc0-fb9b-4710-831c-4f38e21c8128' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-134c189e-9d40-489a-b310-bbd1d468a359' class='xr-var-data-in' type='checkbox'><label for='data-134c189e-9d40-489a-b310-bbd1d468a359' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  0,   1,   2, ..., 669, 670, 671])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-d7e7ba2f-3ba3-483f-8545-321672f190c1' class='xr-section-summary-in' type='checkbox'  checked><label for='section-d7e7ba2f-3ba3-483f-8545-321672f190c1' class='xr-section-summary' >Data variables: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>alpha</span></div><div class='xr-var-dims'>(chain, draw)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.6959 0.6361 ... 0.6491 0.691</div><input id='attrs-20123336-7bbc-4d27-bab7-b93e4bf85759' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-20123336-7bbc-4d27-bab7-b93e4bf85759' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-488bc3ff-5e4a-43d4-af38-ddee28e86fe3' class='xr-var-data-in' type='checkbox'><label for='data-488bc3ff-5e4a-43d4-af38-ddee28e86fe3' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[0.69592703, 0.63605533, 0.68620635, ..., 0.67095042, 0.62715063,
+    modeling_interface_version:  0.15.0</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-80331cd6-2369-412b-b067-76a69c096d8c' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-80331cd6-2369-412b-b067-76a69c096d8c' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>chain</span>: 6</li><li><span class='xr-has-index'>draw</span>: 2000</li><li><span class='xr-has-index'>Treatment_dim</span>: 1</li><li><span class='xr-has-index'>__obs__</span>: 672</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-96de5fe8-64dc-4fa2-ad58-51e8f489ada0' class='xr-section-summary-in' type='checkbox'  checked><label for='section-96de5fe8-64dc-4fa2-ad58-51e8f489ada0' class='xr-section-summary' >Coordinates: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>chain</span></div><div class='xr-var-dims'>(chain)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5</div><input id='attrs-f4a3f296-0612-4791-b711-2bbcfacdb49e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f4a3f296-0612-4791-b711-2bbcfacdb49e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-14fb1e27-0157-4d14-810e-d378c702c4bd' class='xr-var-data-in' type='checkbox'><label for='data-14fb1e27-0157-4d14-810e-d378c702c4bd' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 1, 2, 3, 4, 5])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>draw</span></div><div class='xr-var-dims'>(draw)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 1996 1997 1998 1999</div><input id='attrs-13bf301e-84b9-4c4e-9e2e-27889a8178c2' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-13bf301e-84b9-4c4e-9e2e-27889a8178c2' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-16aaed33-5592-4230-ad14-97bc5e22a378' class='xr-var-data-in' type='checkbox'><label for='data-16aaed33-5592-4230-ad14-97bc5e22a378' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   0,    1,    2, ..., 1997, 1998, 1999])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>Treatment_dim</span></div><div class='xr-var-dims'>(Treatment_dim)</div><div class='xr-var-dtype'>&lt;U5</div><div class='xr-var-preview xr-preview'>&#x27;trt A&#x27;</div><input id='attrs-e6430cfb-a9bb-418a-9708-214a2c309288' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e6430cfb-a9bb-418a-9708-214a2c309288' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-34113291-8cf0-438d-8de1-b3686221be5c' class='xr-var-data-in' type='checkbox'><label for='data-34113291-8cf0-438d-8de1-b3686221be5c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;trt A&#x27;], dtype=&#x27;&lt;U5&#x27;)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>__obs__</span></div><div class='xr-var-dims'>(__obs__)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 ... 667 668 669 670 671</div><input id='attrs-2f17065d-d9c2-44dc-b44d-e3194edd2a39' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2f17065d-d9c2-44dc-b44d-e3194edd2a39' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5cbe632f-f5fe-4652-aa5a-a4ebdbf22f1e' class='xr-var-data-in' type='checkbox'><label for='data-5cbe632f-f5fe-4652-aa5a-a4ebdbf22f1e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  0,   1,   2, ..., 669, 670, 671])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-a6576f25-3b8d-45ff-9e51-129e1c818d5f' class='xr-section-summary-in' type='checkbox'  checked><label for='section-a6576f25-3b8d-45ff-9e51-129e1c818d5f' class='xr-section-summary' >Data variables: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>alpha</span></div><div class='xr-var-dims'>(chain, draw)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.6959 0.6361 ... 0.6491 0.691</div><input id='attrs-c34e641b-7311-44e7-9514-f117c768c1c4' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c34e641b-7311-44e7-9514-f117c768c1c4' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-4719c362-1525-4e9a-b3b0-e5cb056b4093' class='xr-var-data-in' type='checkbox'><label for='data-4719c362-1525-4e9a-b3b0-e5cb056b4093' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[0.69592703, 0.63605533, 0.68620635, ..., 0.67095042, 0.62715063,
         0.63786114],
        [0.65986889, 0.61794149, 0.65993102, ..., 0.62901943, 0.62618106,
         0.65830356],
@@ -817,7 +840,7 @@ Attributes:
        [0.607845  , 0.60197837, 0.62735625, ..., 0.62053682, 0.69257234,
         0.70191768],
        [0.56194368, 0.73219812, 0.63673422, ..., 0.64910599, 0.64910599,
-        0.69098746]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>Intercept</span></div><div class='xr-var-dims'>(chain, draw)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.245 1.477 1.368 ... 1.411 1.401</div><input id='attrs-9dda937f-d327-4a7c-add4-2a6538b4a661' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9dda937f-d327-4a7c-add4-2a6538b4a661' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-726bc770-e441-464c-bd93-b04f8800585b' class='xr-var-data-in' type='checkbox'><label for='data-726bc770-e441-464c-bd93-b04f8800585b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[1.24536263, 1.47708429, 1.36814688, ..., 1.50729605, 1.29322517,
+        0.69098746]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>Intercept</span></div><div class='xr-var-dims'>(chain, draw)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.245 1.477 1.368 ... 1.411 1.401</div><input id='attrs-8c074aa3-a968-4595-9638-a3cec796c376' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8c074aa3-a968-4595-9638-a3cec796c376' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-8cecd9b2-c454-4ff2-9b13-bc5423a2f700' class='xr-var-data-in' type='checkbox'><label for='data-8cecd9b2-c454-4ff2-9b13-bc5423a2f700' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[1.24536263, 1.47708429, 1.36814688, ..., 1.50729605, 1.29322517,
         1.47270335],
        [1.39617005, 1.37951911, 1.38522232, ..., 1.32313883, 1.41031622,
         1.37780825],
@@ -828,7 +851,7 @@ Attributes:
        [1.36842139, 1.3211883 , 1.53664426, ..., 1.43642213, 1.3891655 ,
         1.34097588],
        [1.41683807, 1.46274752, 1.34210863, ..., 1.41098516, 1.41098516,
-        1.40057405]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>Treatment</span></div><div class='xr-var-dims'>(chain, draw, Treatment_dim)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-2.08 -2.272 ... -2.194 -2.131</div><input id='attrs-88ebb8a7-8d46-4873-9355-077d97603440' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-88ebb8a7-8d46-4873-9355-077d97603440' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a6877319-bdfe-45e3-8305-2d5fd3d87558' class='xr-var-data-in' type='checkbox'><label for='data-a6877319-bdfe-45e3-8305-2d5fd3d87558' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[[-2.07969894],
+        1.40057405]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>Treatment</span></div><div class='xr-var-dims'>(chain, draw, Treatment_dim)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-2.08 -2.272 ... -2.194 -2.131</div><input id='attrs-06235a42-ab5b-4900-8392-77145c37c188' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-06235a42-ab5b-4900-8392-77145c37c188' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-572cd801-c3bb-444d-8143-93996cb70688' class='xr-var-data-in' type='checkbox'><label for='data-572cd801-c3bb-444d-8143-93996cb70688' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[[-2.07969894],
         [-2.27219906],
         [-2.1526889 ],
         ...,
@@ -868,7 +891,7 @@ Attributes:
         ...,
         [-2.1944862 ],
         [-2.1944862 ],
-        [-2.13071552]]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mu</span></div><div class='xr-var-dims'>(chain, draw, __obs__)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.4342 0.4342 ... 4.058 4.058</div><input id='attrs-564be8b5-104e-4d61-a563-d04ba4f2ad5c' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-564be8b5-104e-4d61-a563-d04ba4f2ad5c' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-76974f57-42ef-453c-a58f-ece8ad810f04' class='xr-var-data-in' type='checkbox'><label for='data-76974f57-42ef-453c-a58f-ece8ad810f04' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[[0.43416253, 0.43416253, 0.43416253, ..., 3.47419441,
+        [-2.13071552]]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mu</span></div><div class='xr-var-dims'>(chain, draw, __obs__)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.4342 0.4342 ... 4.058 4.058</div><input id='attrs-bfd3701d-20bf-40a9-8266-84f8b65e02a6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-bfd3701d-20bf-40a9-8266-84f8b65e02a6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-06c682fc-2a5d-4f87-b626-529e5ab148f6' class='xr-var-data-in' type='checkbox'><label for='data-06c682fc-2a5d-4f87-b626-529e5ab148f6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[[0.43416253, 0.43416253, 0.43416253, ..., 3.47419441,
          3.47419441, 3.47419441],
         [0.45152941, 0.45152941, 0.45152941, ..., 4.38015576,
          4.38015576, 4.38015576],
@@ -908,13 +931,13 @@ Attributes:
         [0.45680392, 0.45680392, 0.45680392, ..., 4.09999256,
          4.09999256, 4.09999256],
         [0.48184082, 0.48184082, 0.48184082, ..., 4.0575285 ,
-         4.0575285 , 4.0575285 ]]])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-f7718221-9335-472d-8411-c7a60ac7bb9b' class='xr-section-summary-in' type='checkbox'  ><label for='section-f7718221-9335-472d-8411-c7a60ac7bb9b' class='xr-section-summary' >Indexes: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>chain</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-fec32774-f893-431a-9289-b8b3da33893a' class='xr-index-data-in' type='checkbox'/><label for='index-fec32774-f893-431a-9289-b8b3da33893a' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([0, 1, 2, 3, 4, 5], dtype=&#x27;int64&#x27;, name=&#x27;chain&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>draw</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-14070494-4e8e-4b1c-9456-8d9cc185a35c' class='xr-index-data-in' type='checkbox'/><label for='index-14070494-4e8e-4b1c-9456-8d9cc185a35c' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([   0,    1,    2,    3,    4,    5,    6,    7,    8,    9,
+         4.0575285 , 4.0575285 ]]])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-bb46f2ac-448a-4be8-9a94-9115ce18290f' class='xr-section-summary-in' type='checkbox'  ><label for='section-bb46f2ac-448a-4be8-9a94-9115ce18290f' class='xr-section-summary' >Indexes: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>chain</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-606281f6-e1e7-47bc-b045-a492ea97f9b3' class='xr-index-data-in' type='checkbox'/><label for='index-606281f6-e1e7-47bc-b045-a492ea97f9b3' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([0, 1, 2, 3, 4, 5], dtype=&#x27;int64&#x27;, name=&#x27;chain&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>draw</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-16b7c912-cfe1-4941-b1d9-c274962e38ed' class='xr-index-data-in' type='checkbox'/><label for='index-16b7c912-cfe1-4941-b1d9-c274962e38ed' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([   0,    1,    2,    3,    4,    5,    6,    7,    8,    9,
        ...
        1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999],
-      dtype=&#x27;int64&#x27;, name=&#x27;draw&#x27;, length=2000))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>Treatment_dim</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-aa193c27-19c8-4600-ae39-3d22dd62a063' class='xr-index-data-in' type='checkbox'/><label for='index-aa193c27-19c8-4600-ae39-3d22dd62a063' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;trt A&#x27;], dtype=&#x27;object&#x27;, name=&#x27;Treatment_dim&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>__obs__</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-9767cd9c-8e86-49ff-8aab-1db913440143' class='xr-index-data-in' type='checkbox'/><label for='index-9767cd9c-8e86-49ff-8aab-1db913440143' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([  0,   1,   2,   3,   4,   5,   6,   7,   8,   9,
+      dtype=&#x27;int64&#x27;, name=&#x27;draw&#x27;, length=2000))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>Treatment_dim</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-cb0ce6af-1fec-4940-a181-f62e421bccff' class='xr-index-data-in' type='checkbox'/><label for='index-cb0ce6af-1fec-4940-a181-f62e421bccff' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;trt A&#x27;], dtype=&#x27;object&#x27;, name=&#x27;Treatment_dim&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>__obs__</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-a814e74b-859e-4351-8794-11edc457a069' class='xr-index-data-in' type='checkbox'/><label for='index-a814e74b-859e-4351-8794-11edc457a069' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([  0,   1,   2,   3,   4,   5,   6,   7,   8,   9,
        ...
        662, 663, 664, 665, 666, 667, 668, 669, 670, 671],
-      dtype=&#x27;int64&#x27;, name=&#x27;__obs__&#x27;, length=672))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-ee3976c3-6b35-4372-acad-60c6d28309c9' class='xr-section-summary-in' type='checkbox'  checked><label for='section-ee3976c3-6b35-4372-acad-60c6d28309c9' class='xr-section-summary' >Attributes: <span>(8)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>created_at :</span></dt><dd>2025-05-21T19:44:29.234456+00:00</dd><dt><span>arviz_version :</span></dt><dd>0.21.0</dd><dt><span>inference_library :</span></dt><dd>pymc</dd><dt><span>inference_library_version :</span></dt><dd>5.22.0</dd><dt><span>sampling_time :</span></dt><dd>17.945131063461304</dd><dt><span>tuning_steps :</span></dt><dd>500</dd><dt><span>modeling_interface :</span></dt><dd>bambi</dd><dt><span>modeling_interface_version :</span></dt><dd>0.15.0</dd></dl></div></li></ul></div></div>
+      dtype=&#x27;int64&#x27;, name=&#x27;__obs__&#x27;, length=672))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-e2396feb-545b-47c4-bfda-b235a08834c8' class='xr-section-summary-in' type='checkbox'  checked><label for='section-e2396feb-545b-47c4-bfda-b235a08834c8' class='xr-section-summary' >Attributes: <span>(8)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>created_at :</span></dt><dd>2025-05-21T19:44:29.234456+00:00</dd><dt><span>arviz_version :</span></dt><dd>0.21.0</dd><dt><span>inference_library :</span></dt><dd>pymc</dd><dt><span>inference_library_version :</span></dt><dd>5.22.0</dd><dt><span>sampling_time :</span></dt><dd>17.945131063461304</dd><dt><span>tuning_steps :</span></dt><dd>500</dd><dt><span>modeling_interface :</span></dt><dd>bambi</dd><dt><span>modeling_interface_version :</span></dt><dd>0.15.0</dd></dl></div></li></ul></div></div>
 <pre><code>##            TrapID   Longitude    Latitude                 TransplantDate  \
 ## count  672.000000  672.000000  672.000000                            672   
 ## mean   152.500000  108.684570   -6.895572  2023-08-16 01:25:42.857142784   
@@ -964,12 +987,12 @@ Attributes:
 ## 75%      76.000000    4.064375    3.560621    4.654479    4.070682  
 ## max     103.000000    4.064375    3.560621    4.654479    4.070682  
 ## std      26.312575    1.800018    1.577629    2.058681    1.801580</code></pre>
-<p><img src="02-GLMMsInPython_files/figure-html/nbBambi1Output-21.png" width="100%" /><img src="02-GLMMsInPython_files/figure-html/nbBambi1Output-22.png" width="100%" /></p>
+<p><img src="03-GLMMsInPython_files/figure-html/nbBambi1Output-21.png" width="100%" /><img src="03-GLMMsInPython_files/figure-html/nbBambi1Output-22.png" width="100%" /></p>
 <p>The Bayesian parameter estimates match very closely to the frequentist estimates. This is expected, but reassuring that we have built the correct foundation for the more complicated models to come. The first summary output is from the Bayesian model; the second is from the frequentist fit. (Note that in the fequentitst fit, they summarize the inverse shape parameter compared to the bambi fit.)</p>
 <p>Comparisons of TR predictions and predicted moth count values can be found at the end of the page.</p>
 </div>
-<div id="bayesian-pymc-models-python" class="section level3 hasAnchor" number="3.5.4">
-<h3><span class="header-section-number">3.5.4</span> Bayesian (PyMC) models– Python<a href="GLMMsPython.html#bayesian-pymc-models-python" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="bayesian-pymc-models-python" class="section level3 hasAnchor" number="4.5.4">
+<h3><span class="header-section-number">4.5.4</span> Bayesian (PyMC) models– Python<a href="GLMMsPython.html#bayesian-pymc-models-python" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>For most needs, the “bambi” module should suffice. However, when I want to build my complicated non-linear function with multi-dimensional Gaussian Processes, I am going to need a more foundational module– PyMC. Therefore, I will also build all models using this module. Learning PyMC will also help with extracting derived parameters and predictions, etc. from bambi</p>
 <pre><code>##                              mean     sd  hdi_3%  hdi_97%  mcse_mean  mcse_sd  \
 ## beta[Intercept]             1.402  0.067   1.279    1.532      0.001    0.001   
@@ -987,17 +1010,17 @@ Attributes:
 ## 
 ##     r_hat  
 ## TR    1.0</code></pre>
-<p><img src="02-GLMMsInPython_files/figure-html/nbPyMCOutput1-25.png" width="100%" /></p>
+<p><img src="03-GLMMsInPython_files/figure-html/nbPyMCOutput1-25.png" width="100%" /></p>
 </div>
 </div>
-<div id="glmm-random-effect-re-for-locations-1" class="section level2 hasAnchor" number="3.6">
-<h2><span class="header-section-number">3.6</span> GLMM: Random effect (RE) for locations<a href="GLMMsPython.html#glmm-random-effect-re-for-locations-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="glmm-random-effect-re-for-locations-1" class="section level2 hasAnchor" number="4.6">
+<h2><span class="header-section-number">4.6</span> GLMM: Random effect (RE) for locations<a href="GLMMsPython.html#glmm-random-effect-re-for-locations-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The first fix we make to the model is acknowledging that overall average moth pressure varies from location to location (see Fig 1 of moth counts). To make this fix, we add a location random effect (RE) and our model becomes a generalized linear mixed-effects model (GLMM or GLMER).</p>
 <p>We also want to acknowledge that the treatment effect may vary from location to location– sometimes we see a big difference in moth counts between control and treatment fields, and sometimes the difference is smaller. For inference though, we are only interested in the larger picture, which is the overall trapping reduction. (We are not interested in what happens at these exact locations per se, we are more interested in the average treatment effect.) Therefore, we also add a treatment random effect.</p>
 <p>Because dates will have different affect at different location (partially due to different planting dates), they are nested and not crossed.</p>
 <p>(Should date be planting date and not sampling date? )</p>
-<div id="glmm-mathematical-model-1" class="section level3 hasAnchor" number="3.6.1">
-<h3><span class="header-section-number">3.6.1</span> GLMM mathematical model<a href="GLMMsPython.html#glmm-mathematical-model-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="glmm-mathematical-model-2" class="section level3 hasAnchor" number="4.6.1">
+<h3><span class="header-section-number">4.6.1</span> GLMM mathematical model<a href="GLMMsPython.html#glmm-mathematical-model-2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>I only show the Poisson version of the model, the NB version is a straightforward extension.</p>
 <p><span class="math display">\[
 y_{ik} \sim Pois(\lambda_{ik}) \\
@@ -1015,8 +1038,8 @@ log(\lambda_{ik} ) = \beta_0 + \beta_1 x_{A,i} + \gamma_{0k} x_{ik}  + \gamma_{1
 <p><span class="math inline">\(\gamma_{1k}\)</span> is the random slope associated with location <span class="math inline">\(k\)</span>, which leads to different treatment effects at each location. All <span class="math inline">\(\gamma_{1k}\)</span> come from an iid Normal distribution, and</p>
 <p><span class="math inline">\(x_{ik}\)</span> is an indicator variable that equals 1 if moth count <span class="math inline">\(i\)</span> is associated with location <span class="math inline">\(k\)</span> and 0 otherwise.</p>
 <p>OK, technically I should be introducing matrices here because <span class="math inline">\(k = 1,..., K=10\)</span> locations, so we need a new indicator variable for each location, but I’m going to be lazy and write it like this for now.</p>
-<div id="bayesian-glmm" class="section level4 hasAnchor" number="3.6.1.1">
-<h4><span class="header-section-number">3.6.1.1</span> Bayesian GLMM<a href="GLMMsPython.html#bayesian-glmm" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="bayesian-glmm" class="section level4 hasAnchor" number="4.6.1.1">
+<h4><span class="header-section-number">4.6.1.1</span> Bayesian GLMM<a href="GLMMsPython.html#bayesian-glmm" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Here is the same model with a Bayesian framework and using a negative binomial regression:</p>
 <p>To make our models Bayesian, we add priors to our parameters:</p>
 <p><span class="math display">\[
@@ -1031,8 +1054,8 @@ log(\lambda_{ik} ) = \beta_0 + \beta_1 x_{A,i} + \gamma_{0k} x_{ik}  + \gamma_{1
 \phi \sim HalfCauchy(0,1) \\
 \]</span></p>
 </div>
-<div id="bayesian-glmm-matrix-version-2" class="section level4 hasAnchor" number="3.6.1.2">
-<h4><span class="header-section-number">3.6.1.2</span> Bayesian GLMM – Matrix version<a href="GLMMsPython.html#bayesian-glmm-matrix-version-2" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="bayesian-glmm-matrix-version-2" class="section level4 hasAnchor" number="4.6.1.2">
+<h4><span class="header-section-number">4.6.1.2</span> Bayesian GLMM – Matrix version<a href="GLMMsPython.html#bayesian-glmm-matrix-version-2" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>I DO write the Bayesian version in matrix form because it matches the coding (and is more correct given the need for a <span class="math inline">\(KxK\)</span> <span class="math inline">\(Z\)</span> design matrix):</p>
 <p><span class="math display">\[
 \mathbf{Y} \sim NegBinom(\boldsymbol\lambda, \phi) \\
@@ -1044,8 +1067,8 @@ log(\boldsymbol\lambda) = \mathbf{X}\boldsymbol\beta + \mathbf{Z}\boldsymbol\gam
 \]</span></p>
 </div>
 </div>
-<div id="glmm-frequentist-fit-1" class="section level3 hasAnchor" number="3.6.2">
-<h3><span class="header-section-number">3.6.2</span> GLMM frequentist fit<a href="GLMMsPython.html#glmm-frequentist-fit-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="glmm-frequentist-fit-1" class="section level3 hasAnchor" number="4.6.2">
+<h3><span class="header-section-number">4.6.2</span> GLMM frequentist fit<a href="GLMMsPython.html#glmm-frequentist-fit-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Python is a little disappointing for GLMMs. We use “pymer4” module which is just a wrapper to the R library “lme4”. This is awkward here– we are wrapping Python code inside R, and the Python code is a wrapper back to R. So, I get a warning. I am including the code here anyways for anyone working outside of reticulate and RStudio.</p>
 <p>(If we only have random intercepts, you can use the “statsmodels” module, but it cannot accommodate random intercepts and slopes, which is what we have.)</p>
 <p>You can also use the “GPBoost” module, but it is overly complicated for our small data set.</p>
@@ -1059,8 +1082,8 @@ log(\boldsymbol\lambda) = \mathbf{X}\boldsymbol\beta + \mathbf{Z}\boldsymbol\gam
 </ul>
 <p>Therefore, we only fit the negative binomial regression model within the Bayesian framework. This is a category where R takes the win over Python!</p>
 </div>
-<div id="glmm-bayesian-bambi-models" class="section level3 hasAnchor" number="3.6.3">
-<h3><span class="header-section-number">3.6.3</span> GLMM Bayesian (bambi) models<a href="GLMMsPython.html#glmm-bayesian-bambi-models" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="glmm-bayesian-bambi-models" class="section level3 hasAnchor" number="4.6.3">
+<h3><span class="header-section-number">4.6.3</span> GLMM Bayesian (bambi) models<a href="GLMMsPython.html#glmm-bayesian-bambi-models" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>By default, the prior distributions of random slopes and intercepts are correlated in “brm”. If the correlation is non-significant, you may want to remove that correlation to simplify your model. To remove the correlation, change the random effects term from “(1 + TreatmentF|Location)” to ” (1 + TreatmentF||Location)” (has an extra vertical line), which makes them independent. (TRUE FOR BAMBI??)</p>
 <p>You’ll notice that the parameter estimates are slightly different from the frequentist NB model fit here– the more complicated your model is, the more likely you will find this is true with slightly different versions of your model (here, adding priors and fitting with a different algorithm).</p>
 <p>Again, notice the subtle differences between “brms” and “bambi”.</p>
@@ -1068,7 +1091,7 @@ log(\boldsymbol\lambda) = \mathbf{X}\boldsymbol\beta + \mathbf{Z}\boldsymbol\gam
 From:
 <a href="https://discourse.pymc.io/t/bambi-model-correlated-intercept-slopes/16054/2" class="uri">https://discourse.pymc.io/t/bambi-model-correlated-intercept-slopes/16054/2</a></p>
 <p>NOTE: Google Gemini says that the default IS correlated intercept, slopes. (May 21, 2025). Be careful using A.I.!</p>
-<p><img src="02-GLMMsInPython_files/figure-html/nbBambi2setup-27.png" width="100%" /></p>
+<p><img src="03-GLMMsInPython_files/figure-html/nbBambi2setup-27.png" width="100%" /></p>
 <pre><code>## Data variables:
 ##     alpha                     (chain, draw) float64 96kB 1.587 1.468 ... 1.625
 ##     Intercept                 (chain, draw) float64 96kB 1.308 1.862 ... 1.087
@@ -1094,12 +1117,12 @@ From:
 ## 0.500    84.741479
 ## 0.975    90.533637
 ## Name: trtA, dtype: float64</code></pre>
-<p><img src="02-GLMMsInPython_files/figure-html/nbBambi2Output-29.png" width="100%" /><img src="02-GLMMsInPython_files/figure-html/nbBambi2Output-30.png" width="100%" /></p>
+<p><img src="03-GLMMsInPython_files/figure-html/nbBambi2Output-29.png" width="100%" /><img src="03-GLMMsInPython_files/figure-html/nbBambi2Output-30.png" width="100%" /></p>
 </div>
-<div id="glmm-bayesian-pymc-models-python" class="section level3 hasAnchor" number="3.6.4">
-<h3><span class="header-section-number">3.6.4</span> GLMM Bayesian (PyMC) models– Python<a href="GLMMsPython.html#glmm-bayesian-pymc-models-python" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="glmm-bayesian-pymc-models-python" class="section level3 hasAnchor" number="4.6.4">
+<h3><span class="header-section-number">4.6.4</span> GLMM Bayesian (PyMC) models– Python<a href="GLMMsPython.html#glmm-bayesian-pymc-models-python" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Notice that my model framework is different from the tutorial within PyMC. In PyM tutorial, our beta’s are the means of the random intercept and slope. Here, I explicitly keep them as separate parameters. Is their way faster than mine? Perhaps that is why they do it that way? I’m sticking with this way because this is how I have always built the more complicated models that are forthcoming. Also, it is helpful to see similar models coded in different ways– helps you become more familiar with the programming and betters your understanding of the model itself.</p>
-<p><img src="02-GLMMsInPython_files/figure-html/nbPyMCsetup2-33.png" width="100%" /></p>
+<p><img src="03-GLMMsInPython_files/figure-html/nbPyMCsetup2-33.png" width="100%" /></p>
 <p>Starting with these models, I specify which variables for which I want to see the posteriors and summary statistics. In general, we don’t usually want the output for any latent variables as that would overwhelm our screens and are not the parameters of most interest right now.</p>
 <pre><code>##                 mean     sd  hdi_3%  hdi_97%  mcse_mean  mcse_sd  ess_bulk  \
 ## beta_coefs[0]  0.823  1.041  -1.171    2.761      0.024    0.019    1916.0   
@@ -1119,19 +1142,19 @@ From:
 ## 
 ##     r_hat  
 ## TR    1.0</code></pre>
-<p><img src="02-GLMMsInPython_files/figure-html/nbPyMCOutput2-35.png" width="100%" /></p>
+<p><img src="03-GLMMsInPython_files/figure-html/nbPyMCOutput2-35.png" width="100%" /></p>
 </div>
 </div>
-<div id="glmm-re-for-location-crossed-samplingdate" class="section level2 hasAnchor" number="3.7">
-<h2><span class="header-section-number">3.7</span> GLMM: RE for location, crossed SamplingDate<a href="GLMMsPython.html#glmm-re-for-location-crossed-samplingdate" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div id="crossed-glmm-frequentist-fit-1" class="section level3 hasAnchor" number="3.7.1">
-<h3><span class="header-section-number">3.7.1</span> Crossed GLMM frequentist fit<a href="GLMMsPython.html#crossed-glmm-frequentist-fit-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="glmm-re-for-location-crossed-samplingdate" class="section level2 hasAnchor" number="4.7">
+<h2><span class="header-section-number">4.7</span> GLMM: RE for location, crossed SamplingDate<a href="GLMMsPython.html#glmm-re-for-location-crossed-samplingdate" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="crossed-glmm-frequentist-fit-1" class="section level3 hasAnchor" number="4.7.1">
+<h3><span class="header-section-number">4.7.1</span> Crossed GLMM frequentist fit<a href="GLMMsPython.html#crossed-glmm-frequentist-fit-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Not done because relies on the “lmer” wrapper.</p>
 </div>
-<div id="crossed-glmm-bayes-bambi-version" class="section level3 hasAnchor" number="3.7.2">
-<h3><span class="header-section-number">3.7.2</span> Crossed GLMM Bayes (bambi) version<a href="GLMMsPython.html#crossed-glmm-bayes-bambi-version" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="crossed-glmm-bayes-bambi-version" class="section level3 hasAnchor" number="4.7.2">
+<h3><span class="header-section-number">4.7.2</span> Crossed GLMM Bayes (bambi) version<a href="GLMMsPython.html#crossed-glmm-bayes-bambi-version" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Output is slightly different from “brms” output, especially the predictions for Loc9. Differences might be due to correlated versus not correlated RE’s for location.</p>
-<p><img src="02-GLMMsInPython_files/figure-html/nbBambi3setup-37.png" width="100%" /></p>
+<p><img src="03-GLMMsInPython_files/figure-html/nbBambi3setup-37.png" width="100%" /></p>
 <pre><code>##        Formula: nYSB ~ Treatment + (Treatment|Location) +  (1|SamplingDateC) + offset(log(DaysOfCatch))
 ##         Family: negativebinomial
 ##           Link: mu = log
@@ -1230,25 +1253,25 @@ From:
 ## 75%      76.000000    4.064375    1.240226    3.321541    2.079838  
 ## max     103.000000    4.064375   16.136019   45.167927   27.262243  
 ## std      26.312575    1.800018    2.589362    6.435736    4.104133</code></pre>
-<p><img src="02-GLMMsInPython_files/figure-html/nbBambi3Output-39.png" width="100%" /><img src="02-GLMMsInPython_files/figure-html/nbBambi3Output-40.png" width="100%" /></p>
+<p><img src="03-GLMMsInPython_files/figure-html/nbBambi3Output-39.png" width="100%" /><img src="03-GLMMsInPython_files/figure-html/nbBambi3Output-40.png" width="100%" /></p>
 </div>
-<div id="crossed-glmm-bayes-pymc-version" class="section level3 hasAnchor" number="3.7.3">
-<h3><span class="header-section-number">3.7.3</span> Crossed GLMM Bayes (PyMC) version<a href="GLMMsPython.html#crossed-glmm-bayes-pymc-version" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="crossed-glmm-bayes-pymc-version" class="section level3 hasAnchor" number="4.7.3">
+<h3><span class="header-section-number">4.7.3</span> Crossed GLMM Bayes (PyMC) version<a href="GLMMsPython.html#crossed-glmm-bayes-pymc-version" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>To be filled in later.</p>
 </div>
 </div>
-<div id="glmm-with-gaussian-processes-re-for-trial-gp-for-date-1" class="section level2 hasAnchor" number="3.8">
-<h2><span class="header-section-number">3.8</span> GLMM with Gaussian Processes: RE for Trial, GP for Date<a href="GLMMsPython.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="glmm-with-gaussian-processes-re-for-trial-gp-for-date-2" class="section level2 hasAnchor" number="4.8">
+<h2><span class="header-section-number">4.8</span> GLMM with Gaussian Processes: RE for Trial, GP for Date<a href="GLMMsPython.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Now we are in the territory where we have to fit the models in a Bayesian framework. If our response variable was continuous (i.e., the regression model was based on a Normal distribution), then we could still use maximum likelihood estimation.</p>
-<div id="gaussian-process-bayes-bambi-version" class="section level3 hasAnchor" number="3.8.1">
-<h3><span class="header-section-number">3.8.1</span> Gaussian Process Bayes (bambi) version<a href="GLMMsPython.html#gaussian-process-bayes-bambi-version" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="gaussian-process-bayes-bambi-version" class="section level3 hasAnchor" number="4.8.1">
+<h3><span class="header-section-number">4.8.1</span> Gaussian Process Bayes (bambi) version<a href="GLMMsPython.html#gaussian-process-bayes-bambi-version" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <ul>
 <li><p>Use numeric version of sampling date for better algorithm stability. Still, we have a warning about a divergent transition. Ideally, we would tweak the model and look at the data carefully so fix this warning, but because we are working with made up data, we will not worry abotu the warning for now.</p></li>
 <li><p>Different from “brms”– I do not estimate separeate parameters for each Location– that option was causing many divergent warnings.</p></li>
 <li><p>Can only do “hsgp” version that is dimension reduction version. Here, we have only 10 assessments per date-location, so we are already working with limited dimensions.</p></li>
 </ul>
 <p>From the hsgp documentation (<a href="https://www.pymc.io/projects/examples/en/latest/gaussian_processes/HSGP-Basic.html" class="uri">https://www.pymc.io/projects/examples/en/latest/gaussian_processes/HSGP-Basic.html</a>): “For smaller data sets, the full unapproximated GP may still be more efficient.”</p>
-<p><img src="02-GLMMsInPython_files/figure-html/nbBambi4setup-43.png" width="100%" /></p>
+<p><img src="03-GLMMsInPython_files/figure-html/nbBambi4setup-43.png" width="100%" /></p>
 <pre><code>## Data variables:
 ##     alpha                     (chain, draw) float64 32kB 2.461 2.766 ... 2.483
 ##     Intercept                 (chain, draw) float64 32kB 0.4429 ... 0.4649
@@ -1283,23 +1306,23 @@ From:
 ## 0.500    84.0
 ## 0.975    90.0
 ## Name: trtA, dtype: float64</code></pre>
-<p><img src="02-GLMMsInPython_files/figure-html/nbBambi4Output-45.png" width="100%" /><img src="02-GLMMsInPython_files/figure-html/nbBambi4Output-46.png" width="100%" /></p>
+<p><img src="03-GLMMsInPython_files/figure-html/nbBambi4Output-45.png" width="100%" /><img src="03-GLMMsInPython_files/figure-html/nbBambi4Output-46.png" width="100%" /></p>
 </div>
 </div>
-<div id="summary-of-estimates-1" class="section level2 hasAnchor" number="3.9">
-<h2><span class="header-section-number">3.9</span> Summary of estimates<a href="GLMMsPython.html#summary-of-estimates-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div id="compare-tr-estimates-1" class="section level3 hasAnchor" number="3.9.1">
-<h3><span class="header-section-number">3.9.1</span> Compare TR estimates<a href="GLMMsPython.html#compare-tr-estimates-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="summary-of-estimates-1" class="section level2 hasAnchor" number="4.9">
+<h2><span class="header-section-number">4.9</span> Summary of estimates<a href="GLMMsPython.html#summary-of-estimates-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="compare-tr-estimates-1" class="section level3 hasAnchor" number="4.9.1">
+<h3><span class="header-section-number">4.9.1</span> Compare TR estimates<a href="GLMMsPython.html#compare-tr-estimates-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Here, the trapping reduction estimates from all of the models are compared. As expected, the median TR estimates are very close from model to model, but the uncertainty in that estimate increase (i.e., the confidence/credible intervals get wider) when we properly account for the correlations in our data.</p>
 <pre><code>##   Framework  Distribution               Model_name    TR  lowerCI  upperCI
 ## 0  Bayesian  Neg Binomial                      GLM  86.0     88.0     90.0
 ## 1  Bayesian  Neg Binomial          GLMM (location)  75.0     85.0     91.0
 ## 2  Bayesian  Neg Binomial    GLMM (location, date)  72.0     83.0     89.0
 ## 3  Bayesian  Neg Binomial  GLMM (location) with GP  75.0     84.0     90.0</code></pre>
-<p><img src="02-GLMMsInPython_files/figure-html/allTRestimates-49.png" width="100%" /></p>
+<p><img src="03-GLMMsInPython_files/figure-html/allTRestimates-49.png" width="100%" /></p>
 </div>
-<div id="compare-coefficients-1" class="section level3 hasAnchor" number="3.9.2">
-<h3><span class="header-section-number">3.9.2</span> Compare coefficients<a href="GLMMsPython.html#compare-coefficients-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="compare-coefficients-1" class="section level3 hasAnchor" number="4.9.2">
+<h3><span class="header-section-number">4.9.2</span> Compare coefficients<a href="GLMMsPython.html#compare-coefficients-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Because TR is a non-linear function of <span class="math inline">\(\beta_1\)</span>, the differences int he model output get slightly distorted from the transformation. Thereofre, the <span class="math inline">\(\beta_1\)</span> coefficients are displayed as well:</p>
 <pre><code>##     mean     sd
 ## 0 -2.159  0.099
@@ -1311,10 +1334,10 @@ From:
 ## 1  Bayesian  Neg Binomial          GLMM (location) -1.880  0.238
 ## 2  Bayesian  Neg Binomial    GLMM (location, date) -1.744  0.229
 ## 3  Bayesian  Neg Binomial  GLMM (location) with GP -1.826  0.224</code></pre>
-<p><img src="02-GLMMsInPython_files/figure-html/allBetas-51.png" width="100%" /></p>
+<p><img src="03-GLMMsInPython_files/figure-html/allBetas-51.png" width="100%" /></p>
 </div>
-<div id="plot-comparisons-1" class="section level3 hasAnchor" number="3.9.3">
-<h3><span class="header-section-number">3.9.3</span> Plot comparisons<a href="GLMMsPython.html#plot-comparisons-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="plot-comparisons-1" class="section level3 hasAnchor" number="4.9.3">
+<h3><span class="header-section-number">4.9.3</span> Plot comparisons<a href="GLMMsPython.html#plot-comparisons-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Unfortunately, a drawback of using plotnine module is that you cannot readily draw figures sid-by-side.</p>
 
 </div>

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 2 Mathematical models | Bayesian models in R and Python</title>
+  <meta name="description" content="This is a tutorial for R users to convert their code into Python. In particular, fitting GLMMs, hierchical BAyesian models, and non-linear Bayesian models." />
+  <meta name="generator" content="bookdown 0.43 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 2 Mathematical models | Bayesian models in R and Python" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="This is a tutorial for R users to convert their code into Python. In particular, fitting GLMMs, hierchical BAyesian models, and non-linear Bayesian models." />
+  <meta name="github-repo" content="rstudio/BayesInPython" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 2 Mathematical models | Bayesian models in R and Python" />
+  
+  <meta name="twitter:description" content="This is a tutorial for R users to convert their code into Python. In particular, fitting GLMMs, hierchical BAyesian models, and non-linear Bayesian models." />
+  
+
+<meta name="author" content="Kristin Broms" />
+
+
+<meta name="date" content="2025-06-18" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="index.html"/>
+<link rel="next" href="GLMMsR.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+
+
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#case-study"><i class="fa fa-check"></i><b>1.1</b> Case Study</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#case-study-objectives"><i class="fa fa-check"></i><b>1.1.1</b> Case study objectives</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="mathematical-models.html"><a href="mathematical-models.html"><i class="fa fa-check"></i><b>2</b> Mathematical models</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="mathematical-models.html"><a href="mathematical-models.html#basic-glm-models"><i class="fa fa-check"></i><b>2.1</b> Basic GLM models</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="mathematical-models.html"><a href="mathematical-models.html#poisson-regression-model"><i class="fa fa-check"></i><b>2.1.1</b> Poisson regression model</a></li>
+<li class="chapter" data-level="2.1.2" data-path="mathematical-models.html"><a href="mathematical-models.html#negative-binomial-regression-model"><i class="fa fa-check"></i><b>2.1.2</b> Negative binomial regression model</a></li>
+<li class="chapter" data-level="2.1.3" data-path="mathematical-models.html"><a href="mathematical-models.html#bayesian-model"><i class="fa fa-check"></i><b>2.1.3</b> Bayesian model</a></li>
+<li class="chapter" data-level="2.1.4" data-path="mathematical-models.html"><a href="mathematical-models.html#trapping-reduction-defined"><i class="fa fa-check"></i><b>2.1.4</b> Trapping reduction defined</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="mathematical-models.html"><a href="mathematical-models.html#glmm-random-effects-re-for-locations"><i class="fa fa-check"></i><b>2.2</b> GLMM: Random effects (RE) for locations</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="mathematical-models.html"><a href="mathematical-models.html#glmm-mathematical-model"><i class="fa fa-check"></i><b>2.2.1</b> GLMM mathematical model</a></li>
+<li class="chapter" data-level="2.2.2" data-path="mathematical-models.html"><a href="mathematical-models.html#bayesian-version"><i class="fa fa-check"></i><b>2.2.2</b> Bayesian version</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="mathematical-models.html"><a href="mathematical-models.html#glmm-re-for-location-samplingdate"><i class="fa fa-check"></i><b>2.3</b> GLMM: RE for Location, SamplingDate</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="mathematical-models.html"><a href="mathematical-models.html#frequentist-version"><i class="fa fa-check"></i><b>2.3.1</b> Frequentist version</a></li>
+<li class="chapter" data-level="2.3.2" data-path="mathematical-models.html"><a href="mathematical-models.html#bayesian-version-1"><i class="fa fa-check"></i><b>2.3.2</b> Bayesian version</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="mathematical-models.html"><a href="mathematical-models.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date"><i class="fa fa-check"></i><b>2.4</b> GLMM with Gaussian Processes: RE for Trial, GP for Date</a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="mathematical-models.html"><a href="mathematical-models.html#bayesian-mathematical-model"><i class="fa fa-check"></i><b>2.4.1</b> Bayesian mathematical model</a></li>
+<li class="chapter" data-level="2.4.2" data-path="mathematical-models.html"><a href="mathematical-models.html#gaussian-process-bayes-brms-version"><i class="fa fa-check"></i><b>2.4.2</b> Gaussian Process Bayes (brms) version</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="GLMMsR.html"><a href="GLMMsR.html"><i class="fa fa-check"></i><b>3</b> GLMM’s in R</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="GLMMsR.html"><a href="GLMMsR.html#data-exploration"><i class="fa fa-check"></i><b>3.1</b> Data Exploration</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="GLMMsR.html"><a href="GLMMsR.html#moth-counts"><i class="fa fa-check"></i><b>3.1.1</b> Moth counts</a></li>
+<li class="chapter" data-level="3.1.2" data-path="GLMMsR.html"><a href="GLMMsR.html#trap-locations"><i class="fa fa-check"></i><b>3.1.2</b> Trap locations</a></li>
+<li class="chapter" data-level="3.1.3" data-path="GLMMsR.html"><a href="GLMMsR.html#timeline"><i class="fa fa-check"></i><b>3.1.3</b> Timeline</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="GLMMsR.html"><a href="GLMMsR.html#basic-glm-models-1"><i class="fa fa-check"></i><b>3.2</b> Basic GLM models</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="GLMMsR.html"><a href="GLMMsR.html#fitting-the-frequentist-models"><i class="fa fa-check"></i><b>3.2.1</b> Fitting the frequentist models</a></li>
+<li class="chapter" data-level="3.2.2" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-brms-model-fit"><i class="fa fa-check"></i><b>3.2.2</b> Bayesian (brms) model fit</a></li>
+<li class="chapter" data-level="3.2.3" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-rjags-model-fit"><i class="fa fa-check"></i><b>3.2.3</b> Bayesian (rjags) model fit</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-random-effect-re-for-locations"><i class="fa fa-check"></i><b>3.3</b> GLMM: Random effect (RE) for locations</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-mathematical-model-1"><i class="fa fa-check"></i><b>3.3.1</b> GLMM mathematical model</a></li>
+<li class="chapter" data-level="3.3.2" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-frequentist-fit"><i class="fa fa-check"></i><b>3.3.2</b> GLMM frequentist fit</a></li>
+<li class="chapter" data-level="3.3.3" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-bayes-brms-version"><i class="fa fa-check"></i><b>3.3.3</b> GLMM Bayes (brms) version</a></li>
+<li class="chapter" data-level="3.3.4" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-bayes-rjags-model-fit"><i class="fa fa-check"></i><b>3.3.4</b> GLMM Bayes (rjags) model fit</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-re-for-location-samplingdate-1"><i class="fa fa-check"></i><b>3.4</b> GLMM: RE for Location, SamplingDate</a>
+<ul>
+<li class="chapter" data-level="3.4.1" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-mathematical-model"><i class="fa fa-check"></i><b>3.4.1</b> Crossed GLMM mathematical model</a></li>
+<li class="chapter" data-level="3.4.2" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-frequentist-fit"><i class="fa fa-check"></i><b>3.4.2</b> Crossed GLMM frequentist fit</a></li>
+<li class="chapter" data-level="3.4.3" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-bayes-brms-version"><i class="fa fa-check"></i><b>3.4.3</b> Crossed GLMM Bayes (brms) version</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date-1"><i class="fa fa-check"></i><b>3.5</b> GLMM with Gaussian Processes: RE for Trial, GP for Date</a>
+<ul>
+<li class="chapter" data-level="3.5.1" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-mathematical-model-1"><i class="fa fa-check"></i><b>3.5.1</b> Bayesian mathematical model</a></li>
+<li class="chapter" data-level="3.5.2" data-path="GLMMsR.html"><a href="GLMMsR.html#gaussian-process-bayes-brms-version-1"><i class="fa fa-check"></i><b>3.5.2</b> Gaussian Process Bayes (brms) version</a></li>
+</ul></li>
+<li class="chapter" data-level="3.6" data-path="GLMMsR.html"><a href="GLMMsR.html#summary-of-estimates"><i class="fa fa-check"></i><b>3.6</b> Summary of estimates</a>
+<ul>
+<li class="chapter" data-level="3.6.1" data-path="GLMMsR.html"><a href="GLMMsR.html#compare-tr-estimates"><i class="fa fa-check"></i><b>3.6.1</b> Compare TR estimates</a></li>
+<li class="chapter" data-level="3.6.2" data-path="GLMMsR.html"><a href="GLMMsR.html#compare-coefficients"><i class="fa fa-check"></i><b>3.6.2</b> Compare coefficients</a></li>
+<li class="chapter" data-level="3.6.3" data-path="GLMMsR.html"><a href="GLMMsR.html#plot-comparisons"><i class="fa fa-check"></i><b>3.6.3</b> Plot comparisons</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="GLMMsPython.html"><a href="GLMMsPython.html"><i class="fa fa-check"></i><b>4</b> GLMM’s in Python</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#getting-started-with-python"><i class="fa fa-check"></i><b>4.1</b> Getting started with Python</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#python-modules"><i class="fa fa-check"></i><b>4.1.1</b> Python modules</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#set-up"><i class="fa fa-check"></i><b>4.2</b> Set up</a></li>
+<li class="chapter" data-level="4.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#outline"><i class="fa fa-check"></i><b>4.3</b> Outline</a></li>
+<li class="chapter" data-level="4.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#data-exploration-1"><i class="fa fa-check"></i><b>4.4</b> Data Exploration</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#moth-counts-1"><i class="fa fa-check"></i><b>4.4.1</b> Moth counts</a></li>
+<li class="chapter" data-level="4.4.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#trap-locations-1"><i class="fa fa-check"></i><b>4.4.2</b> Trap locations</a></li>
+<li class="chapter" data-level="4.4.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#timeline-1"><i class="fa fa-check"></i><b>4.4.3</b> Timeline</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="GLMMsPython.html"><a href="GLMMsPython.html#basic-glm-models-2"><i class="fa fa-check"></i><b>4.5</b> Basic GLM models</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#mathematical-model"><i class="fa fa-check"></i><b>4.5.1</b> Mathematical model</a></li>
+<li class="chapter" data-level="4.5.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#fitting-the-frequentist-models-1"><i class="fa fa-check"></i><b>4.5.2</b> Fitting the frequentist models</a></li>
+<li class="chapter" data-level="4.5.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#bayesian-bambi-models-python"><i class="fa fa-check"></i><b>4.5.3</b> Bayesian (bambi) models– Python</a></li>
+<li class="chapter" data-level="4.5.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#bayesian-pymc-models-python"><i class="fa fa-check"></i><b>4.5.4</b> Bayesian (PyMC) models– Python</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-random-effect-re-for-locations-1"><i class="fa fa-check"></i><b>4.6</b> GLMM: Random effect (RE) for locations</a>
+<ul>
+<li class="chapter" data-level="4.6.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-mathematical-model-2"><i class="fa fa-check"></i><b>4.6.1</b> GLMM mathematical model</a></li>
+<li class="chapter" data-level="4.6.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-frequentist-fit-1"><i class="fa fa-check"></i><b>4.6.2</b> GLMM frequentist fit</a></li>
+<li class="chapter" data-level="4.6.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-bayesian-bambi-models"><i class="fa fa-check"></i><b>4.6.3</b> GLMM Bayesian (bambi) models</a></li>
+<li class="chapter" data-level="4.6.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-bayesian-pymc-models-python"><i class="fa fa-check"></i><b>4.6.4</b> GLMM Bayesian (PyMC) models– Python</a></li>
+</ul></li>
+<li class="chapter" data-level="4.7" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-re-for-location-crossed-samplingdate"><i class="fa fa-check"></i><b>4.7</b> GLMM: RE for location, crossed SamplingDate</a>
+<ul>
+<li class="chapter" data-level="4.7.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-frequentist-fit-1"><i class="fa fa-check"></i><b>4.7.1</b> Crossed GLMM frequentist fit</a></li>
+<li class="chapter" data-level="4.7.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-bayes-bambi-version"><i class="fa fa-check"></i><b>4.7.2</b> Crossed GLMM Bayes (bambi) version</a></li>
+<li class="chapter" data-level="4.7.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-bayes-pymc-version"><i class="fa fa-check"></i><b>4.7.3</b> Crossed GLMM Bayes (PyMC) version</a></li>
+</ul></li>
+<li class="chapter" data-level="4.8" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date-2"><i class="fa fa-check"></i><b>4.8</b> GLMM with Gaussian Processes: RE for Trial, GP for Date</a>
+<ul>
+<li class="chapter" data-level="4.8.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#gaussian-process-bayes-bambi-version"><i class="fa fa-check"></i><b>4.8.1</b> Gaussian Process Bayes (bambi) version</a></li>
+</ul></li>
+<li class="chapter" data-level="4.9" data-path="GLMMsPython.html"><a href="GLMMsPython.html#summary-of-estimates-1"><i class="fa fa-check"></i><b>4.9</b> Summary of estimates</a>
+<ul>
+<li class="chapter" data-level="4.9.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#compare-tr-estimates-1"><i class="fa fa-check"></i><b>4.9.1</b> Compare TR estimates</a></li>
+<li class="chapter" data-level="4.9.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#compare-coefficients-1"><i class="fa fa-check"></i><b>4.9.2</b> Compare coefficients</a></li>
+<li class="chapter" data-level="4.9.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#plot-comparisons-1"><i class="fa fa-check"></i><b>4.9.3</b> Plot comparisons</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="NonlinearR.html"><a href="NonlinearR.html"><i class="fa fa-check"></i><b>5</b> Nonlinear Bayesian Models in R</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="NonlinearR.html"><a href="NonlinearR.html#generalized-logistic-curve"><i class="fa fa-check"></i><b>5.1</b> Generalized Logistic Curve</a></li>
+<li class="chapter" data-level="5.2" data-path="NonlinearR.html"><a href="NonlinearR.html#bayesian-model-1"><i class="fa fa-check"></i><b>5.2</b> Bayesian model</a></li>
+<li class="chapter" data-level="5.3" data-path="NonlinearR.html"><a href="NonlinearR.html#fitting-models-with-the-brms-package"><i class="fa fa-check"></i><b>5.3</b> Fitting models with the brms package</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="NonlinearR.html"><a href="NonlinearR.html#no-re-no-gp"><i class="fa fa-check"></i><b>5.3.1</b> no RE, no GP</a></li>
+<li class="chapter" data-level="5.3.2" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-no-gp"><i class="fa fa-check"></i><b>5.3.2</b> intercept RE, no GP</a></li>
+<li class="chapter" data-level="5.3.3" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-a-re-no-gp"><i class="fa fa-check"></i><b>5.3.3</b> intercept RE, A RE, no GP</a></li>
+<li class="chapter" data-level="5.3.4" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-a-re-with-gp-same-for-all-loc"><i class="fa fa-check"></i><b>5.3.4</b> intercept RE, A RE, WITH GP (same for all loc)</a></li>
+<li class="chapter" data-level="5.3.5" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-a-re-with-gp-diff-for-each-loc"><i class="fa fa-check"></i><b>5.3.5</b> intercept, A RE, with GP (DIFF for each loc)</a></li>
+<li class="chapter" data-level="5.3.6" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-a-b-m-re-with-gp-diff-for-each-loc"><i class="fa fa-check"></i><b>5.3.6</b> intercept, A, B, M RE, with GP (DIFF for each loc)</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="NonlinearR.html"><a href="NonlinearR.html#model-our-case-study-data"><i class="fa fa-check"></i><b>5.4</b> Model our case study data</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Bayesian models in R and Python</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="mathematical-models" class="section level1 hasAnchor" number="2">
+<h1><span class="header-section-number">Chapter 2</span> Mathematical models<a href="mathematical-models.html#mathematical-models" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>These are the models fit to our data.</p>
+<p>For a good reference on additional details related to GLMM’s, check [here] (<a href="https://bbolker.github.io/mixedmodels-misc/glmmFAQ" class="uri">https://bbolker.github.io/mixedmodels-misc/glmmFAQ</a>).</p>
+<div id="basic-glm-models" class="section level2 hasAnchor" number="2.1">
+<h2><span class="header-section-number">2.1</span> Basic GLM models<a href="mathematical-models.html#basic-glm-models" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The first model ignores all the spatial and temporal relationships in the data and assumes each data point is independent and identically distributed (<em>iid</em>). <strong>This is not a good model for the data!</strong> It is just our starting off point.</p>
+<p>When building hierarchical Bayesian models, it is always a good idea to start simple, make sure everything works as expected, and then build up.</p>
+<p>Our response variable is a count, therefore we use either a Poisson or negative binomial distribution as the basis for our model. These models are known as generalized linear models (GLMs).</p>
+<p>The model includes an offset to account for the varying time intervals between sample. (If the traps are left unchecked for more days, we naturally expect the traps to have more moths. This varying effort is accounted for by the offset.)</p>
+<div id="poisson-regression-model" class="section level3 hasAnchor" number="2.1.1">
+<h3><span class="header-section-number">2.1.1</span> Poisson regression model<a href="mathematical-models.html#poisson-regression-model" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>We start with a Poisson regression model:</p>
+<p><span class="math display">\[
+y_i \sim Pois(\lambda_i) \\
+log(\lambda_i ) = \beta_0 + \beta_1 x_{Trt, i} + \mbox{ln} \left(DaysOfCatch_i\right)
+\]</span></p>
+<p>where, for data samples <span class="math inline">\(i = 1, ..., N\)</span>,</p>
+<p><span class="math inline">\(y_i\)</span> is moth count <span class="math inline">\(i\)</span>,</p>
+<p><span class="math inline">\(\lambda_i\)</span> is the expected moth count for sample <span class="math inline">\(i\)</span>,</p>
+<p><span class="math inline">\(\beta_0\)</span> is the intercept of the model. Here, it provides the expected moth count for our control treatment.</p>
+<p><span class="math inline">\(\beta_1\)</span> is the expected difference in moth counts between the control group and the treatment group,</p>
+<p><span class="math inline">\(x_{Trt, i}\)</span> is an indicator variable that equals 1 if sample <span class="math inline">\(i\)</span> is from a treatment field and equals 0 otherwise, and</p>
+<p><span class="math inline">\(DaysOfCatch_i\)</span> is the offset to account for the varying time interval between samples. This is necessary because with a longer time interval, more moths will fly into the trap.</p>
+</div>
+<div id="negative-binomial-regression-model" class="section level3 hasAnchor" number="2.1.2">
+<h3><span class="header-section-number">2.1.2</span> Negative binomial regression model<a href="mathematical-models.html#negative-binomial-regression-model" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>In ecology, there is always additional variability in our data than what the Poisson distribution allows. To account for the additional variability in our data, we switch the model to a negative binomial distribution:</p>
+<p><span class="math display">\[
+y_i \sim NegBinom(\lambda_i, \theta) \\
+log(\lambda_i ) = \beta_0 + \beta_1 x_{Trt,i} + \mbox{ln} \left(DaysOfCatch_i\right)
+\]</span></p>
+<p>“Negative binomial regression is used to model count data for which the variance is higher than the mean.” (<a href="https://www.pymc.io/projects/examples/en/latest/generalized_linear_models/GLM-negative-binomial-regression.html" class="uri">https://www.pymc.io/projects/examples/en/latest/generalized_linear_models/GLM-negative-binomial-regression.html</a>)</p>
+<p>(Alternatively, we could fit over-dispersed Poisson regressions or quasi-Poisson regressions. A zero-inflated model may also be appropriate and worth assessing.)</p>
+<p>For the negative binomial regression, all variables and parameters are defined as before, but the model has an additional parameter, <span class="math inline">\(\theta\)</span>, that allows for the additional variation. The negative binomial distribution and regression model can be written in many ways. In our models, <span class="math inline">\(\theta\)</span> is defined through the following formula where the variance associated with an expected moth count, <span class="math inline">\(\lambda\)</span>, is:</p>
+<p><span class="math display">\[
+Var(\lambda) = \lambda + \frac{\lambda^2}{\theta}
+\]</span></p>
+<p>(For a Poisson distribution, <span class="math inline">\(Var(\lambda) = \lambda\)</span>.)</p>
+<p>Here, small values for <span class="math inline">\(\theta\)</span> will lead to extra variability in the response variable, i.e., our counts.</p>
+<p>(<a href="https://cran.r-project.org/web/packages/pscl/vignettes/countreg.pdf" class="uri">https://cran.r-project.org/web/packages/pscl/vignettes/countreg.pdf</a>)</p>
+<p><strong>MAKE SURE VARIANCE DEF MATCHES RESULTING SHAPE PARAM’S FROM MODEL FITS!!!</strong></p>
+</div>
+<div id="bayesian-model" class="section level3 hasAnchor" number="2.1.3">
+<h3><span class="header-section-number">2.1.3</span> Bayesian model<a href="mathematical-models.html#bayesian-model" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Using a Bayesian framework here builds the foundation for the more complex models that come later.</p>
+<p>For the Bayesian models, I only show the negative binomial version.</p>
+<p>To make our models Bayesian, we add priors to our parameters:</p>
+<p><span class="math display">\[
+y_i \sim NegBinom(\lambda_i, \theta) \\
+log(\lambda_i ) = \beta_0 + \beta_1 x_{Trt,i} + \mbox{ln} \left(DaysOfCatch_i\right) \\
+\beta_0 \sim Normal(0, 2) \\
+\beta_1 \sim Normal(0, 2) \\
+\theta \sim HalfCauchy(0,1)
+\]</span></p>
+<p>The models use slightly informative priors. When working on a log-scale (e.g., with Poisson or negative binomial distributions), this often becomes essential to avoid parameter estimates on the boundaries. (See Hooten and Hobbs (2015)<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> for a good discussion on this issue.)</p>
+</div>
+<div id="trapping-reduction-defined" class="section level3 hasAnchor" number="2.1.4">
+<h3><span class="header-section-number">2.1.4</span> Trapping reduction defined<a href="mathematical-models.html#trapping-reduction-defined" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>As a reminder, the primary metric of interest from these models is a derived parameter that we call trapping reduction (TR):</p>
+<p><span class="math display">\[
+TR = 100 - 100 e ^{(-\beta_1)}
+\]</span></p>
+<p>To obtain a 95% confidence interval for TR (for the frequentist version of our model), we use the following approximation:</p>
+<p><span class="math display">\[
+TR = 100 - 100 e ^{(-\beta_1 \pm 2 \cdot SE(\beta_1))}
+\]</span></p>
+<p>For the Bayesian version, the derived parameter is sampled as part of the MCMC iterations, and the 95% credible interval is the 2.5%, 97.5% quantiles of its resulting distribution.</p>
+</div>
+</div>
+<div id="glmm-random-effects-re-for-locations" class="section level2 hasAnchor" number="2.2">
+<h2><span class="header-section-number">2.2</span> GLMM: Random effects (RE) for locations<a href="mathematical-models.html#glmm-random-effects-re-for-locations" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The first fix we make to the model is acknowledging that overall average moth population pressure vary from location to location (see Figure <a href="index.html#fig:mothctsFig">1.1</a> of moth counts). In other words, some locations have more moths than others. To add this information to the model, we add a location random effect (RE) and our model becomes a generalized linear mixed-effects model (GLMM or GLMER).</p>
+<p>We also want to acknowledge that the treatment effect may vary from location to location– sometimes we see a big difference in moth counts between control and treatment fields, and sometimes the difference is smaller. For inference though, we are only interested in the larger picture, which is the overall trapping reduction. (We are not interested in what happens at these exact locations per se, we are more interested in the average, expected treatment effect at a new location.) Therefore, we also add a treatment random effect to the model.</p>
+<div id="glmm-mathematical-model" class="section level3 hasAnchor" number="2.2.1">
+<h3><span class="header-section-number">2.2.1</span> GLMM mathematical model<a href="mathematical-models.html#glmm-mathematical-model" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Going forward, I only show the negative binomial (NB) regression models, the Poisson versions are straightforward extensions.</p>
+<p><span class="math display">\[
+y_{ik} \sim NegBinom(\lambda_{ik}, \theta) \\
+log(\lambda_{ik} ) = \beta_0 + \beta_1 x_{Trt,i} + \gamma_{0k} x_{ik}  + \gamma_{1k} x_{Trt,i} x_{ik} + \mbox{ln} \left(DaysOfCatch_i\right) \\
+\boldsymbol\gamma_{k} \sim Normal(\mathbf{0}, \Sigma) \\
+\]</span></p>
+<p>where, in addition to the variables and parameters defined for the GLM, we have</p>
+<p><span class="math inline">\(k = 1,..., K=10\)</span> represents the locations,</p>
+<p><span class="math inline">\(y_{ik}\)</span> is moth count <span class="math inline">\(i\)</span> from location <span class="math inline">\(k\)</span>,</p>
+<p><span class="math inline">\(\lambda_{ik}\)</span> is the expected moth count for sample <span class="math inline">\(i\)</span> from location <span class="math inline">\(k\)</span>,</p>
+<p><span class="math inline">\(\beta_0\)</span> provides the expected moth count for the control group at a new location,</p>
+<p><span class="math inline">\(\beta_1\)</span> provides the expected difference in moth counts between the control group and the treatment group at a new location,</p>
+<p><span class="math inline">\(\gamma_{0k}\)</span> is the random intercept associated with location <span class="math inline">\(k\)</span>, which leads to different <em>background (control group) moth pressures</em> at each location. The <span class="math inline">\(\gamma_{0k}\)</span> come from a Normal distribution.</p>
+<p><span class="math inline">\(\gamma_{1k}\)</span> is the random slope associated with location <span class="math inline">\(k\)</span>, which leads to different <em>treatment</em> effects at each location. The <span class="math inline">\(\gamma_{1k}\)</span> come from a Normal distribution, and</p>
+<p><span class="math inline">\(x_{ik}\)</span> is an indicator variable that equals 1 if moth count <span class="math inline">\(i\)</span> is associated with location <span class="math inline">\(k\)</span> and 0 otherwise.</p>
+<p>The distributions for the <span class="math inline">\(\gamma_{0k}\)</span> and the <span class="math inline">\(\gamma_{1k}\)</span> are combined into a multivariate Normal distribution to reflect the correlation that exists between them. (The model may also be specified with uncorrelated intercept and slope, see <a href="https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#model-specification">here</a>)</p>
+</div>
+<div id="bayesian-version" class="section level3 hasAnchor" number="2.2.2">
+<h3><span class="header-section-number">2.2.2</span> Bayesian version<a href="mathematical-models.html#bayesian-version" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Here is the same model within a Bayesian framework. To make our models Bayesian, we add priors to our parameters.</p>
+<p>Model:</p>
+<p><span class="math display">\[
+y_{ik}\sim NegBinom(\lambda_{ik}, \theta) \\
+log(\lambda_{ik} ) = \beta_0 + \beta_1 x_{Trt,i} + \gamma_{0k} x_{ik}  + \gamma_{1k} x_{Trt,i} x_{ik} + \mbox{ln} \left(DaysOfCatch_i\right) \\
+\boldsymbol\gamma_{k} \sim Normal(\mathbf{0}, \Sigma) \\
+\]</span></p>
+<p>where <span class="math inline">\(\Sigma = \begin{pmatrix}\sigma_0^2 &amp; \rho \\\rho &amp; \sigma_1^2 \end{pmatrix}\)</span>. With the following priors:</p>
+<p><span class="math display">\[
+\boldsymbol\beta \sim Normal(\mathbf{0}, 2\mathbf{I}) \\
+\sigma^2_{0} \sim HalfCauchy(0,1) \\
+\sigma^2_{1} \sim HalfCauchy(0,1) \\
+\theta \sim HalfCauchy(0,1) \\
+\]</span></p>
+<p><strong>ADD PRIORS FOR RHO– THE CORRELATION!!</strong></p>
+<p>In the packages that I use to fit the models, the default setting is for the random effects to be correlated, which matches the <code>glmer</code>, <code>glmer.nb</code> functions from the <code>lme4</code> package, which is typically used to fit frequentist GLMM’s in R.</p>
+<p>Equivalently, the priors for the <span class="math inline">\(\boldsymbol\beta\)</span> coefficients can be written:</p>
+<p><span class="math display">\[
+\beta_0 \sim Normal(0, 2) \\
+\beta_1 \sim Normal(0, 2) \\
+\]</span></p>
+<!-- $$ -->
+<!-- \mathbf{Y} \sim NegBinom(\boldsymbol\lambda, \phi) \\ -->
+<!-- log(\boldsymbol\lambda) = \mathbf{X}\boldsymbol\beta + \mathbf{Z}\boldsymbol\gamma  + \mbox{ln} \left(\bf{DaysOfCatch}\right) \\ -->
+<!-- \boldsymbol\beta \sim Normal(\mathbf{0}, 2\mathbf{I}) \\ -->
+<!-- \boldsymbol\gamma \sim Normal(\mathbf{0}, \boldsymbol\sigma^2 \mathbf{I}) \\ -->
+<!-- \boldsymbol\sigma^2 \sim HalfCauchy(\mathbf{0}, 1\mathbf{I})) \\ -->
+<!-- \phi \sim HalfCauchy(0,1) -->
+<!-- $$ -->
+</div>
+</div>
+<div id="glmm-re-for-location-samplingdate" class="section level2 hasAnchor" number="2.3">
+<h2><span class="header-section-number">2.3</span> GLMM: RE for Location, SamplingDate<a href="mathematical-models.html#glmm-re-for-location-samplingdate" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In this version of the model, we acknowledge that sampling on different days of the season adds to the variability of the moth counts, and that counts from the same sampling date are more similar than for a different date. In this model, however, the correlation between sampling dates is ignored.</p>
+<p>This model is included here because it is important to think about whether you have nested or crossed random effects (if applicable) (<a href="https://stats.stackexchange.com/questions/228800/crossed-vs-nested-random-effects-how-do-they-differ-and-how-are-they-specified">Good nested vs crossed reference</a>). Here, we are assuming crossed random effects because Java island (i.e., Indonesia) is fairly homogeneous in terms of weather and ecosystem, and the rice for our trials are generally transplanted within a couple of weeks of each other, so it makes sense for all samples from one date to be considered one group, regardless of location. For example, the moth populations of the island tend to peak on certain dates and then decrease as the rice matures.</p>
+<p>This model allows us to include sampling date in our model as a random effect and still fit the model quickly in a frequentist framework.</p>
+<p>We include dates in our model because samples within a date will be more similar than samples across all dates at a location. We only include random intercepts, and do not add a random effect for date X treatment effect.</p>
+<div id="frequentist-version" class="section level3 hasAnchor" number="2.3.1">
+<h3><span class="header-section-number">2.3.1</span> Frequentist version<a href="mathematical-models.html#frequentist-version" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><span class="math display">\[
+y_{ikj} \sim NegBinom(\lambda_{ikj}, \theta) \\
+log(\lambda_{ikj} ) = \beta_0 + \beta_1 x_{Trt,i} + \gamma_{0k} x_{ik}  + \gamma_{1k} x_{Trt,i} x_{ik}  + \gamma_{00j} x_{ij}  + \mbox{ln} \left(DaysOfCatch_i\right) \\
+\boldsymbol\gamma_{k} \sim Normal(\mathbf{0}, \Sigma) \\
+\gamma_{00j} \sim Normal(0, \sigma^2_{00}) \\
+\]</span></p>
+<p>where, in addition to the variables and parameters defined previously, we have</p>
+<p><span class="math inline">\(k = 1,..., K=10\)</span> represents the locations,</p>
+<p><span class="math inline">\(j = 1, ..., J = 117\)</span> represents the 117 unique sampling dates,</p>
+<p><span class="math inline">\(y_{ikj}\)</span> is moth count <span class="math inline">\(i\)</span> from location <span class="math inline">\(k\)</span> on date <span class="math inline">\(j\)</span>,</p>
+<p><span class="math inline">\(\lambda_{ikj}\)</span> is the expected moth count for sample <span class="math inline">\(i\)</span> from location <span class="math inline">\(k\)</span> on date <span class="math inline">\(j\)</span>,</p>
+<p><span class="math inline">\(\beta_0\)</span> provides the expected moth count for the control field for a new location,</p>
+<p><span class="math inline">\(\beta_1\)</span> provides the expected difference in moth counts between the control group and the treatment group for a new location,</p>
+<p><span class="math inline">\(\gamma_{0k}\)</span> is the random intercept associated with location <span class="math inline">\(k\)</span>, which leads to different background moth pressures at each location,</p>
+<p><span class="math inline">\(\gamma_{1k}\)</span> is the random slope associated with location <span class="math inline">\(k\)</span>, which leads to a different treatment effect at each location,</p>
+<p><span class="math inline">\(x_{ik}\)</span> is an indicator variable that equals 1 if moth count <span class="math inline">\(i\)</span> is associated with location <span class="math inline">\(k\)</span> and 0 otherwise,</p>
+<p><span class="math inline">\(\gamma_{00j}\)</span> is the random intercept associated with date <span class="math inline">\(j\)</span>, which leads to different background moth pressures for each date, and</p>
+<p><span class="math inline">\(x_{ij}\)</span> is an indicator variable that equals 1 if moth count <span class="math inline">\(i\)</span> is associated with date <span class="math inline">\(j\)</span> and 0 otherwise.</p>
+<p>Note that the crossed random effect, sampling date, is not correlated with the intercept, slope random effects associated with location.</p>
+</div>
+<div id="bayesian-version-1" class="section level3 hasAnchor" number="2.3.2">
+<h3><span class="header-section-number">2.3.2</span> Bayesian version<a href="mathematical-models.html#bayesian-version-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Model:</p>
+<p><span class="math display">\[
+y_{ik}\sim NegBinom(\lambda_{ik}, \theta) \\
+log(\lambda_{ikj} ) = \beta_0 + \beta_1 x_{Trt,i} + \gamma_{0k} x_{ik}  + \gamma_{1k} x_{Trt,i} x_{ik}  + \gamma_{00j} x_{ij}  + \mbox{ln} \left(DaysOfCatch_i\right) \\
+\boldsymbol\gamma_{k} \sim Normal(\mathbf{0}, \Sigma) \\
+\gamma_{00j} \sim Normal(0, \sigma^2_{00}) \\
+\]</span></p>
+<p>where <span class="math inline">\(\Sigma = \begin{pmatrix}\sigma_0^2 &amp; \rho \\\rho &amp; \sigma_1^2 \end{pmatrix}\)</span>.</p>
+<p>With the following priors:</p>
+<p><span class="math display">\[
+\boldsymbol\beta \sim Normal(\mathbf{0}, 2\mathbf{I}) \\
+\sigma^2_{0} \sim HalfCauchy(0,1) \\
+\sigma^2_{1} \sim HalfCauchy(0,1) \\
+\sigma^2_{00} \sim HalfCauchy(0,1) \\
+\theta \sim HalfCauchy(0,1) \\
+\]</span></p>
+<!-- $$ -->
+<!-- \mathbf{Y} \sim NegBinom(\boldsymbol\lambda, \phi) \\ -->
+<!-- log(\boldsymbol\lambda) = \mathbf{X}\boldsymbol\beta + \mathbf{Z}\boldsymbol\gamma  + \mathbf{z_{00}}\gamma_{00}  + \mbox{ln} \left(\bf{DaysOfCatch}\right) \\ -->
+<!-- \boldsymbol\beta \sim Normal(\mathbf{0}, 2\mathbf{I}) \\ -->
+<!-- \boldsymbol\gamma \sim Normal(\mathbf{0}, \boldsymbol\sigma^2 \mathbf{I}) \\ -->
+<!-- \gamma_{00} \sim Normal(0, \sigma^2) \\ -->
+<!-- \boldsymbol\sigma^2 \sim HalfCauchy(\mathbf{0}, 1\mathbf{I})) \\ -->
+<!-- \sigma^2_{00} \sim HalfCauchy(0,1) \\ -->
+<!-- \phi \sim HalfCauchy(0,1) -->
+<!-- $$ -->
+</div>
+</div>
+<div id="glmm-with-gaussian-processes-re-for-trial-gp-for-date" class="section level2 hasAnchor" number="2.4">
+<h2><span class="header-section-number">2.4</span> GLMM with Gaussian Processes: RE for Trial, GP for Date<a href="mathematical-models.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Now we are in the territory where we <em>have</em> to fit the models in a Bayesian framework. If our response variable was continuous (i.e., the regression model was based on a Normal distribution), then we could still use maximum likelihood estimation.</p>
+<div id="bayesian-mathematical-model" class="section level3 hasAnchor" number="2.4.1">
+<h3><span class="header-section-number">2.4.1</span> Bayesian mathematical model<a href="mathematical-models.html#bayesian-mathematical-model" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Model:</p>
+<p><span class="math display">\[
+y_{ijk} \sim NegBinom(\lambda_{ijk}, \theta) \\
+log(\lambda_{ikj} ) = \beta_0 + \beta_1 x_{Trt,i} + \gamma_{0k} x_{ik}  + \gamma_{1k} x_{Trt,i} x_{ik}  + GP_{ijk}  + \mbox{ln} \left(DaysOfCatch_i\right) \\
+\boldsymbol\gamma \sim Normal(\mathbf{0}, \boldsymbol\Sigma_{\gamma}) \\
+\mathbf{GP_k} \sim MVN(0, \boldsymbol\Sigma_k) \\
+\]</span>
+Priors:</p>
+<p><span class="math display">\[
+\boldsymbol\beta \sim Normal(\mathbf{0}, 2\mathbf{I}) \\
+\Sigma_{\gamma} = = \begin{pmatrix}\sigma_0^2 &amp; \rho \\\rho &amp; \sigma_1^2 \end{pmatrix} \\
+\sigma^2_{0} \sim HalfCauchy(0,1) \\
+\sigma^2_{1} \sim HalfCauchy(0,1) \\
+\rho \sim ?? \\
+\Sigma_{k} = \tau_k \cdot e^{-\frac{|d_l - d_m|^2}{l_k^2}} \\
+\tau_k \sim HalfCauchy(0, 1) \\
+l_k \sim HalfCauchy(0, 1) \\
+\theta \sim HalfCauchy(0,1) \\
+\]</span></p>
+<p>where, in addition to the variables and parameters defined previously, we have</p>
+<p><span class="math inline">\(k = 1,..., K=10\)</span> represents the locations,</p>
+<p><span class="math inline">\(j = 1, ..., J = 117\)</span> represents the 117 unique dates,</p>
+<p><span class="math inline">\(y_{ikj}\)</span> is moth count <span class="math inline">\(i\)</span> from location <span class="math inline">\(k\)</span> on date <span class="math inline">\(j\)</span>,</p>
+<p><span class="math inline">\(\lambda_{ikj}\)</span> is the expected moth count for sample <span class="math inline">\(i\)</span> from location <span class="math inline">\(k\)</span> on date <span class="math inline">\(j\)</span>,</p>
+<p><span class="math inline">\(\beta_0\)</span> is the expected moth count for the control treatment for a new location,</p>
+<p><span class="math inline">\(\beta_1\)</span> is the expected difference in moth counts between the control group and the treatment group for a new location,</p>
+<p><span class="math inline">\(\gamma_{0k}\)</span> is the random intercept associated with location <span class="math inline">\(k\)</span>, which leads to different background moth pressures at each location,</p>
+<p><span class="math inline">\(\gamma_{1k}\)</span> is the random slope associated with location <span class="math inline">\(k\)</span>, which leads to different treatment effects at each location,</p>
+<p><span class="math inline">\(x_{ik}\)</span> is an indicator variable that equals 1 if moth count <span class="math inline">\(i\)</span> is associated with location <span class="math inline">\(k\)</span> and 0 otherwise,</p>
+<p><span class="math inline">\(l_k\)</span> = length-scale associated with location <span class="math inline">\(k\)</span>,</p>
+<p><span class="math inline">\(\phi\)</span> = sdgp…</p>
+</div>
+<div id="gaussian-process-bayes-brms-version" class="section level3 hasAnchor" number="2.4.2">
+<h3><span class="header-section-number">2.4.2</span> Gaussian Process Bayes (brms) version<a href="mathematical-models.html#gaussian-process-bayes-brms-version" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<ul>
+<li><p>Using squared-exponential covariance function (quite typical choice).</p></li>
+<li><p>We have a different Gaussian Process (GP) for each location (each location has its own parameters for the function). This is done to further account for expected differences between locations. Ideally, we would do some model selection to decide between this model and one that shares the GP parameters across all locations.</p></li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="2">
+<li id="fn2"><p>Hobbs, N.T. and Hooten, M.B. <em>Bayesian Models: A Statistical Primer for Ecologists.</em> Princeton University Press, 2015.<a href="mathematical-models.html#fnref2" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="GLMMsR.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": null,
+    "text": null
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": null,
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

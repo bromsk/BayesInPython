@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 4 Nonlinear Bayesian Models in R | Bayesian models in R and Python</title>
+  <title>Chapter 5 Nonlinear Bayesian Models in R | Bayesian models in R and Python</title>
   <meta name="description" content="This is a tutorial for R users to convert their code into Python. In particular, fitting GLMMs, hierchical BAyesian models, and non-linear Bayesian models." />
   <meta name="generator" content="bookdown 0.43 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 4 Nonlinear Bayesian Models in R | Bayesian models in R and Python" />
+  <meta property="og:title" content="Chapter 5 Nonlinear Bayesian Models in R | Bayesian models in R and Python" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="This is a tutorial for R users to convert their code into Python. In particular, fitting GLMMs, hierchical BAyesian models, and non-linear Bayesian models." />
   <meta name="github-repo" content="rstudio/BayesInPython" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 4 Nonlinear Bayesian Models in R | Bayesian models in R and Python" />
+  <meta name="twitter:title" content="Chapter 5 Nonlinear Bayesian Models in R | Bayesian models in R and Python" />
   
   <meta name="twitter:description" content="This is a tutorial for R users to convert their code into Python. In particular, fitting GLMMs, hierchical BAyesian models, and non-linear Bayesian models." />
   
@@ -23,7 +23,7 @@
 <meta name="author" content="Kristin Broms" />
 
 
-<meta name="date" content="2025-05-29" />
+<meta name="date" content="2025-06-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -80,107 +80,130 @@
 <ul>
 <li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#case-study-objectives"><i class="fa fa-check"></i><b>1.1.1</b> Case study objectives</a></li>
 </ul></li>
-<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#outline"><i class="fa fa-check"></i><b>1.2</b> Outline</a></li>
 </ul></li>
-<li class="chapter" data-level="2" data-path="GLMMsR.html"><a href="GLMMsR.html"><i class="fa fa-check"></i><b>2</b> GLMM’s in R</a>
+<li class="chapter" data-level="2" data-path="mathematical-models.html"><a href="mathematical-models.html"><i class="fa fa-check"></i><b>2</b> Mathematical models</a>
 <ul>
-<li class="chapter" data-level="2.1" data-path="GLMMsR.html"><a href="GLMMsR.html#data-exploration"><i class="fa fa-check"></i><b>2.1</b> Data Exploration</a>
+<li class="chapter" data-level="2.1" data-path="mathematical-models.html"><a href="mathematical-models.html#basic-glm-models"><i class="fa fa-check"></i><b>2.1</b> Basic GLM models</a>
 <ul>
-<li class="chapter" data-level="2.1.1" data-path="GLMMsR.html"><a href="GLMMsR.html#moth-counts"><i class="fa fa-check"></i><b>2.1.1</b> Moth counts</a></li>
-<li class="chapter" data-level="2.1.2" data-path="GLMMsR.html"><a href="GLMMsR.html#trap-locations"><i class="fa fa-check"></i><b>2.1.2</b> Trap locations</a></li>
-<li class="chapter" data-level="2.1.3" data-path="GLMMsR.html"><a href="GLMMsR.html#timeline"><i class="fa fa-check"></i><b>2.1.3</b> Timeline</a></li>
+<li class="chapter" data-level="2.1.1" data-path="mathematical-models.html"><a href="mathematical-models.html#poisson-regression-model"><i class="fa fa-check"></i><b>2.1.1</b> Poisson regression model</a></li>
+<li class="chapter" data-level="2.1.2" data-path="mathematical-models.html"><a href="mathematical-models.html#negative-binomial-regression-model"><i class="fa fa-check"></i><b>2.1.2</b> Negative binomial regression model</a></li>
+<li class="chapter" data-level="2.1.3" data-path="mathematical-models.html"><a href="mathematical-models.html#bayesian-model"><i class="fa fa-check"></i><b>2.1.3</b> Bayesian model</a></li>
+<li class="chapter" data-level="2.1.4" data-path="mathematical-models.html"><a href="mathematical-models.html#trapping-reduction-defined"><i class="fa fa-check"></i><b>2.1.4</b> Trapping reduction defined</a></li>
 </ul></li>
-<li class="chapter" data-level="2.2" data-path="GLMMsR.html"><a href="GLMMsR.html#basic-glm-models"><i class="fa fa-check"></i><b>2.2</b> Basic GLM models</a>
+<li class="chapter" data-level="2.2" data-path="mathematical-models.html"><a href="mathematical-models.html#glmm-random-effects-re-for-locations"><i class="fa fa-check"></i><b>2.2</b> GLMM: Random effects (RE) for locations</a>
 <ul>
-<li class="chapter" data-level="2.2.1" data-path="GLMMsR.html"><a href="GLMMsR.html#mathematical-model"><i class="fa fa-check"></i><b>2.2.1</b> Mathematical model</a></li>
-<li class="chapter" data-level="2.2.2" data-path="GLMMsR.html"><a href="GLMMsR.html#fitting-the-frequentist-models"><i class="fa fa-check"></i><b>2.2.2</b> Fitting the frequentist models</a></li>
-<li class="chapter" data-level="2.2.3" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-brms-model-fit"><i class="fa fa-check"></i><b>2.2.3</b> Bayesian (brms) model fit</a></li>
-<li class="chapter" data-level="2.2.4" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-rjags-model-fit"><i class="fa fa-check"></i><b>2.2.4</b> Bayesian (rjags) model fit</a></li>
+<li class="chapter" data-level="2.2.1" data-path="mathematical-models.html"><a href="mathematical-models.html#glmm-mathematical-model"><i class="fa fa-check"></i><b>2.2.1</b> GLMM mathematical model</a></li>
+<li class="chapter" data-level="2.2.2" data-path="mathematical-models.html"><a href="mathematical-models.html#bayesian-version"><i class="fa fa-check"></i><b>2.2.2</b> Bayesian version</a></li>
 </ul></li>
-<li class="chapter" data-level="2.3" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-random-effect-re-for-locations"><i class="fa fa-check"></i><b>2.3</b> GLMM: Random effect (RE) for locations</a>
+<li class="chapter" data-level="2.3" data-path="mathematical-models.html"><a href="mathematical-models.html#glmm-re-for-location-samplingdate"><i class="fa fa-check"></i><b>2.3</b> GLMM: RE for Location, SamplingDate</a>
 <ul>
-<li class="chapter" data-level="2.3.1" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-mathematical-model"><i class="fa fa-check"></i><b>2.3.1</b> GLMM mathematical model</a></li>
-<li class="chapter" data-level="2.3.2" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-frequentist-fit"><i class="fa fa-check"></i><b>2.3.2</b> GLMM frequentist fit</a></li>
-<li class="chapter" data-level="2.3.3" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-bayes-brms-version"><i class="fa fa-check"></i><b>2.3.3</b> GLMM Bayes (brms) version</a></li>
-<li class="chapter" data-level="2.3.4" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-bayes-rjags-model-fit"><i class="fa fa-check"></i><b>2.3.4</b> GLMM Bayes (rjags) model fit</a></li>
+<li class="chapter" data-level="2.3.1" data-path="mathematical-models.html"><a href="mathematical-models.html#frequentist-version"><i class="fa fa-check"></i><b>2.3.1</b> Frequentist version</a></li>
+<li class="chapter" data-level="2.3.2" data-path="mathematical-models.html"><a href="mathematical-models.html#bayesian-version-1"><i class="fa fa-check"></i><b>2.3.2</b> Bayesian version</a></li>
 </ul></li>
-<li class="chapter" data-level="2.4" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-re-for-location-samplingdate"><i class="fa fa-check"></i><b>2.4</b> GLMM: RE for Location, SamplingDate</a>
+<li class="chapter" data-level="2.4" data-path="mathematical-models.html"><a href="mathematical-models.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date"><i class="fa fa-check"></i><b>2.4</b> GLMM with Gaussian Processes: RE for Trial, GP for Date</a>
 <ul>
-<li class="chapter" data-level="2.4.1" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-mathematical-model"><i class="fa fa-check"></i><b>2.4.1</b> Crossed GLMM mathematical model</a></li>
-<li class="chapter" data-level="2.4.2" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-frequentist-fit"><i class="fa fa-check"></i><b>2.4.2</b> Crossed GLMM frequentist fit</a></li>
-<li class="chapter" data-level="2.4.3" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-bayes-brms-version"><i class="fa fa-check"></i><b>2.4.3</b> Crossed GLMM Bayes (brms) version</a></li>
-</ul></li>
-<li class="chapter" data-level="2.5" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date"><i class="fa fa-check"></i><b>2.5</b> GLMM with Gaussian Processes: RE for Trial, GP for Date</a>
-<ul>
-<li class="chapter" data-level="2.5.1" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-mathematical-model-1"><i class="fa fa-check"></i><b>2.5.1</b> Bayesian mathematical model</a></li>
-<li class="chapter" data-level="2.5.2" data-path="GLMMsR.html"><a href="GLMMsR.html#gaussian-process-bayes-brms-version"><i class="fa fa-check"></i><b>2.5.2</b> Gaussian Process Bayes (brms) version</a></li>
-</ul></li>
-<li class="chapter" data-level="2.6" data-path="GLMMsR.html"><a href="GLMMsR.html#summary-of-estimates"><i class="fa fa-check"></i><b>2.6</b> Summary of estimates</a>
-<ul>
-<li class="chapter" data-level="2.6.1" data-path="GLMMsR.html"><a href="GLMMsR.html#compare-tr-estimates"><i class="fa fa-check"></i><b>2.6.1</b> Compare TR estimates</a></li>
-<li class="chapter" data-level="2.6.2" data-path="GLMMsR.html"><a href="GLMMsR.html#compare-coefficients"><i class="fa fa-check"></i><b>2.6.2</b> Compare coefficients</a></li>
-<li class="chapter" data-level="2.6.3" data-path="GLMMsR.html"><a href="GLMMsR.html#plot-comparisons"><i class="fa fa-check"></i><b>2.6.3</b> Plot comparisons</a></li>
+<li class="chapter" data-level="2.4.1" data-path="mathematical-models.html"><a href="mathematical-models.html#bayesian-mathematical-model"><i class="fa fa-check"></i><b>2.4.1</b> Bayesian mathematical model</a></li>
+<li class="chapter" data-level="2.4.2" data-path="mathematical-models.html"><a href="mathematical-models.html#gaussian-process-bayes-brms-version"><i class="fa fa-check"></i><b>2.4.2</b> Gaussian Process Bayes (brms) version</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="3" data-path="GLMMsPython.html"><a href="GLMMsPython.html"><i class="fa fa-check"></i><b>3</b> GLMM’s in Python</a>
+<li class="chapter" data-level="3" data-path="GLMMsR.html"><a href="GLMMsR.html"><i class="fa fa-check"></i><b>3</b> GLMM’s in R</a>
 <ul>
-<li class="chapter" data-level="3.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#getting-started-with-python"><i class="fa fa-check"></i><b>3.1</b> Getting started with Python</a>
+<li class="chapter" data-level="3.1" data-path="GLMMsR.html"><a href="GLMMsR.html#data-exploration"><i class="fa fa-check"></i><b>3.1</b> Data Exploration</a>
 <ul>
-<li class="chapter" data-level="3.1.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#python-modules"><i class="fa fa-check"></i><b>3.1.1</b> Python modules</a></li>
+<li class="chapter" data-level="3.1.1" data-path="GLMMsR.html"><a href="GLMMsR.html#moth-counts"><i class="fa fa-check"></i><b>3.1.1</b> Moth counts</a></li>
+<li class="chapter" data-level="3.1.2" data-path="GLMMsR.html"><a href="GLMMsR.html#trap-locations"><i class="fa fa-check"></i><b>3.1.2</b> Trap locations</a></li>
+<li class="chapter" data-level="3.1.3" data-path="GLMMsR.html"><a href="GLMMsR.html#timeline"><i class="fa fa-check"></i><b>3.1.3</b> Timeline</a></li>
 </ul></li>
-<li class="chapter" data-level="3.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#set-up"><i class="fa fa-check"></i><b>3.2</b> Set up</a></li>
-<li class="chapter" data-level="3.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#outline-1"><i class="fa fa-check"></i><b>3.3</b> Outline</a></li>
-<li class="chapter" data-level="3.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#data-exploration-1"><i class="fa fa-check"></i><b>3.4</b> Data Exploration</a>
+<li class="chapter" data-level="3.2" data-path="GLMMsR.html"><a href="GLMMsR.html#basic-glm-models-1"><i class="fa fa-check"></i><b>3.2</b> Basic GLM models</a>
 <ul>
-<li class="chapter" data-level="3.4.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#moth-counts-1"><i class="fa fa-check"></i><b>3.4.1</b> Moth counts</a></li>
-<li class="chapter" data-level="3.4.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#trap-locations-1"><i class="fa fa-check"></i><b>3.4.2</b> Trap locations</a></li>
-<li class="chapter" data-level="3.4.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#timeline-1"><i class="fa fa-check"></i><b>3.4.3</b> Timeline</a></li>
+<li class="chapter" data-level="3.2.1" data-path="GLMMsR.html"><a href="GLMMsR.html#fitting-the-frequentist-models"><i class="fa fa-check"></i><b>3.2.1</b> Fitting the frequentist models</a></li>
+<li class="chapter" data-level="3.2.2" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-brms-model-fit"><i class="fa fa-check"></i><b>3.2.2</b> Bayesian (brms) model fit</a></li>
+<li class="chapter" data-level="3.2.3" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-rjags-model-fit"><i class="fa fa-check"></i><b>3.2.3</b> Bayesian (rjags) model fit</a></li>
 </ul></li>
-<li class="chapter" data-level="3.5" data-path="GLMMsPython.html"><a href="GLMMsPython.html#basic-glm-models-1"><i class="fa fa-check"></i><b>3.5</b> Basic GLM models</a>
+<li class="chapter" data-level="3.3" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-random-effect-re-for-locations"><i class="fa fa-check"></i><b>3.3</b> GLMM: Random effect (RE) for locations</a>
 <ul>
-<li class="chapter" data-level="3.5.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#mathematical-model-1"><i class="fa fa-check"></i><b>3.5.1</b> Mathematical model</a></li>
-<li class="chapter" data-level="3.5.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#fitting-the-frequentist-models-1"><i class="fa fa-check"></i><b>3.5.2</b> Fitting the frequentist models</a></li>
-<li class="chapter" data-level="3.5.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#bayesian-bambi-models-python"><i class="fa fa-check"></i><b>3.5.3</b> Bayesian (bambi) models– Python</a></li>
-<li class="chapter" data-level="3.5.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#bayesian-pymc-models-python"><i class="fa fa-check"></i><b>3.5.4</b> Bayesian (PyMC) models– Python</a></li>
+<li class="chapter" data-level="3.3.1" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-mathematical-model-1"><i class="fa fa-check"></i><b>3.3.1</b> GLMM mathematical model</a></li>
+<li class="chapter" data-level="3.3.2" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-frequentist-fit"><i class="fa fa-check"></i><b>3.3.2</b> GLMM frequentist fit</a></li>
+<li class="chapter" data-level="3.3.3" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-bayes-brms-version"><i class="fa fa-check"></i><b>3.3.3</b> GLMM Bayes (brms) version</a></li>
+<li class="chapter" data-level="3.3.4" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-bayes-rjags-model-fit"><i class="fa fa-check"></i><b>3.3.4</b> GLMM Bayes (rjags) model fit</a></li>
 </ul></li>
-<li class="chapter" data-level="3.6" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-random-effect-re-for-locations-1"><i class="fa fa-check"></i><b>3.6</b> GLMM: Random effect (RE) for locations</a>
+<li class="chapter" data-level="3.4" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-re-for-location-samplingdate-1"><i class="fa fa-check"></i><b>3.4</b> GLMM: RE for Location, SamplingDate</a>
 <ul>
-<li class="chapter" data-level="3.6.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-mathematical-model-1"><i class="fa fa-check"></i><b>3.6.1</b> GLMM mathematical model</a></li>
-<li class="chapter" data-level="3.6.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-frequentist-fit-1"><i class="fa fa-check"></i><b>3.6.2</b> GLMM frequentist fit</a></li>
-<li class="chapter" data-level="3.6.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-bayesian-bambi-models"><i class="fa fa-check"></i><b>3.6.3</b> GLMM Bayesian (bambi) models</a></li>
-<li class="chapter" data-level="3.6.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-bayesian-pymc-models-python"><i class="fa fa-check"></i><b>3.6.4</b> GLMM Bayesian (PyMC) models– Python</a></li>
+<li class="chapter" data-level="3.4.1" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-mathematical-model"><i class="fa fa-check"></i><b>3.4.1</b> Crossed GLMM mathematical model</a></li>
+<li class="chapter" data-level="3.4.2" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-frequentist-fit"><i class="fa fa-check"></i><b>3.4.2</b> Crossed GLMM frequentist fit</a></li>
+<li class="chapter" data-level="3.4.3" data-path="GLMMsR.html"><a href="GLMMsR.html#crossed-glmm-bayes-brms-version"><i class="fa fa-check"></i><b>3.4.3</b> Crossed GLMM Bayes (brms) version</a></li>
 </ul></li>
-<li class="chapter" data-level="3.7" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-re-for-location-crossed-samplingdate"><i class="fa fa-check"></i><b>3.7</b> GLMM: RE for location, crossed SamplingDate</a>
+<li class="chapter" data-level="3.5" data-path="GLMMsR.html"><a href="GLMMsR.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date-1"><i class="fa fa-check"></i><b>3.5</b> GLMM with Gaussian Processes: RE for Trial, GP for Date</a>
 <ul>
-<li class="chapter" data-level="3.7.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-frequentist-fit-1"><i class="fa fa-check"></i><b>3.7.1</b> Crossed GLMM frequentist fit</a></li>
-<li class="chapter" data-level="3.7.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-bayes-bambi-version"><i class="fa fa-check"></i><b>3.7.2</b> Crossed GLMM Bayes (bambi) version</a></li>
-<li class="chapter" data-level="3.7.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-bayes-pymc-version"><i class="fa fa-check"></i><b>3.7.3</b> Crossed GLMM Bayes (PyMC) version</a></li>
+<li class="chapter" data-level="3.5.1" data-path="GLMMsR.html"><a href="GLMMsR.html#bayesian-mathematical-model-1"><i class="fa fa-check"></i><b>3.5.1</b> Bayesian mathematical model</a></li>
+<li class="chapter" data-level="3.5.2" data-path="GLMMsR.html"><a href="GLMMsR.html#gaussian-process-bayes-brms-version-1"><i class="fa fa-check"></i><b>3.5.2</b> Gaussian Process Bayes (brms) version</a></li>
 </ul></li>
-<li class="chapter" data-level="3.8" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date-1"><i class="fa fa-check"></i><b>3.8</b> GLMM with Gaussian Processes: RE for Trial, GP for Date</a>
+<li class="chapter" data-level="3.6" data-path="GLMMsR.html"><a href="GLMMsR.html#summary-of-estimates"><i class="fa fa-check"></i><b>3.6</b> Summary of estimates</a>
 <ul>
-<li class="chapter" data-level="3.8.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#gaussian-process-bayes-bambi-version"><i class="fa fa-check"></i><b>3.8.1</b> Gaussian Process Bayes (bambi) version</a></li>
-</ul></li>
-<li class="chapter" data-level="3.9" data-path="GLMMsPython.html"><a href="GLMMsPython.html#summary-of-estimates-1"><i class="fa fa-check"></i><b>3.9</b> Summary of estimates</a>
-<ul>
-<li class="chapter" data-level="3.9.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#compare-tr-estimates-1"><i class="fa fa-check"></i><b>3.9.1</b> Compare TR estimates</a></li>
-<li class="chapter" data-level="3.9.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#compare-coefficients-1"><i class="fa fa-check"></i><b>3.9.2</b> Compare coefficients</a></li>
-<li class="chapter" data-level="3.9.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#plot-comparisons-1"><i class="fa fa-check"></i><b>3.9.3</b> Plot comparisons</a></li>
+<li class="chapter" data-level="3.6.1" data-path="GLMMsR.html"><a href="GLMMsR.html#compare-tr-estimates"><i class="fa fa-check"></i><b>3.6.1</b> Compare TR estimates</a></li>
+<li class="chapter" data-level="3.6.2" data-path="GLMMsR.html"><a href="GLMMsR.html#compare-coefficients"><i class="fa fa-check"></i><b>3.6.2</b> Compare coefficients</a></li>
+<li class="chapter" data-level="3.6.3" data-path="GLMMsR.html"><a href="GLMMsR.html#plot-comparisons"><i class="fa fa-check"></i><b>3.6.3</b> Plot comparisons</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="NonlinearR.html"><a href="NonlinearR.html"><i class="fa fa-check"></i><b>4</b> Nonlinear Bayesian Models in R</a>
+<li class="chapter" data-level="4" data-path="GLMMsPython.html"><a href="GLMMsPython.html"><i class="fa fa-check"></i><b>4</b> GLMM’s in Python</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="NonlinearR.html"><a href="NonlinearR.html#generalized-logistic-curve"><i class="fa fa-check"></i><b>4.1</b> Generalized Logistic Curve</a></li>
-<li class="chapter" data-level="4.2" data-path="NonlinearR.html"><a href="NonlinearR.html#bayesian-model"><i class="fa fa-check"></i><b>4.2</b> Bayesian model</a></li>
-<li class="chapter" data-level="4.3" data-path="NonlinearR.html"><a href="NonlinearR.html#fitting-models-with-the-brms-package"><i class="fa fa-check"></i><b>4.3</b> Fitting models with the brms package</a>
+<li class="chapter" data-level="4.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#getting-started-with-python"><i class="fa fa-check"></i><b>4.1</b> Getting started with Python</a>
 <ul>
-<li class="chapter" data-level="4.3.1" data-path="NonlinearR.html"><a href="NonlinearR.html#no-re-no-gp"><i class="fa fa-check"></i><b>4.3.1</b> no RE, no GP</a></li>
-<li class="chapter" data-level="4.3.2" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-no-gp"><i class="fa fa-check"></i><b>4.3.2</b> intercept RE, no GP</a></li>
-<li class="chapter" data-level="4.3.3" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-a-re-no-gp"><i class="fa fa-check"></i><b>4.3.3</b> intercept RE, A RE, no GP</a></li>
-<li class="chapter" data-level="4.3.4" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-a-re-with-gp-same-for-all-loc"><i class="fa fa-check"></i><b>4.3.4</b> intercept RE, A RE, WITH GP (same for all loc)</a></li>
-<li class="chapter" data-level="4.3.5" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-a-re-with-gp-diff-for-each-loc"><i class="fa fa-check"></i><b>4.3.5</b> intercept, A RE, with GP (DIFF for each loc)</a></li>
-<li class="chapter" data-level="4.3.6" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-a-b-m-re-with-gp-diff-for-each-loc"><i class="fa fa-check"></i><b>4.3.6</b> intercept, A, B, M RE, with GP (DIFF for each loc)</a></li>
+<li class="chapter" data-level="4.1.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#python-modules"><i class="fa fa-check"></i><b>4.1.1</b> Python modules</a></li>
 </ul></li>
-<li class="chapter" data-level="4.4" data-path="NonlinearR.html"><a href="NonlinearR.html#model-our-case-study-data"><i class="fa fa-check"></i><b>4.4</b> Model our case study data</a></li>
+<li class="chapter" data-level="4.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#set-up"><i class="fa fa-check"></i><b>4.2</b> Set up</a></li>
+<li class="chapter" data-level="4.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#outline"><i class="fa fa-check"></i><b>4.3</b> Outline</a></li>
+<li class="chapter" data-level="4.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#data-exploration-1"><i class="fa fa-check"></i><b>4.4</b> Data Exploration</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#moth-counts-1"><i class="fa fa-check"></i><b>4.4.1</b> Moth counts</a></li>
+<li class="chapter" data-level="4.4.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#trap-locations-1"><i class="fa fa-check"></i><b>4.4.2</b> Trap locations</a></li>
+<li class="chapter" data-level="4.4.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#timeline-1"><i class="fa fa-check"></i><b>4.4.3</b> Timeline</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="GLMMsPython.html"><a href="GLMMsPython.html#basic-glm-models-2"><i class="fa fa-check"></i><b>4.5</b> Basic GLM models</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#mathematical-model"><i class="fa fa-check"></i><b>4.5.1</b> Mathematical model</a></li>
+<li class="chapter" data-level="4.5.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#fitting-the-frequentist-models-1"><i class="fa fa-check"></i><b>4.5.2</b> Fitting the frequentist models</a></li>
+<li class="chapter" data-level="4.5.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#bayesian-bambi-models-python"><i class="fa fa-check"></i><b>4.5.3</b> Bayesian (bambi) models– Python</a></li>
+<li class="chapter" data-level="4.5.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#bayesian-pymc-models-python"><i class="fa fa-check"></i><b>4.5.4</b> Bayesian (PyMC) models– Python</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-random-effect-re-for-locations-1"><i class="fa fa-check"></i><b>4.6</b> GLMM: Random effect (RE) for locations</a>
+<ul>
+<li class="chapter" data-level="4.6.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-mathematical-model-2"><i class="fa fa-check"></i><b>4.6.1</b> GLMM mathematical model</a></li>
+<li class="chapter" data-level="4.6.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-frequentist-fit-1"><i class="fa fa-check"></i><b>4.6.2</b> GLMM frequentist fit</a></li>
+<li class="chapter" data-level="4.6.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-bayesian-bambi-models"><i class="fa fa-check"></i><b>4.6.3</b> GLMM Bayesian (bambi) models</a></li>
+<li class="chapter" data-level="4.6.4" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-bayesian-pymc-models-python"><i class="fa fa-check"></i><b>4.6.4</b> GLMM Bayesian (PyMC) models– Python</a></li>
+</ul></li>
+<li class="chapter" data-level="4.7" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-re-for-location-crossed-samplingdate"><i class="fa fa-check"></i><b>4.7</b> GLMM: RE for location, crossed SamplingDate</a>
+<ul>
+<li class="chapter" data-level="4.7.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-frequentist-fit-1"><i class="fa fa-check"></i><b>4.7.1</b> Crossed GLMM frequentist fit</a></li>
+<li class="chapter" data-level="4.7.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-bayes-bambi-version"><i class="fa fa-check"></i><b>4.7.2</b> Crossed GLMM Bayes (bambi) version</a></li>
+<li class="chapter" data-level="4.7.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#crossed-glmm-bayes-pymc-version"><i class="fa fa-check"></i><b>4.7.3</b> Crossed GLMM Bayes (PyMC) version</a></li>
+</ul></li>
+<li class="chapter" data-level="4.8" data-path="GLMMsPython.html"><a href="GLMMsPython.html#glmm-with-gaussian-processes-re-for-trial-gp-for-date-2"><i class="fa fa-check"></i><b>4.8</b> GLMM with Gaussian Processes: RE for Trial, GP for Date</a>
+<ul>
+<li class="chapter" data-level="4.8.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#gaussian-process-bayes-bambi-version"><i class="fa fa-check"></i><b>4.8.1</b> Gaussian Process Bayes (bambi) version</a></li>
+</ul></li>
+<li class="chapter" data-level="4.9" data-path="GLMMsPython.html"><a href="GLMMsPython.html#summary-of-estimates-1"><i class="fa fa-check"></i><b>4.9</b> Summary of estimates</a>
+<ul>
+<li class="chapter" data-level="4.9.1" data-path="GLMMsPython.html"><a href="GLMMsPython.html#compare-tr-estimates-1"><i class="fa fa-check"></i><b>4.9.1</b> Compare TR estimates</a></li>
+<li class="chapter" data-level="4.9.2" data-path="GLMMsPython.html"><a href="GLMMsPython.html#compare-coefficients-1"><i class="fa fa-check"></i><b>4.9.2</b> Compare coefficients</a></li>
+<li class="chapter" data-level="4.9.3" data-path="GLMMsPython.html"><a href="GLMMsPython.html#plot-comparisons-1"><i class="fa fa-check"></i><b>4.9.3</b> Plot comparisons</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="NonlinearR.html"><a href="NonlinearR.html"><i class="fa fa-check"></i><b>5</b> Nonlinear Bayesian Models in R</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="NonlinearR.html"><a href="NonlinearR.html#generalized-logistic-curve"><i class="fa fa-check"></i><b>5.1</b> Generalized Logistic Curve</a></li>
+<li class="chapter" data-level="5.2" data-path="NonlinearR.html"><a href="NonlinearR.html#bayesian-model-1"><i class="fa fa-check"></i><b>5.2</b> Bayesian model</a></li>
+<li class="chapter" data-level="5.3" data-path="NonlinearR.html"><a href="NonlinearR.html#fitting-models-with-the-brms-package"><i class="fa fa-check"></i><b>5.3</b> Fitting models with the brms package</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="NonlinearR.html"><a href="NonlinearR.html#no-re-no-gp"><i class="fa fa-check"></i><b>5.3.1</b> no RE, no GP</a></li>
+<li class="chapter" data-level="5.3.2" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-no-gp"><i class="fa fa-check"></i><b>5.3.2</b> intercept RE, no GP</a></li>
+<li class="chapter" data-level="5.3.3" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-a-re-no-gp"><i class="fa fa-check"></i><b>5.3.3</b> intercept RE, A RE, no GP</a></li>
+<li class="chapter" data-level="5.3.4" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-re-a-re-with-gp-same-for-all-loc"><i class="fa fa-check"></i><b>5.3.4</b> intercept RE, A RE, WITH GP (same for all loc)</a></li>
+<li class="chapter" data-level="5.3.5" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-a-re-with-gp-diff-for-each-loc"><i class="fa fa-check"></i><b>5.3.5</b> intercept, A RE, with GP (DIFF for each loc)</a></li>
+<li class="chapter" data-level="5.3.6" data-path="NonlinearR.html"><a href="NonlinearR.html#intercept-a-b-m-re-with-gp-diff-for-each-loc"><i class="fa fa-check"></i><b>5.3.6</b> intercept, A, B, M RE, with GP (DIFF for each loc)</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="NonlinearR.html"><a href="NonlinearR.html#model-our-case-study-data"><i class="fa fa-check"></i><b>5.4</b> Model our case study data</a></li>
 </ul></li>
 </ul>
 
@@ -199,12 +222,12 @@
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="NonlinearR" class="section level1 hasAnchor" number="4">
-<h1><span class="header-section-number">Chapter 4</span> Nonlinear Bayesian Models in R<a href="NonlinearR.html#NonlinearR" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="NonlinearR" class="section level1 hasAnchor" number="5">
+<h1><span class="header-section-number">Chapter 5</span> Nonlinear Bayesian Models in R<a href="NonlinearR.html#NonlinearR" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>(Same set up code as Chapter 3):</p>
 <p>Asymptotic sigmoidal curve expected for product performance over time. Eventually, given enough time, the product has to stop working, and <span class="math inline">\(\beta_1\)</span> goes to 0 as t goes to 0.</p>
-<div id="generalized-logistic-curve" class="section level2 hasAnchor" number="4.1">
-<h2><span class="header-section-number">4.1</span> Generalized Logistic Curve<a href="NonlinearR.html#generalized-logistic-curve" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="generalized-logistic-curve" class="section level2 hasAnchor" number="5.1">
+<h2><span class="header-section-number">5.1</span> Generalized Logistic Curve<a href="NonlinearR.html#generalized-logistic-curve" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Adapted from: <a href="https://en.wikipedia.org/wiki/Generalised_logistic_function" class="uri">https://en.wikipedia.org/wiki/Generalised_logistic_function</a></p>
 <p><span class="math display">\[
 \beta(t) = A + \frac{(K - A)}{(1 + e^{-B(t-M)})^{1/v}}
@@ -220,8 +243,8 @@ where,</p>
 <p>See the shiny app to play around with how the parameter values affect the curve. This will be helpful in understanding the model and setting priors for the model.</p>
 <p><a href="https://bromsk.shinyapps.io/GeneralizedLogisticCurves/" class="uri">https://bromsk.shinyapps.io/GeneralizedLogisticCurves/</a></p>
 </div>
-<div id="bayesian-model" class="section level2 hasAnchor" number="4.2">
-<h2><span class="header-section-number">4.2</span> Bayesian model<a href="NonlinearR.html#bayesian-model" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="bayesian-model-1" class="section level2 hasAnchor" number="5.2">
+<h2><span class="header-section-number">5.2</span> Bayesian model<a href="NonlinearR.html#bayesian-model-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p><span class="math display">\[
 y_{ijk} \sim NegBinom(\lambda_{ijk}, r) \\
 log(\lambda_{ikt} ) = \beta_0 + \beta_{1,t} x_{A,i} + \gamma_{k} x_{ik}  + GP_{ijk}  + \mbox{ln} \left(DaysOfCatch_i\right) \\
@@ -255,11 +278,11 @@ l_k \sim HalfCauchy(0, 1) \\
 <p><span class="math inline">\(\phi\)</span> = sdgp</p>
 <p>For now, we assume that each location shares all of the same non-linear parameters except for <span class="math inline">\(A\)</span>, the maximum trapping reduction level. For now, we also set <span class="math inline">\(v=1\)</span>.</p>
 </div>
-<div id="fitting-models-with-the-brms-package" class="section level2 hasAnchor" number="4.3">
-<h2><span class="header-section-number">4.3</span> Fitting models with the brms package<a href="NonlinearR.html#fitting-models-with-the-brms-package" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="fitting-models-with-the-brms-package" class="section level2 hasAnchor" number="5.3">
+<h2><span class="header-section-number">5.3</span> Fitting models with the brms package<a href="NonlinearR.html#fitting-models-with-the-brms-package" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Setting priors in a nonlinear model is non-trivial!!</p>
-<div id="no-re-no-gp" class="section level3 hasAnchor" number="4.3.1">
-<h3><span class="header-section-number">4.3.1</span> no RE, no GP<a href="NonlinearR.html#no-re-no-gp" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="no-re-no-gp" class="section level3 hasAnchor" number="5.3.1">
+<h3><span class="header-section-number">5.3.1</span> no RE, no GP<a href="NonlinearR.html#no-re-no-gp" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p><img src="04-NonlinerInR_files/figure-html/simdata1-1.png" width="100%" /></p>
 <pre><code>##  Family: negbinomial 
 ##   Links: mu = log; shape = identity 
@@ -298,8 +321,8 @@ l_k \sim HalfCauchy(0, 1) \\
 ##     cauchy(0, 1) shape                                  0             user</code></pre>
 <p><img src="04-NonlinerInR_files/figure-html/output1-1.png" width="100%" /></p>
 </div>
-<div id="intercept-re-no-gp" class="section level3 hasAnchor" number="4.3.2">
-<h3><span class="header-section-number">4.3.2</span> intercept RE, no GP<a href="NonlinearR.html#intercept-re-no-gp" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="intercept-re-no-gp" class="section level3 hasAnchor" number="5.3.2">
+<h3><span class="header-section-number">5.3.2</span> intercept RE, no GP<a href="NonlinearR.html#intercept-re-no-gp" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p><img src="04-NonlinerInR_files/figure-html/simdata2-1.png" width="100%" /></p>
 <pre><code>##  Family: poisson 
 ##   Links: mu = log 
@@ -338,8 +361,8 @@ l_k \sim HalfCauchy(0, 1) \\
 <pre><code>## [1] 2.29 1.29 2.54 1.71 2.13</code></pre>
 <p><img src="04-NonlinerInR_files/figure-html/output2-1.png" width="100%" /></p>
 </div>
-<div id="intercept-re-a-re-no-gp" class="section level3 hasAnchor" number="4.3.3">
-<h3><span class="header-section-number">4.3.3</span> intercept RE, A RE, no GP<a href="NonlinearR.html#intercept-re-a-re-no-gp" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="intercept-re-a-re-no-gp" class="section level3 hasAnchor" number="5.3.3">
+<h3><span class="header-section-number">5.3.3</span> intercept RE, A RE, no GP<a href="NonlinearR.html#intercept-re-a-re-no-gp" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p><img src="04-NonlinerInR_files/figure-html/simdata3-1.png" width="100%" /></p>
 <pre><code>##  Family: negbinomial 
 ##   Links: mu = log; shape = identity 
@@ -397,8 +420,8 @@ l_k \sim HalfCauchy(0, 1) \\
 ##   ..$ : NULL</code></pre>
 <p><img src="04-NonlinerInR_files/figure-html/preds3-1.png" width="100%" /></p>
 </div>
-<div id="intercept-re-a-re-with-gp-same-for-all-loc" class="section level3 hasAnchor" number="4.3.4">
-<h3><span class="header-section-number">4.3.4</span> intercept RE, A RE, WITH GP (same for all loc)<a href="NonlinearR.html#intercept-re-a-re-with-gp-same-for-all-loc" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="intercept-re-a-re-with-gp-same-for-all-loc" class="section level3 hasAnchor" number="5.3.4">
+<h3><span class="header-section-number">5.3.4</span> intercept RE, A RE, WITH GP (same for all loc)<a href="NonlinearR.html#intercept-re-a-re-with-gp-same-for-all-loc" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p><img src="04-NonlinerInR_files/figure-html/simdata4-1.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata4-2.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata4-3.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata4-4.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata4-5.png" width="100%" /></p>
 <pre><code>## [1] 0</code></pre>
 <p><img src="04-NonlinerInR_files/figure-html/simdata4-6.png" width="100%" /></p>
@@ -485,8 +508,8 @@ l_k \sim HalfCauchy(0, 1) \\
 ##   ..$ : NULL</code></pre>
 <p><img src="04-NonlinerInR_files/figure-html/preds4-1.png" width="100%" /></p>
 </div>
-<div id="intercept-a-re-with-gp-diff-for-each-loc" class="section level3 hasAnchor" number="4.3.5">
-<h3><span class="header-section-number">4.3.5</span> intercept, A RE, with GP (DIFF for each loc)<a href="NonlinearR.html#intercept-a-re-with-gp-diff-for-each-loc" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="intercept-a-re-with-gp-diff-for-each-loc" class="section level3 hasAnchor" number="5.3.5">
+<h3><span class="header-section-number">5.3.5</span> intercept, A RE, with GP (DIFF for each loc)<a href="NonlinearR.html#intercept-a-re-with-gp-diff-for-each-loc" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p><img src="04-NonlinerInR_files/figure-html/simdata5-1.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata5-2.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata5-3.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata5-4.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata5-5.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata5-6.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata5-7.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata5-8.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata5-9.png" width="100%" /></p>
 <pre><code>## [1] 0</code></pre>
 <p><img src="04-NonlinerInR_files/figure-html/simdata5-10.png" width="100%" /></p>
@@ -626,11 +649,9 @@ l_k \sim HalfCauchy(0, 1) \\
 ##   ..$ : NULL</code></pre>
 <p><img src="04-NonlinerInR_files/figure-html/preds5-1.png" width="100%" /></p>
 </div>
-<div id="intercept-a-b-m-re-with-gp-diff-for-each-loc" class="section level3 hasAnchor" number="4.3.6">
-<h3><span class="header-section-number">4.3.6</span> intercept, A, B, M RE, with GP (DIFF for each loc)<a href="NonlinearR.html#intercept-a-b-m-re-with-gp-diff-for-each-loc" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p><img src="04-NonlinerInR_files/figure-html/simdata6-1.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata6-2.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata6-3.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata6-4.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata6-5.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata6-6.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata6-7.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata6-8.png" width="100%" /><img src="04-NonlinerInR_files/figure-html/simdata6-9.png" width="100%" /></p>
-<pre><code>## [1] 0</code></pre>
-<p><img src="04-NonlinerInR_files/figure-html/simdata6-10.png" width="100%" /></p>
+<div id="intercept-a-b-m-re-with-gp-diff-for-each-loc" class="section level3 hasAnchor" number="5.3.6">
+<h3><span class="header-section-number">5.3.6</span> intercept, A, B, M RE, with GP (DIFF for each loc)<a href="NonlinearR.html#intercept-a-b-m-re-with-gp-diff-for-each-loc" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><img src="04-NonlinerInR_files/figure-html/simdata6-1.png" width="100%" /></p>
 <pre><code>##  Family: negbinomial 
 ##   Links: mu = log; shape = identity 
 ## Formula: nYSB ~ b0 - (A * (1 - 1/(1 + exp(-1 * B * (DAT - M))))) * numTrt + gpP + log(DaysOfCatch) 
@@ -842,8 +863,8 @@ l_k \sim HalfCauchy(0, 1) \\
 <p><img src="04-NonlinerInR_files/figure-html/preds6-1.png" width="100%" /></p>
 </div>
 </div>
-<div id="model-our-case-study-data" class="section level2 hasAnchor" number="4.4">
-<h2><span class="header-section-number">4.4</span> Model our case study data<a href="NonlinearR.html#model-our-case-study-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="model-our-case-study-data" class="section level2 hasAnchor" number="5.4">
+<h2><span class="header-section-number">5.4</span> Model our case study data<a href="NonlinearR.html#model-our-case-study-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Too many divergent warnings with model with intercept, A, B, M RE, with GP (DIFF for each loc). (M was multimodal)</p>
 <p>Use constant B, M instead.</p>
 <pre><code>##  Family: negbinomial 
@@ -1054,15 +1075,18 @@ l_k \sim HalfCauchy(0, 1) \\
 ##  8 r_Location__A[Loc7,Intercept]   0.921   4.41
 ##  9 r_Location__A[Loc8,Intercept]  -1.45    2.04
 ## 10 r_Location__A[Loc9,Intercept]   0.429   3.91</code></pre>
-<p><img src="04-NonlinerInR_files/figure-html/outputR-1.png" width="100%" /></p>
-<pre><code>##  num [1:672, 1:4] -0.363 -0.33 -0.301 0.598 1.498 ...
-##  - attr(*, &quot;dimnames&quot;)=List of 2
-##   ..$ : NULL
-##   ..$ : chr [1:4] &quot;Estimate&quot; &quot;Est.Error&quot; &quot;Q2.5&quot; &quot;Q97.5&quot;</code></pre>
-<p><img src="04-NonlinerInR_files/figure-html/predsR-1.png" width="100%" /></p>
+<p><img src="04-NonlinerInR_files/figure-html/outputR-1.png" width="100%" />
+<img src="04-NonlinerInR_files/figure-html/predsR-1.png" width="100%" /></p>
 
 </div>
 </div>
+
+
+
+
+
+
+
             </section>
 
           </div>
