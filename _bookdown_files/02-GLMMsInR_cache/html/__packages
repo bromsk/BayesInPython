@@ -12,11 +12,10 @@ dplyr
 stringr
 forcats
 lubridate
+kableExtra
 ggmap
 Rcpp
 brms
+ggmcmc
 coda
 rjags
-kableExtra
-ggmcmc
-bayesm

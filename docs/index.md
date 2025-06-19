@@ -1,7 +1,7 @@
 --- 
 title: "Bayesian models in R and Python"
 author: "Kristin Broms"
-date: "2025-06-18"
+date: "2025-06-19"
 site: bookdown::bookdown_site
 output: bookdown::gitbook
 documentclass: book
@@ -32,6 +32,8 @@ I have two purposes:
 
 
 All models are written mathematically and fit in both R and Python. Frequentist versions are fit, when available, in addition to the Bayesian versions. The fitted models start simple (GLM's) and are then built up.
+
+While it is an essential part of any analysis, no model selection and assessment is conducted here because that is not the purpose of this tutorial. Additionally, model output is not explained because that can be found elsewhere (e.g., function help pages).
 
 
 ## Case Study

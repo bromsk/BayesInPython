@@ -17,8 +17,8 @@ editor_options:
 ```{r, eval = F, include=FALSE, message=F, warning=FALSE, results = "hide", echo=F}
 ## to create the website:
 bookdown::render_book("index.Rmd")
-bookdown::clean_book(clean = FALSE) # to celan up after yaml error
-bookdown::clean_book(clean = TRUE) # to celan up after yaml error
+bookdown::clean_book(clean = FALSE) # to clean up after yaml error
+bookdown::clean_book(clean = TRUE) # to clean up after yaml error
 bookdown::preview_chapter()
 ```
 
@@ -38,6 +38,8 @@ I have two purposes:
 
 
 All models are written mathematically and fit in both R and Python. Frequentist versions are fit, when available, in addition to the Bayesian versions. The fitted models start simple (GLM's) and are then built up.
+
+While it is an essential part of any analysis, no model selection and assessment is conducted here because that is not the purpose of this tutorial. Additionally, model output is not explained because that can be found elsewhere (e.g., function help pages).
 
 
 ## Case Study

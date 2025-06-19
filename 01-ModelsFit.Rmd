@@ -4,7 +4,7 @@ These are the models fit to our data.
 
 For a good reference on additional details related to GLMM's, check [here] (https://bbolker.github.io/mixedmodels-misc/glmmFAQ).
 
-## Basic GLM models
+## GLM mathematical models {#glm}
 
 The first model ignores all the spatial and temporal relationships in the data and assumes each data point is independent and identically distributed (_iid_). **This is not a good model for the data!** It is just our starting off point.
 
@@ -13,6 +13,8 @@ When building hierarchical Bayesian models, it is always a good idea to start si
 Our response variable is a count, therefore we use either a Poisson or negative binomial distribution as the basis for our model. These models are known as generalized linear models (GLMs).
  
 The model includes an offset to account for the varying time intervals between sample. (If the traps are left unchecked for more days, we naturally expect the traps to have more moths. This varying effort is accounted for by the offset.)
+
+See Section [Fitted GLM models] for the associated model fits.
 
 ### Poisson regression model
 
@@ -98,7 +100,7 @@ $$
 
 For the Bayesian version, the derived parameter is sampled as part of the MCMC iterations, and the 95% credible interval is the 2.5%, 97.5% quantiles of its resulting distribution.
 
-## GLMM: Random effects (RE) for locations
+## GLMM: Random effects (RE) for locations {#glmm}
 
 The first fix we make to the model is acknowledging that overall average moth population pressure vary from location to location (see Figure \@ref(fig:mothctsFig) of moth counts). In other words, some locations have more moths than others. To add this information to the model, we add a location random effect (RE) and our model becomes a generalized linear mixed-effects model (GLMM or GLMER).
 
@@ -178,7 +180,7 @@ $$
 <!-- $$ -->
 
 
-## GLMM: RE for Location, SamplingDate
+## GLMM: RE for Location, SamplingDate {#glmm_datesC}
 
 In this version of the model, we acknowledge that sampling on different days of the season adds to the variability of the moth counts, and that counts from the same sampling date are more similar than for a different date. In this model, however,  the correlation between sampling dates is ignored.
 
@@ -201,7 +203,7 @@ where, in addition to the variables and parameters defined previously, we have
 
 $k = 1,..., K=10$ represents the locations, 
 
-$j = 1, ..., J = 117$ represents the 117 unique sampling dates,
+$j = 1, ..., J = 117$ represents the 62 unique sampling dates,
 
 $y_{ikj}$ is moth count $i$ from location $k$ on date $j$,
 
@@ -258,7 +260,7 @@ $$
 <!-- $$ -->
 
 
-## GLMM with Gaussian Processes: RE for Trial, GP for Date
+## GLMM with Gaussian Processes: RE for Trial, GP for Date {#glmm_gp}
 
 Now we are in the territory where we _have_ to fit the models in a Bayesian framework. If our response variable was continuous (i.e., the regression model was based on a Normal distribution), then we could still use maximum likelihood estimation.
 
@@ -290,7 +292,7 @@ where, in addition to the variables and parameters defined previously, we have
 
 $k = 1,..., K=10$ represents the locations, 
 
-$j = 1, ..., J = 117$ represents the 117 unique dates,
+$j = 1, ..., J = 117$ represents the 62 unique dates,
 
 $y_{ikj}$ is moth count $i$ from location $k$ on date $j$,
 
