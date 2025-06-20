@@ -1,7 +1,7 @@
 --- 
 title: "Bayesian models in R and Python"
 author: "Kristin Broms"
-date: "2025-06-19"
+date: "2025-06-20"
 site: bookdown::bookdown_site
 output: bookdown::gitbook
 documentclass: book
@@ -22,7 +22,7 @@ I have used R, in conjunction with Rmarkdown documents, in an RStudio GUI for ov
 
 However, the world seems to prefer Python. Perhaps it is because computer programmers rule the world more than statisticians and scientists. In that vein, this tutorial fits GLMM's, hierarchical Bayesian models (with Gaussian Processes and random effects), and non-linear Bayesian models in Python. 
 
-The intended audience here is someone who is proficient at fitting statistical models in R, but would like to fit those same models in Python instead. In particular, fitting complex Bayesian hierarchical models.
+**The intended audience here is someone who is proficient at fitting statistical models in R, but would like to fit those same models in Python instead. In particular, fitting complex Bayesian hierarchical models in R and Python.**
 
 I have two purposes:
 

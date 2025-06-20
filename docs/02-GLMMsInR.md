@@ -74,7 +74,9 @@ predplot <- function(preddata, plottitle = "") {
   scale_color_manual(values = mycolors) +
   scale_fill_manual(values = mycolors) +
   labs(title = plottitle, 
-       subtitle = "Lines are predictions, points are the data")
+       subtitle = "Lines are predictions, points are the data", 
+       y = "Moth count per day",
+       x = "Days after installation (DAI)")
 
   return(p)
 }
@@ -94,7 +96,9 @@ brmspredplot = function(preddata, plottitle = "") {
   scale_color_manual(values = mycolors) +
   scale_fill_manual(values = mycolors) +
   labs(title = plottitle,
-       subtitle = "Lines are predictions, points are the data")
+       subtitle = "Lines are predictions, points are the data", 
+       y = "Moth count per day",
+       x = "Days after installation (DAI)")
 
   return(p)
 }
@@ -148,18 +152,131 @@ Here is what the data look like after the above manipulation.
 
 
 ``` r
-knitr::kable(head(datR, 5))
+kable(head(datR, 5)) %>%
+  kable_styling() %>%
+  scroll_box(width = "100%", box_css = "border: 0px;")
 ```
 
-
-
-|Location |Treatment | TrapID| Longitude|  Latitude|TransplantDate |TrapInstallDate |DispInstallDate | AssessmentNumber|SamplingDate | nYSB| DaysOfCatch| DATI| DADI| DAT| mothsperday|SamplingDateC |
-|:--------|:---------|------:|---------:|---------:|:--------------|:---------------|:---------------|----------------:|:------------|----:|-----------:|----:|----:|---:|-----------:|:-------------|
-|Loc9     |Trt       |    201|  111.6028| -7.233634|2023-08-06     |2023-08-13      |2023-08-13      |                1|2023-08-23   |    4|          10|   10|   10|  17|   0.4000000|2023-08-23    |
-|Loc9     |Trt       |    201|  111.6028| -7.233634|2023-08-06     |2023-08-13      |2023-08-13      |                2|2023-09-03   |    6|          11|   21|   21|  28|   0.5454545|2023-09-03    |
-|Loc9     |Trt       |    201|  111.6028| -7.233634|2023-08-06     |2023-08-13      |2023-08-13      |                3|2023-09-12   |    6|           9|   30|   30|  37|   0.6666667|2023-09-12    |
-|Loc9     |Trt       |    201|  111.6028| -7.233634|2023-08-06     |2023-08-13      |2023-08-13      |                4|2023-09-23   |   24|          11|   41|   41|  48|   2.1818182|2023-09-23    |
-|Loc9     |Trt       |    201|  111.6028| -7.233634|2023-08-06     |2023-08-13      |2023-08-13      |                5|2023-10-02   |   43|           9|   50|   50|  57|   4.7777778|2023-10-02    |
+<div style="border: 0px;overflow-x: scroll; width:100%; "><table class="table" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Location </th>
+   <th style="text-align:left;"> Treatment </th>
+   <th style="text-align:right;"> TrapID </th>
+   <th style="text-align:right;"> Longitude </th>
+   <th style="text-align:right;"> Latitude </th>
+   <th style="text-align:left;"> TransplantDate </th>
+   <th style="text-align:left;"> TrapInstallDate </th>
+   <th style="text-align:left;"> DispInstallDate </th>
+   <th style="text-align:right;"> AssessmentNumber </th>
+   <th style="text-align:left;"> SamplingDate </th>
+   <th style="text-align:right;"> nYSB </th>
+   <th style="text-align:right;"> DaysOfCatch </th>
+   <th style="text-align:right;"> DATI </th>
+   <th style="text-align:right;"> DADI </th>
+   <th style="text-align:right;"> DAT </th>
+   <th style="text-align:right;"> mothsperday </th>
+   <th style="text-align:left;"> SamplingDateC </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Loc9 </td>
+   <td style="text-align:left;"> Trt </td>
+   <td style="text-align:right;"> 201 </td>
+   <td style="text-align:right;"> 111.6028 </td>
+   <td style="text-align:right;"> -7.233634 </td>
+   <td style="text-align:left;"> 2023-08-06 </td>
+   <td style="text-align:left;"> 2023-08-13 </td>
+   <td style="text-align:left;"> 2023-08-13 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:left;"> 2023-08-23 </td>
+   <td style="text-align:right;"> 4 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 17 </td>
+   <td style="text-align:right;"> 0.4000000 </td>
+   <td style="text-align:left;"> 2023-08-23 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Loc9 </td>
+   <td style="text-align:left;"> Trt </td>
+   <td style="text-align:right;"> 201 </td>
+   <td style="text-align:right;"> 111.6028 </td>
+   <td style="text-align:right;"> -7.233634 </td>
+   <td style="text-align:left;"> 2023-08-06 </td>
+   <td style="text-align:left;"> 2023-08-13 </td>
+   <td style="text-align:left;"> 2023-08-13 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:left;"> 2023-09-03 </td>
+   <td style="text-align:right;"> 6 </td>
+   <td style="text-align:right;"> 11 </td>
+   <td style="text-align:right;"> 21 </td>
+   <td style="text-align:right;"> 21 </td>
+   <td style="text-align:right;"> 28 </td>
+   <td style="text-align:right;"> 0.5454545 </td>
+   <td style="text-align:left;"> 2023-09-03 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Loc9 </td>
+   <td style="text-align:left;"> Trt </td>
+   <td style="text-align:right;"> 201 </td>
+   <td style="text-align:right;"> 111.6028 </td>
+   <td style="text-align:right;"> -7.233634 </td>
+   <td style="text-align:left;"> 2023-08-06 </td>
+   <td style="text-align:left;"> 2023-08-13 </td>
+   <td style="text-align:left;"> 2023-08-13 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:left;"> 2023-09-12 </td>
+   <td style="text-align:right;"> 6 </td>
+   <td style="text-align:right;"> 9 </td>
+   <td style="text-align:right;"> 30 </td>
+   <td style="text-align:right;"> 30 </td>
+   <td style="text-align:right;"> 37 </td>
+   <td style="text-align:right;"> 0.6666667 </td>
+   <td style="text-align:left;"> 2023-09-12 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Loc9 </td>
+   <td style="text-align:left;"> Trt </td>
+   <td style="text-align:right;"> 201 </td>
+   <td style="text-align:right;"> 111.6028 </td>
+   <td style="text-align:right;"> -7.233634 </td>
+   <td style="text-align:left;"> 2023-08-06 </td>
+   <td style="text-align:left;"> 2023-08-13 </td>
+   <td style="text-align:left;"> 2023-08-13 </td>
+   <td style="text-align:right;"> 4 </td>
+   <td style="text-align:left;"> 2023-09-23 </td>
+   <td style="text-align:right;"> 24 </td>
+   <td style="text-align:right;"> 11 </td>
+   <td style="text-align:right;"> 41 </td>
+   <td style="text-align:right;"> 41 </td>
+   <td style="text-align:right;"> 48 </td>
+   <td style="text-align:right;"> 2.1818182 </td>
+   <td style="text-align:left;"> 2023-09-23 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Loc9 </td>
+   <td style="text-align:left;"> Trt </td>
+   <td style="text-align:right;"> 201 </td>
+   <td style="text-align:right;"> 111.6028 </td>
+   <td style="text-align:right;"> -7.233634 </td>
+   <td style="text-align:left;"> 2023-08-06 </td>
+   <td style="text-align:left;"> 2023-08-13 </td>
+   <td style="text-align:left;"> 2023-08-13 </td>
+   <td style="text-align:right;"> 5 </td>
+   <td style="text-align:left;"> 2023-10-02 </td>
+   <td style="text-align:right;"> 43 </td>
+   <td style="text-align:right;"> 9 </td>
+   <td style="text-align:right;"> 50 </td>
+   <td style="text-align:right;"> 50 </td>
+   <td style="text-align:right;"> 57 </td>
+   <td style="text-align:right;"> 4.7777778 </td>
+   <td style="text-align:left;"> 2023-10-02 </td>
+  </tr>
+</tbody>
+</table></div>
 
 Column descriptions: 
 
@@ -235,10 +352,6 @@ ggmap(basemap) +
 
 <img src="02-GLMMsInR_files/figure-html/LocsFig-1.png" width="100%" />
 
-``` r
-#
-```
-
 Within each location, the treatment traps have a slightly different alignment:
 
 
@@ -263,19 +376,17 @@ ggplot(coords,
 <img src="02-GLMMsInR_files/figure-html/TrapsPlotted-1.png" width="100%" />
 
 
-## Basic GLM models {#fit_glm}
+## Fitted GLM models {#fit-glmR}
 
-To start, we ignore all the spatial and temporal relationships in the data and assume each data point is independent and identically distributed (iid). **This is not a good model for the data!** It is just our starting off point.
+To start, we ignore all the spatial and temporal relationships in the data and assume each data point is independent and identically distributed (_iid_). **This is not a good model for the data!** It is just our starting off point.
 
 When building hierarchical Bayesian models, it is always a good idea to start simple, make sure everything works as expected, and then build up.
 
-See Section [Basic GLM models] for the associated mathematical models.
+See Section \@ref(glm) for the associated mathematical models.
 
-### Fitting the frequentist Poisson model
+### Frequentist Poisson model
 
-Note: when I predict for new data, I set DaysOfCatch = 1, and then I compare to the moths per day variable (mothsperday = nYSB / DaysOfCatch). I want to exclude any patterns related to the varying time intervals.
-
-These models show a very tight confidence intervals for our predictions. But also, the residual deviance is MUCH greater than the degree of freedom, indicating a lack of fit. The plot of the predictions overlaid on the data also demonstrate the lack of fit.
+These models show a very tight confidence intervals for our coefficient estimates and our predictions. But also, the residual deviance is MUCH greater than the degree of freedom, indicating a lack of fit. The plot of the predictions (Figure \@ref(fig:p1p-glmFig)) overlaid on the data also demonstrate the lack of fit.
 
 
 ``` r
@@ -308,8 +419,37 @@ summary(mod1p)
 ## Number of Fisher Scoring iterations: 6
 ```
 
+
 ``` r
-TR_1p <- getTR(mod1p)
+## obtain TR estimate for comparison later (custom function in Setup code)
+TR_1p <- getTR(mod1p) 
+kable(TR_1p)  %>%
+  kable_styling(full_width = F)
+```
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>(\#tab:TR1p)(\#tab:TR1p)Trapping reduction estimate for the Poisson GLM model.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> TR </th>
+   <th style="text-align:right;"> lowerCI </th>
+   <th style="text-align:right;"> upperCI </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 88.5 </td>
+   <td style="text-align:right;"> 87.9 </td>
+   <td style="text-align:right;"> 89.1 </td>
+  </tr>
+</tbody>
+</table>
+
+Note: when I predict for new data, I set $DaysOfCatch = 1$, and then I compare to the moths per day variable ($mothsperday = nYSB / DaysOfCatch$). I want to exclude any patterns related to the varying time intervals.
+
+
+``` r
+## code to predict moth counts from model:
 tmp = predict(mod1p, se = T, type = "link",
               newdata = datR  %>% mutate(DaysOfCatch = 1))
 # str(tmp)
@@ -322,17 +462,20 @@ preds1p %<>%
          lowerCI = exp(lowerCI),
          upperCI = exp(upperCI))
 
-p1p_glm = predplot(preds1p, "Poisson GLM predictions")
+p1p_glm = predplot(preds1p, "Poisson GLM predictions") # custom function
 print(p1p_glm)
 ```
 
-<img src="02-GLMMsInR_files/figure-html/pois1-1.png" width="100%" />
+<div class="figure">
+<img src="02-GLMMsInR_files/figure-html/p1p-glmFig-1.png" alt="Poisson GLM predictions." width="100%" />
+<p class="caption">(\#fig:p1p-glmFig)Poisson GLM predictions.</p>
+</div>
 
-The model is such a bad fit to the data, it is hard to even tell what is going on in the plot above.
+The model is such a bad fit to the data, it is hard to even tell what is going on in the figure above.
 
-### Fitting the frequentist neg. binomial model
+### Frequentist negative binomial model {#nb1}
 
-For the negative binomial model, our confidence intervals are a little wider, but we are still ignoring all the correlations in our data. And the plot of the predictions again indicates the lack of fit.
+For the negative binomial model, our confidence intervals are a little wider, but we are still ignoring all the correlations in our data. And the plot of the predictions again indicates the lack of fit (Figure \@ref(fig:p1nb-glmFig)).
 
 
 ``` r
@@ -370,11 +513,35 @@ summary(mod1nb)
 ##  2 x log-likelihood:  -4877.5410
 ```
 
+
 ``` r
-#ref: https://library.virginia.edu/data/articles/simulating-data-for-count-models
-# install.packages("topmodels", repos = "https://R-Forge.R-project.org")
-# topmodels::rootogram(mod1nb, confint = F, xlim = c(0, 50), style = "standing")
+## obtain TR estimate for comparison later (custom function in Setup code)
 TR_1nb <- getTR(mod1nb)
+kable(TR_1nb)  %>%
+  kable_styling(full_width = F)
+```
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>(\#tab:TR1nb)(\#tab:TR1nb)Trapping reduction estimate for the negative binomial GLM model.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> TR </th>
+   <th style="text-align:right;"> lowerCI </th>
+   <th style="text-align:right;"> upperCI </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 88.5 </td>
+   <td style="text-align:right;"> 86.1 </td>
+   <td style="text-align:right;"> 90.5 </td>
+  </tr>
+</tbody>
+</table>
+
+
+``` r
+## code to predict moth counts from model:
 tmp = predict(mod1nb, se = T, type = "link",
               newdata= datR  %>% mutate(DaysOfCatch = 1))
 # str(tmp)
@@ -386,24 +553,25 @@ preds1nb %<>%
   mutate(preds = exp(preds),
          lowerCI = exp(lowerCI),
          upperCI = exp(upperCI))
-# str(preds1nb)
 
 p1nb_glm = predplot(preds1nb, "Neg. binomial GLM predictions")
 print(p1nb_glm)
 ```
 
-<img src="02-GLMMsInR_files/figure-html/nb1-1.png" width="100%" />
+<div class="figure">
+<img src="02-GLMMsInR_files/figure-html/p1nb-glmFig-1.png" alt="Negative bimomial GLM predictions." width="100%" />
+<p class="caption">(\#fig:p1nb-glmFig)Negative bimomial GLM predictions.</p>
+</div>
 
-### Fitting the Bayesian (brms) model
+### Bayesian model
 
 In R, I fit the Bayesian models using the `brms` package. I find this package very intuitive and it has fast, efficient algorithms using Stan on the back-end. 
 
 Because the models take a few minutes to fit, I usually fit them when I am initially running through my code, save them, and then only load the model fit when rendering the Rmarkdown file and creating the resulting figures.
 
-The prior_summary command is helpful if you do not know what a parameter is called in `brms` and it is helpful to learn if you have set all the prior distributions as desired. Here, I used the command to find out what they called their $\theta$ parameter. (They call it the shape parameter.)
-
 
 ``` r
+## not run:
 brm1nb <- brm(formula = nYSB ~ Treatment + offset(log(DaysOfCatch)),
               data = datR, 
               family = negbinomial, #log-link is default
@@ -415,6 +583,9 @@ brm1nb <- brm(formula = nYSB ~ Treatment + offset(log(DaysOfCatch)),
               chains = nCores, cores = nCores) 
 saveRDS(brm1nb, "output/brm1nb.RDS")
 ```
+
+The prior_summary command is helpful if you do not know what a parameter is called in `brms` and it is shows the prior distributions. Here, I used the command to find out what they called their $\theta$ parameter. (They call it the shape parameter.)
+
 
 ``` r
 brm1nb <- readRDS("output/brm1nb.RDS")
@@ -429,17 +600,7 @@ prior_summary(brm1nb)
 ##  cauchy(0,1)     shape                                     0            user
 ```
 
-``` r
-# 
-```
-
-The Bayesian parameter estimates match very closely to the frequentist estimates:
-
-
-``` r
-knitr::kable(round(summary(brm1nb)$fixed[, 1:4], 3), caption = "Coefficient estimates from the Bayesian framework, fit using the brms package.")
-```
-
+The Bayesian parameter estimates match very closely to the frequentist estimates (copied here from Section \@ref(nb1)):
 
 
 Table: (\#tab:compareCoef1nb)Coefficient estimates from the Bayesian framework, fit using the brms package.
@@ -449,24 +610,14 @@ Table: (\#tab:compareCoef1nb)Coefficient estimates from the Bayesian framework, 
 |Intercept    |    1.402|     0.069|    1.267|    1.540|
 |TreatmentTrt |   -2.159|     0.100|   -2.354|   -1.964|
 
-``` r
-knitr::kable(round(summary(mod1nb)$coef, 3), caption = "Coefficient estimates from the frequentist framework, fit using the stats package.")
-```
 
 
-
-Table: (\#tab:compareCoef1nb)Coefficient estimates from the frequentist framework, fit using the stats package.
+Table: (\#tab:compareCoef1nb)Coefficient estimates from the frequentist framework, fit using glm.nb().
 
 |             | Estimate| Std. Error| z value| Pr(>&#124;z&#124;)|
 |:------------|--------:|----------:|-------:|------------------:|
 |(Intercept)  |    1.402|      0.068|  20.652|                  0|
 |TreatmentTrt |   -2.164|      0.099| -21.871|                  0|
-
-``` r
-knitr::kable(round(summary(brm1nb)$spec_pars[,1:4], 3), caption = "Shape parameter estimate from the Bayesian framework.")
-```
-
-
 
 Table: (\#tab:compareShape1nb)Shape parameter estimate from the Bayesian framework.
 
@@ -474,29 +625,31 @@ Table: (\#tab:compareShape1nb)Shape parameter estimate from the Bayesian framewo
 |:-----|--------:|---------:|--------:|--------:|
 |shape |    0.655|     0.035|    0.588|    0.726|
 
-``` r
-knitr::kable(round(summary(mod1nb)$theta, 3), caption = "Shape parameter estimate from the frequentist framework.")
-```
-
-
-
-Table: (\#tab:compareShape1nb)Shape parameter estimate from the frequentist framework.
-
-|     x|
-|-----:|
-| 0.656|
-
-One difference however is that the frequentist model gives only a point estimate for the shape parameter while the Bayesian model gives us a distribution and therefore 95% credible intervals for the parameter.
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>(\#tab:compareShape1nb)(\#tab:compareShape1nb)Shape parameter estimate from the frequentist framework.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> x </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 0.656 </td>
+  </tr>
+</tbody>
+</table>
 
 The matching parameter estimates are expected, but reassuring that we have built the correct foundation for the more complicated models to come. 
 
-Comparisons of TR predictions and predicted moth count values can be found at the end of the page (Section \@ref(compareTR)).
+One difference however is that the frequentist model gives only a point estimate for the shape parameter while the Bayesian model gives us a distribution and therefore 95% credible intervals for the parameter.
+
+The next code chink calculates trapping reduction (TR) for this model and the model predictions of the moth counts for each location and date.
 
 
 ``` r
-# CALC TR:
+## Calc TR for later comparison
 mod1t <- ggs(brm1nb) # transform MCMC output into a table
-unique(mod1t$Parameter)
+# unique(mod1t$Parameter)
 beta1 <- mod1t %>% 
   filter(Parameter == "b_TreatmentTrt", # our beta1
          Iteration > 500) # remove burn-in
@@ -504,32 +657,61 @@ TR = 100 * (1 - exp(beta1$value))
 bayesTR_1nb <- data.frame(TR = round(median(TR), 1), 
            lowerCI = round(quantile(TR, 0.025), 1),
           upperCI = round(quantile(TR, 0.975), 1))   
-print(bayesTR_1nb)
+row.names(bayesTR_1nb) = NULL
+kable(bayesTR_1nb)  %>%
+  kable_styling(full_width = F)
+```
 
-# plot predictions:
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>(\#tab:TRBayes1nb)(\#tab:TRBayes1nb)Trapping reduction estimate for the negative binomial GLM model.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> TR </th>
+   <th style="text-align:right;"> lowerCI </th>
+   <th style="text-align:right;"> upperCI </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 88.5 </td>
+   <td style="text-align:right;"> 86 </td>
+   <td style="text-align:right;"> 90.5 </td>
+  </tr>
+</tbody>
+</table>
+
+
+``` r
+## plot predictions:
 predsbrm1nb <- fitted(brm1nb,
                        scale = "linear",
                         newdata = datR  %>% mutate(DaysOfCatch = 1))   
 
 bayes_p1nb = brmspredplot(cbind(datR, exp(predsbrm1nb)), 
-                          plottitle = "Bayesian neg. binomial GLM predictions")
+                          plottitle = "Bayes NB GLM predictions")
 print(bayes_p1nb)
 ```
 
-<img src="02-GLMMsInR_files/figure-html/unnamed-chunk-2-1.png" width="100%" />
+<div class="figure">
+<img src="02-GLMMsInR_files/figure-html/pBayes1nb-Fig-1.png" alt="Bayesian negative binomial GLM predictions." width="100%" />
+<p class="caption">(\#fig:pBayes1nb-Fig)Bayesian negative binomial GLM predictions.</p>
+</div>
 
-## GLMM: Random effect (RE) for locations
+The figure looks almost identical to the the frequent predictions (Figure \@ref(fig:p1nb-glmFig)). Comparisons of all TR estimates, coefficient estimates, and predicted moth counts  can be found at the end of the page (Section \@ref(compareTR)).
 
-The first fix we make to the model is acknowledging that overall average  moth pressure varies from location to location (see Fig 1 of moth counts). To make this fix, we add a location random effect (RE) and our model becomes a generalized linear mixed-effects model (GLMM or GLMER).
+## GLMM: Random effects (RE) for locations {#fit-glmmR}
+
+The first fix we make to the model is acknowledging that overall average  moth pressure varies from location to location (see Fig \@ref(fig:mothctsFig) of moth counts). To make this fix, we add a location random effect (RE) and our model becomes a generalized linear mixed-effects model (GLMM or GLMER).
 
 We also want to acknowledge that the treatment effect may vary from location to location-- sometimes we see a big difference in moth counts between control and treatment fields, and sometimes the difference is smaller. For inference though, we are only interested in the larger picture, which is the overall trapping reduction. (We are not interested in what happens at these exact locations per se, we are more interested in the average treatment effect.) Therefore, we also add a treatment random effect.
 
+See Section \@ref(glmm) for the associated mathematical models.
 
-### GLMM frequentist fit
+### GLMM Poisson fit
 
 A couple of notes here. R always gets mad when you ask for SE's for predictions from a GLMM. Technically, you need to run simulations to get them and then they still come with an asterisk related to their reliability. (This is a reason to use the Bayesian model-- credible intervals are never based on approximations!)
 
-When we plot our predictions, we see that we now have better estimates for the overall mean at each location, and we see how much they vary from location to location, but there is a strong temporal pattern at each location that we are missing.
+
 
 
 ``` r
@@ -537,6 +719,8 @@ mod2p <- glmer(nYSB ~ Treatment + (1 + Treatment|Location),
              offset = log(DaysOfCatch),
              family = poisson,
              data = datR)
+# summary(mod2p)$varcor # to get SD instead of var of RE's
+# summary(mod2p)$coef
 summary(mod2p)
 ```
 
@@ -575,14 +759,31 @@ summary(mod2p)
 
 ``` r
 TR_2p <- getTR(mod2p)
-knitr::kable(TR_2p)
+kable(TR_2p)  %>%
+  kable_styling(full_width = F)
 ```
 
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>(\#tab:pois2)(\#tab:pois2)Trapping reduction estimate for the Poisson GLMM model.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> TR </th>
+   <th style="text-align:right;"> lowerCI </th>
+   <th style="text-align:right;"> upperCI </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 84.9 </td>
+   <td style="text-align:right;"> 77.4 </td>
+   <td style="text-align:right;"> 89.9 </td>
+  </tr>
+</tbody>
+</table>
+
+When we plot our predictions, we see that we now have better estimates for the overall mean at each location, and we see how much they vary from location to location, but there is a strong temporal pattern at each location that we are missing in the model.
 
 
-|   TR| lowerCI| upperCI|
-|----:|-------:|-------:|
-| 84.9|    77.4|    89.9|
 
 ``` r
 tmp = predict(mod2p, se = T, type = "link",
@@ -598,15 +799,14 @@ preds2p %<>%
          upperCI = exp(upperCI))
 # str(predsp2)
 
-p2p_glmm = predplot(preds2p, "Poisson GLMM (Location) predictions")
+p2p_glmm = predplot(preds2p, "Poisson GLMM predictions")
 print(p2p_glmm)
 ```
 
-<img src="02-GLMMsInR_files/figure-html/pois2-1.png" width="100%" />
+<img src="02-GLMMsInR_files/figure-html/p2p-glmmFig-1.png" width="100%" />
 
-``` r
-# print(p2p_glmm)
-```
+### GLMM neg binom fit
+
 
 ``` r
 mod2nb <- glmer.nb(nYSB ~ Treatment + (1 + Treatment|Location), 
@@ -650,14 +850,28 @@ summary(mod2nb)
 
 ``` r
 TR_2nb <- getTR(mod2nb)
-knitr::kable(TR_2nb)
+kable(TR_2nb, caption = "Trapping reduction estimate for the Poisson GLMM model.")  %>%
+  kable_styling(full_width = F)
 ```
 
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>(\#tab:nb2)(\#tab:nb2)Trapping reduction estimate for the Poisson GLMM model.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> TR </th>
+   <th style="text-align:right;"> lowerCI </th>
+   <th style="text-align:right;"> upperCI </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 85 </td>
+   <td style="text-align:right;"> 77.7 </td>
+   <td style="text-align:right;"> 89.9 </td>
+  </tr>
+</tbody>
+</table>
 
-
-| TR| lowerCI| upperCI|
-|--:|-------:|-------:|
-| 85|    77.7|    89.9|
 
 ``` r
 tmp = predict(mod2nb, se = T, type = "link",
@@ -673,21 +887,23 @@ preds2nb %<>%
          upperCI = exp(upperCI))
 # str(predsnb2)
 
-p2nb_glmm = predplot(preds2nb, "Neg. binomial GLMM (Location) predictions")
+p2nb_glmm = predplot(preds2nb, "NB GLMM predictions")
 print(p2nb_glmm)
 ```
 
-<img src="02-GLMMsInR_files/figure-html/nb2-1.png" width="100%" />
+<div class="figure">
+<img src="02-GLMMsInR_files/figure-html/p2nb-glmmFig-1.png" alt="NB GLMM moth count predictions." width="100%" />
+<p class="caption">(\#fig:p2nb-glmmFig)NB GLMM moth count predictions.</p>
+</div>
 
 
 ### GLMM Bayesian fit
 
-By default, the prior distributions of random slopes and intercepts are correlated in `brm`, which matches the "GLMM" frequentist fit. If the correlation is non-significant, you may want to remove that correlation to simplify your model. To remove the correlation, change the random effects term from "(1 + TreatmentF|Location)" to " (1 + TreatmentF||Location)" (has an extra vertical line), which makes them independent. 
-
-You'll notice that the parameter estimates are slightly different from the frequentist NB model fit here-- the more complicated your model is, the more likely you will find this is true with slightly different versions of your model (here, adding priors and fitting with a different algorithm). 
+By default, the prior distributions of random slopes and intercepts are correlated in `brm`, which matches the `GLMM` frequentist fit. If the correlation is non-significant, you may want to remove that correlation to simplify your model. To remove the correlation, change the random effects term from `(1 + TreatmentF|Location)` to `(1 + TreatmentF||Location)` (has an extra vertical line), which makes them independent. 
 
 
 ``` r
+##not run
 brm2nb <- brm(formula = nYSB ~ Treatment + offset(log(DaysOfCatch)) + 
                     (1 + Treatment|Location),
               data = datR, 
@@ -705,55 +921,52 @@ saveRDS(brm2nb, "output/brm2nb.RDS")
 
 ``` r
 brm2nb <- readRDS("output/brm2nb.RDS")
-# prior_summary(brm2nb) # we did not change the default prior for the RE correlation
-# 
-summary(brm2nb)
+# summary(brm2nb)
 ```
 
-```
-##  Family: negbinomial 
-##   Links: mu = log; shape = identity 
-## Formula: nYSB ~ Treatment + offset(log(DaysOfCatch)) + (1 + Treatment | Location) 
-##    Data: datR (Number of observations: 672) 
-##   Draws: 6 chains, each with iter = 2000; warmup = 500; thin = 1;
-##          total post-warmup draws = 9000
-## 
-## Multilevel Hyperparameters:
-## ~Location (Number of levels: 10) 
-##                             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-## sd(Intercept)                   1.32      0.32     0.84     2.10 1.00     2355
-## sd(TreatmentTrt)                0.69      0.19     0.40     1.13 1.00     2984
-## cor(Intercept,TreatmentTrt)    -0.61      0.22    -0.90    -0.07 1.00     4009
-##                             Tail_ESS
-## sd(Intercept)                   3331
-## sd(TreatmentTrt)                4589
-## cor(Intercept,TreatmentTrt)     5301
-## 
-## Regression Coefficients:
-##              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## Intercept        0.82      0.42    -0.03     1.67 1.00     2407     3221
-## TreatmentTrt    -1.88      0.23    -2.34    -1.41 1.00     3513     4646
-## 
-## Further Distributional Parameters:
-##       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## shape     1.53      0.10     1.35     1.73 1.00     9290     6869
-## 
-## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
-## and Tail_ESS are effective sample size measures, and Rhat is the potential
-## scale reduction factor on split chains (at convergence, Rhat = 1).
-```
+You'll notice that the parameter estimates are slightly different from the frequentist NB model fit here-- the more complicated your model is, the more likely you will find this is true with slightly different versions of your model (here, adding priors and fitting with a different algorithm). 
+
+
+Table: (\#tab:compareCoef2nb)Coefficient estimates from the Bayesian GLMM.
+
+|             | Estimate| Est.Error| l-95% CI| u-95% CI|
+|:------------|--------:|---------:|--------:|--------:|
+|Intercept    |    0.824|     0.423|   -0.026|    1.666|
+|TreatmentTrt |   -1.885|     0.229|   -2.341|   -1.415|
+
+
+
+Table: (\#tab:compareCoef2nb)Coefficient estimates from the frequentist GLMM.
+
+|             | Estimate| Std. Error| z value| Pr(>&#124;z&#124;)|
+|:------------|--------:|----------:|-------:|------------------:|
+|(Intercept)  |    0.826|      0.378|   2.184|              0.029|
+|TreatmentTrt |   -1.899|      0.203|  -9.340|              0.000|
+
+Table: (\#tab:compareShape2nb)Shape parameter estimate from the Bayesian GLMM
+
+|      | Estimate| Est.Error| l-95% CI| u-95% CI|
+|:-----|--------:|---------:|--------:|--------:|
+|shape |    1.533|     0.098|    1.349|     1.73|
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>(\#tab:compareShape2nb)(\#tab:compareShape2nb)Shape parameter estimate from the frequentist GLMM</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> x </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> 1.5338 </td>
+  </tr>
+</tbody>
+</table>
+
 
 ``` r
-# summary(mod2nb)
-```
-
-
-``` r
-# CALC TR:
+## Calc TR for later comparison
 modtransformed <- ggs(brm2nb) # transform MCMC output into a table
-# head(modtransformed)
-# summary(modtransformed)
-# unique(modtransformed$Parameter)
 beta1 <- modtransformed %>% 
   filter(Parameter == "b_TreatmentTrt", # our beta1
          Iteration > 500) # remove burn-in
@@ -761,30 +974,50 @@ TR = 100 * (1 - exp(beta1$value))
 bayesTR_2nb <- data.frame(TR = round(median(TR), 1), 
            lowerCI = round(quantile(TR, 0.025), 1),
           upperCI = round(quantile(TR, 0.975), 1))   
-knitr::kable(bayesTR_2nb)
+row.names(bayesTR_2nb) = NULL
+kable(bayesTR_2nb, caption = "Trapping reduction estimate for the negative binomial GLMM model.")  %>%
+  kable_styling(full_width = F)
 ```
 
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>(\#tab:TRBayes2nb)(\#tab:TRBayes2nb)Trapping reduction estimate for the negative binomial GLMM model.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> TR </th>
+   <th style="text-align:right;"> lowerCI </th>
+   <th style="text-align:right;"> upperCI </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 84.8 </td>
+   <td style="text-align:right;"> 75.7 </td>
+   <td style="text-align:right;"> 90.4 </td>
+  </tr>
+</tbody>
+</table>
 
-
-|     |   TR| lowerCI| upperCI|
-|:----|----:|-------:|-------:|
-|2.5% | 84.8|    75.7|    90.4|
 
 ``` r
-# plot predictions:
-predsbrm <- fitted(brm2nb,
-                   scale = "linear",
-                   newdata = datR  %>% mutate(logDaysOfCatch = 0))  
+## plot predictions:
+predsbrm2nb <- fitted(brm2nb,
+                       scale = "linear",
+                        newdata = datR  %>% mutate(DaysOfCatch = 1))   
 
-bayes_p2nb = brmspredplot(cbind(datR, exp(predsbrm)), 
-                          "Bayesian neg. binomial GLMM (Location) predictions")
+bayes_p2nb = brmspredplot(cbind(datR, exp(predsbrm2nb)), 
+                          plottitle = "Bayes NB GLMM predictions")
 print(bayes_p2nb)
 ```
 
-<img src="02-GLMMsInR_files/figure-html/unnamed-chunk-4-1.png" width="100%" />
+<div class="figure">
+<img src="02-GLMMsInR_files/figure-html/pBayes2nb-Fig-1.png" alt="Bayesian negative binomial GLM predictions." width="100%" />
+<p class="caption">(\#fig:pBayes2nb-Fig)Bayesian negative binomial GLM predictions.</p>
+</div>
+
+Again, the figure looks almost identical to the the frequent predictions (Figure \@ref(fig:p2nb-glmmFig)). 
 
 
-## GLMM: RE for Location, SamplingDate
+## GLMM: RE for Location, SamplingDate {#fit-glmm-datesR}
 
 In this version of the model, we acknowledge that sampling on different days of the season adds to the variability of the moth counts, and that counts from the same sampling date are more similar than for a different date. In this model, however,  the correlation between sampling dates is ignored.
 
@@ -796,7 +1029,11 @@ Include dates because samples within a date will be more similar than samples ac
 
 The predictions now mimic the spatial patterns we see over time.
 
-### Crossed GLMM frequentist fit
+See Section \@ref(glmm-dates) for the associated mathematical models.
+
+### Crossed Poisson GLMM fit
+
+Summary output not shown for increased readability.
 
 
 ``` r
@@ -806,10 +1043,32 @@ mod3p <- glmer(nYSB ~ Treatment  +
              offset = log(DaysOfCatch),
              family = poisson,
              data = datR)
-summary(mod3p)
+# summary(mod3p)
 TR_3p <- getTR(mod3p)
-knitr::kable(TR_3p)
+kable(TR_3p)  %>%
+  kable_styling(full_width = F)
+```
 
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>(\#tab:pois3)(\#tab:pois3)Trapping reduction estimate for the Crossed Poisson GLMM model.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> TR </th>
+   <th style="text-align:right;"> lowerCI </th>
+   <th style="text-align:right;"> upperCI </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 81.3 </td>
+   <td style="text-align:right;"> 72.7 </td>
+   <td style="text-align:right;"> 87.2 </td>
+  </tr>
+</tbody>
+</table>
+
+
+``` r
 tmp = predict(mod3p, se = T, type = "link",
               newdata = datR %>% mutate(DaysOfCatch = 1))
 # str(tmp)
@@ -823,24 +1082,48 @@ preds3p %<>%
          upperCI = exp(upperCI))
 # str(predsp3)
 
-
-p3p_glmm = predplot(preds3p, "Poisson GLMM (Location, Date) predictions")
+p3p_glmm = predplot(preds3p, "Poisson crossed GLMM predictions")
 print(p3p_glmm)
 ```
 
-<img src="02-GLMMsInR_files/figure-html/pois3-1.png" width="100%" />
+<img src="02-GLMMsInR_files/figure-html/p3p-glmmFig-1.png" width="100%" />
+
+### Crossed NB GLMM fit
+
+Summary output not shown for increased readability.
+
 
 ``` r
-# too slow!
 mod3nb <- glmer.nb(nYSB ~ Treatment  +
                       (1 + Treatment|Location) + 
                  (1|SamplingDateC), 
              offset = log(DaysOfCatch),
              data = datR)
-summary(mod3nb)
+# summary(mod3nb)
 TR_3nb <- getTR(mod3nb)
-knitr::kable(TR_3nb)
+kable(TR_3nb)  %>%
+  kable_styling(full_width = F)
+```
 
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>(\#tab:nb3)(\#tab:nb3)Trapping reduction estimate for the Crossed Poisson GLMM model.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> TR </th>
+   <th style="text-align:right;"> lowerCI </th>
+   <th style="text-align:right;"> upperCI </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 82.9 </td>
+   <td style="text-align:right;"> 74.9 </td>
+   <td style="text-align:right;"> 88.4 </td>
+  </tr>
+</tbody>
+</table>
+
+``` r
 tmp = predict(mod3nb, se = T, type = "link",
               newdata=datR %>% mutate(DaysOfCatch = 1))
 # str(tmp)
@@ -854,20 +1137,20 @@ preds3nb %<>%
          upperCI = exp(upperCI))
 # str(predsnb2)
 
-p3nb_glmm = predplot(preds3nb, "Neg. binomial GLMM (Location, Date) predictions")
+p3nb_glmm = predplot(preds3nb, "NB crossed GLMM predictions")
 print(p3nb_glmm)
 ```
 
-<img src="02-GLMMsInR_files/figure-html/nb3-1.png" width="100%" />
+<img src="02-GLMMsInR_files/figure-html/p3nb-glmmFig-1.png" width="100%" />
 
-### Crossed GLMM Bayes (brms) version
+### Crossed Bayes GLMM fit
 
 
 ``` r
+##not run
 brm3nb <- brm(formula = nYSB ~ Treatment + offset(log(DaysOfCatch)) + 
                     (1 + Treatment|Location) + 
                     (1|SamplingDateC),
-                    # (1|Location:SamplingDateC),
               data = datR, 
               family = negbinomial,
               prior = c(set_prior("normal(0,2)", class = "b"),
@@ -882,53 +1165,48 @@ saveRDS(brm3nb, "output/brm3nb.RDS")
 
 ``` r
 brm3nb <- readRDS("output/brm3nb.RDS")
-# prior_summary(brm3nb, all = FALSE)
-# print(prior_summary(brm3nb, all = FALSE), show_df = FALSE)
-
-summary(brm3nb)
+# summary(brm3nb)
 ```
 
-```
-##  Family: negbinomial 
-##   Links: mu = log; shape = identity 
-## Formula: nYSB ~ Treatment + offset(log(DaysOfCatch)) + (1 + Treatment | Location) + (1 | SamplingDateC) 
-##    Data: datR (Number of observations: 672) 
-##   Draws: 6 chains, each with iter = 2000; warmup = 500; thin = 1;
-##          total post-warmup draws = 9000
-## 
-## Multilevel Hyperparameters:
-## ~Location (Number of levels: 10) 
-##                             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-## sd(Intercept)                   1.16      0.30     0.74     1.90 1.00     2611
-## sd(TreatmentTrt)                0.65      0.18     0.38     1.10 1.00     3469
-## cor(Intercept,TreatmentTrt)    -0.58      0.23    -0.90    -0.02 1.00     3688
-##                             Tail_ESS
-## sd(Intercept)                   4087
-## sd(TreatmentTrt)                5126
-## cor(Intercept,TreatmentTrt)     4813
-## 
-## ~SamplingDateC (Number of levels: 62) 
-##               Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## sd(Intercept)     0.67      0.08     0.53     0.85 1.00     2345     4284
-## 
-## Regression Coefficients:
-##              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## Intercept        0.64      0.38    -0.10     1.38 1.00     1745     2463
-## TreatmentTrt    -1.75      0.23    -2.20    -1.28 1.00     2374     3383
-## 
-## Further Distributional Parameters:
-##       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## shape     2.58      0.22     2.17     3.03 1.00     8941     6216
-## 
-## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
-## and Tail_ESS are effective sample size measures, and Rhat is the potential
-## scale reduction factor on split chains (at convergence, Rhat = 1).
-```
+Again, the parameter estimates from the Bayesian and frequentist frameworks vary slightly.
 
-``` r
-# summary(mod3nb)
-# 
-```
+
+Table: (\#tab:compareCoef3nb)Coefficient estimates from the Bayesian framework for the crossed GLMM.
+
+|             | Estimate| Est.Error| l-95% CI| u-95% CI|
+|:------------|--------:|---------:|--------:|--------:|
+|Intercept    |    0.642|     0.375|   -0.102|    1.378|
+|TreatmentTrt |   -1.748|     0.229|   -2.203|   -1.278|
+
+
+
+Table: (\#tab:compareCoef3nb)Coefficient estimates from the frequentist framework for the crossed GLMM.
+
+|             | Estimate| Std. Error| z value| Pr(>&#124;z&#124;)|
+|:------------|--------:|----------:|-------:|------------------:|
+|(Intercept)  |    0.632|      0.342|   1.846|              0.065|
+|TreatmentTrt |   -1.767|      0.195|  -9.040|              0.000|
+
+Table: (\#tab:compareShape3nb)Shape parameter estimate from the Bayesian framework.
+
+|      | Estimate| Est.Error| l-95% CI| u-95% CI|
+|:-----|--------:|---------:|--------:|--------:|
+|shape |    2.577|     0.218|    2.174|    3.033|
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>(\#tab:compareShape3nb)(\#tab:compareShape3nb)Shape parameter estimate from the frequentist framework.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> x </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> 2.5826 </td>
+  </tr>
+</tbody>
+</table>
+
 
 
 ``` r
@@ -941,29 +1219,59 @@ TR = 100 * (1 - exp(beta1$value))
 bayesTR_3nb <- data.frame(TR = round(median(TR), 1), 
            lowerCI = round(quantile(TR, 0.025), 1),
           upperCI = round(quantile(TR, 0.975), 1))   
-# knitr::kable(bayesTR_3nb)
+kable(bayesTR_3nb)  %>%
+  kable_styling(full_width = F)
+```
 
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>(\#tab:TRBayes3nb)(\#tab:TRBayes3nb)Trapping reduction estimate for the negative binomial GLMM model.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;">  </th>
+   <th style="text-align:right;"> TR </th>
+   <th style="text-align:right;"> lowerCI </th>
+   <th style="text-align:right;"> upperCI </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> 2.5% </td>
+   <td style="text-align:right;"> 82.6 </td>
+   <td style="text-align:right;"> 72.1 </td>
+   <td style="text-align:right;"> 89 </td>
+  </tr>
+</tbody>
+</table>
+
+
+``` r
 # plot predictions:
 predsbrm <- fitted(brm3nb,
                    scale = "linear",
                    newdata = datR  %>% mutate(DaysOfCatch = 1))
 
 bayes_p3nb = brmspredplot(cbind(datR, exp(predsbrm)), 
-                          "Bayesian Poisson GLMM (Location, Date) predictions")
+                          "Bayes crossed GLMM predictions")
 print(bayes_p3nb)
 ```
 
-<img src="02-GLMMsInR_files/figure-html/unnamed-chunk-7-1.png" width="100%" />
+<div class="figure">
+<img src="02-GLMMsInR_files/figure-html/pBayes3nb-Fig-1.png" alt="Bayesian crossed NB GLMM predictions." width="100%" />
+<p class="caption">(\#fig:pBayes3nb-Fig)Bayesian crossed NB GLMM predictions.</p>
+</div>
 
 
-## GLMM with Gaussian Processes: RE for Trial, GP for Date
+## GLMM with Gaussian Processes: RE for Trial, GP for Date {#fit-glmm-gpR}
 
 Now we are in the territory where we have to fit the models in a Bayesian framework. If our response variable was continuous (i.e., the regression model was based on a Normal distribution), then we could still use maximum likelihood estimation.
 
+See Section \@ref(glmm-gp) for the associated mathematical models.
 
-### Gaussian Process Bayes (brms) version
+### Gaussian Process Bayes GLMM fit
 
-* Use numeric version of sampling date for better algorithm stability. Still, we have a warning about a divergent transition. Ideally, we would tweak the model and look at the data carefully so fix this warning, but because we are working with made up data, we will not worry about the warning for now.
+* Use numeric version of sampling date for better algorithm stability. To obtain a numeric date, we use DATI-- days after trap installation-- to quantify time.
+
+* We have a warning about a divergent transition. Ideally, we would tweak the model and look at the data carefully so fix this warning, but because we are working with made up data, we will not worry about the warning for now.
 
 * Using squared-exponential covariance function (quite typical choice).
 
@@ -971,7 +1279,7 @@ Now we are in the territory where we have to fit the models in a Bayesian framew
 
 
 ``` r
-# summary(datR$numericDate) # check max before fitting, in case seasons don't line up
+## not run:
 brm4nb <- brm(formula = nYSB ~ Treatment + offset(log(DaysOfCatch)) + 
                     (1 + Treatment|Location) + 
               gp(DATI, by =Location), 
@@ -1002,228 +1310,15 @@ brm4nb <- brm(formula = nYSB ~ Treatment + offset(log(DaysOfCatch)) +
 saveRDS(brm4nb, "output/brm4nb.RDS")
 ```
 
-``` r
-summary(datR$numericDate) # check max before fitting, in case seasons don't line up
-brm4nb1gp <- brm(formula = nYSB ~ Treatment + offset(log(DaysOfCatch)) + 
-                    (1 + Treatment|Location) + 
-              gp(DATI), 
-                  control = list(adapt_delta = 0.9),
-              data = datR, 
-              family = negbinomial,
-              prior = c(set_prior("normal(0,2)", class = "b"),
-                        set_prior("cauchy(0,1)", class = "shape"), # == half-cauchy
-                        set_prior("normal(0,2)", class = "Intercept"),
-                        set_prior("cauchy(0,1)", class = "sd"),
-                        set_prior("cauchy(0,1)", class = "lscale", coef = "gpDATI"),
-                        set_prior("normal(0,2)", class = "sdgp")),
-                        # set_prior("lkj(2)", class = "cor")),
-              warmup = 1000, iter = 5000, 
-              seed = 5000,
-              chains = nCores, cores = nCores) 
-saveRDS(brm4nb1gp, "output/brm4nb1GP.RDS")
-# brm4nb = brm4nb1gp
-```
 
 
 ``` r
 brm4nb <- readRDS("output/brm4nb.RDS")
-summary(brm4nb)
-```
-
-```
-##  Family: negbinomial 
-##   Links: mu = log; shape = identity 
-## Formula: nYSB ~ Treatment + offset(log(DaysOfCatch)) + (1 + Treatment | Location) + gp(DATI, by = Location) 
-##    Data: datR (Number of observations: 672) 
-##   Draws: 6 chains, each with iter = 5000; warmup = 1000; thin = 1;
-##          total post-warmup draws = 24000
-## 
-## Gaussian Process Hyperparameters:
-##                             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-## sdgp(gpDATILocationLoc1)        1.08      0.61     0.40     2.71 1.00     9206
-## sdgp(gpDATILocationLoc10)       1.32      0.62     0.55     2.93 1.00     7887
-## sdgp(gpDATILocationLoc2)        0.90      0.44     0.39     2.03 1.00     6682
-## sdgp(gpDATILocationLoc3)        1.06      0.84     0.07     3.26 1.00     8235
-## sdgp(gpDATILocationLoc4)        1.35      0.96     0.07     3.69 1.00    10138
-## sdgp(gpDATILocationLoc5)        1.30      0.54     0.62     2.70 1.00     7744
-## sdgp(gpDATILocationLoc6)        0.98      0.85     0.04     3.23 1.00    10711
-## sdgp(gpDATILocationLoc7)        1.22      0.30     0.78     1.93 1.00     6871
-## sdgp(gpDATILocationLoc8)        1.33      0.90     0.28     3.67 1.00     4363
-## sdgp(gpDATILocationLoc9)        1.04      0.38     0.54     1.98 1.00     6521
-## lscale(gpDATILocationLoc1)      0.24      0.09     0.08     0.42 1.00     5619
-## lscale(gpDATILocationLoc10)     0.19      0.07     0.02     0.32 1.00     5266
-## lscale(gpDATILocationLoc2)      0.10      0.09     0.01     0.32 1.00     3425
-## lscale(gpDATILocationLoc3)      3.45     31.07     0.04    14.84 1.00     3694
-## lscale(gpDATILocationLoc4)     12.27    271.18     0.31    39.77 1.00    10892
-## lscale(gpDATILocationLoc5)      0.12      0.06     0.02     0.28 1.00     2889
-## lscale(gpDATILocationLoc6)      7.85     72.69     0.13    37.99 1.00    11351
-## lscale(gpDATILocationLoc7)      0.01      0.00     0.00     0.02 1.00     6367
-## lscale(gpDATILocationLoc8)      1.30      1.71     0.02     4.82 1.00     1835
-## lscale(gpDATILocationLoc9)      0.02      0.03     0.00     0.12 1.00     5034
-##                             Tail_ESS
-## sdgp(gpDATILocationLoc1)       15405
-## sdgp(gpDATILocationLoc10)      13181
-## sdgp(gpDATILocationLoc2)       10580
-## sdgp(gpDATILocationLoc3)        8560
-## sdgp(gpDATILocationLoc4)        8240
-## sdgp(gpDATILocationLoc5)       12368
-## sdgp(gpDATILocationLoc6)       11349
-## sdgp(gpDATILocationLoc7)       11682
-## sdgp(gpDATILocationLoc8)       10785
-## sdgp(gpDATILocationLoc9)       10631
-## lscale(gpDATILocationLoc1)      5595
-## lscale(gpDATILocationLoc10)     4535
-## lscale(gpDATILocationLoc2)      2379
-## lscale(gpDATILocationLoc3)      4533
-## lscale(gpDATILocationLoc4)     11046
-## lscale(gpDATILocationLoc5)      2612
-## lscale(gpDATILocationLoc6)      6231
-## lscale(gpDATILocationLoc7)      9780
-## lscale(gpDATILocationLoc8)      4201
-## lscale(gpDATILocationLoc9)      1833
-## 
-## Multilevel Hyperparameters:
-## ~Location (Number of levels: 10) 
-##                             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-## sd(Intercept)                   1.01      0.36     0.43     1.86 1.00     6783
-## sd(TreatmentTrt)                0.70      0.20     0.42     1.18 1.00    10106
-## cor(Intercept,TreatmentTrt)    -0.59      0.27    -0.95     0.07 1.00     6570
-##                             Tail_ESS
-## sd(Intercept)                   7144
-## sd(TreatmentTrt)               14365
-## cor(Intercept,TreatmentTrt)     7931
-## 
-## Regression Coefficients:
-##              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## Intercept        0.76      0.41    -0.08     1.55 1.00     7087    10696
-## TreatmentTrt    -1.81      0.23    -2.27    -1.34 1.00    10126    12953
-## 
-## Further Distributional Parameters:
-##       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## shape     3.40      0.31     2.83     4.04 1.00    13133    15442
-## 
-## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
-## and Tail_ESS are effective sample size measures, and Rhat is the potential
-## scale reduction factor on split chains (at convergence, Rhat = 1).
-```
-
-``` r
+# summary(brm4nb)
 # bayes_R2(brm4nb) # 0.824
 
-prior_summary(brm4nb)
-```
-
-```
-##                 prior     class                coef    group resp dpar nlpar lb
-##           normal(0,2)         b                                                
-##           normal(0,2)         b        TreatmentTrt                            
-##           normal(0,2) Intercept                                                
-##  lkj_corr_cholesky(1)         L                                                
-##  lkj_corr_cholesky(1)         L                     Location                   
-##                (flat)    lscale                                               0
-##           cauchy(0,1)    lscale  gpDATILocationLoc1                           0
-##           cauchy(0,1)    lscale gpDATILocationLoc10                           0
-##           cauchy(0,1)    lscale  gpDATILocationLoc2                           0
-##           cauchy(0,1)    lscale  gpDATILocationLoc3                           0
-##           cauchy(0,1)    lscale  gpDATILocationLoc4                           0
-##           cauchy(0,1)    lscale  gpDATILocationLoc5                           0
-##           cauchy(0,1)    lscale  gpDATILocationLoc6                           0
-##           cauchy(0,1)    lscale  gpDATILocationLoc7                           0
-##           cauchy(0,1)    lscale  gpDATILocationLoc8                           0
-##           cauchy(0,1)    lscale  gpDATILocationLoc9                           0
-##           cauchy(0,1)        sd                                               0
-##           cauchy(0,1)        sd                     Location                  0
-##           cauchy(0,1)        sd           Intercept Location                  0
-##           cauchy(0,1)        sd        TreatmentTrt Location                  0
-##           normal(0,2)      sdgp                                               0
-##           normal(0,2)      sdgp  gpDATILocationLoc1                           0
-##           normal(0,2)      sdgp gpDATILocationLoc10                           0
-##           normal(0,2)      sdgp  gpDATILocationLoc2                           0
-##           normal(0,2)      sdgp  gpDATILocationLoc3                           0
-##           normal(0,2)      sdgp  gpDATILocationLoc4                           0
-##           normal(0,2)      sdgp  gpDATILocationLoc5                           0
-##           normal(0,2)      sdgp  gpDATILocationLoc6                           0
-##           normal(0,2)      sdgp  gpDATILocationLoc7                           0
-##           normal(0,2)      sdgp  gpDATILocationLoc8                           0
-##           normal(0,2)      sdgp  gpDATILocationLoc9                           0
-##           cauchy(0,1)     shape                                               0
-##  ub       source
-##             user
-##     (vectorized)
-##             user
-##          default
-##     (vectorized)
-##          default
-##             user
-##             user
-##             user
-##             user
-##             user
-##             user
-##             user
-##             user
-##             user
-##             user
-##             user
-##     (vectorized)
-##     (vectorized)
-##     (vectorized)
-##             user
-##     (vectorized)
-##     (vectorized)
-##     (vectorized)
-##     (vectorized)
-##     (vectorized)
-##     (vectorized)
-##     (vectorized)
-##     (vectorized)
-##     (vectorized)
-##     (vectorized)
-##             user
-```
-
-``` r
-prior_summary(brm4nb, all = FALSE)
-```
-
-```
-##                 prior     class                coef group resp dpar nlpar lb ub
-##           normal(0,2)         b                                                
-##           normal(0,2) Intercept                                                
-##  lkj_corr_cholesky(1)         L                                                
-##           cauchy(0,1)    lscale  gpDATILocationLoc1                            
-##           cauchy(0,1)    lscale gpDATILocationLoc10                            
-##           cauchy(0,1)    lscale  gpDATILocationLoc2                            
-##           cauchy(0,1)    lscale  gpDATILocationLoc3                            
-##           cauchy(0,1)    lscale  gpDATILocationLoc4                            
-##           cauchy(0,1)    lscale  gpDATILocationLoc5                            
-##           cauchy(0,1)    lscale  gpDATILocationLoc6                            
-##           cauchy(0,1)    lscale  gpDATILocationLoc7                            
-##           cauchy(0,1)    lscale  gpDATILocationLoc8                            
-##           cauchy(0,1)    lscale  gpDATILocationLoc9                            
-##           cauchy(0,1)        sd                                            0   
-##           normal(0,2)      sdgp                                            0   
-##           cauchy(0,1)     shape                                            0   
-##   source
-##     user
-##     user
-##  default
-##     user
-##     user
-##     user
-##     user
-##     user
-##     user
-##     user
-##     user
-##     user
-##     user
-##     user
-##     user
-##     user
-```
-
-``` r
+# prior_summary(brm4nb)
+# prior_summary(brm4nb, all = FALSE)
 # 
 ```
 
@@ -1238,14 +1333,16 @@ TR = 100 * (1 - exp(beta1$value))
 bayesTR_4nb <- data.frame(TR = round(median(TR), 1), 
            lowerCI = round(quantile(TR, 0.025), 1),
           upperCI = round(quantile(TR, 0.975), 1))   
-knitr::kable(bayesTR_4nb)
+row.names(bayesTR_4nb) = NULL
+kable(bayesTR_4nb)
 ```
 
 
 
-|     |   TR| lowerCI| upperCI|
-|:----|----:|-------:|-------:|
-|2.5% | 83.7|    73.8|    89.7|
+|   TR| lowerCI| upperCI|
+|----:|-------:|-------:|
+| 83.7|    73.8|    89.7|
+
 
 ``` r
 # plot predictions:
@@ -1262,63 +1359,17 @@ predsbrm <- fitted(brm4nb,
 # Give it a try!)
 
 bayes_p4nb = brmspredplot(cbind(datR, exp(predsbrm)), 
-                          "Bayesian neg binomial GP GLMM predictions")
+                          "Bayes NB GP GLMM predictions")
 print(bayes_p4nb)
 ```
 
-<img src="02-GLMMsInR_files/figure-html/unnamed-chunk-11-1.png" width="100%" />
+<img src="02-GLMMsInR_files/figure-html/pBayes4nb-Fig-1.png" width="100%" />
 
 ## Summary of estimates
 
 ### Compare TR estimates {#compareTR}
 
 Here, the trapping reduction estimates from all of the models are compared. As expected, the median TR estimates are very close from model to model, but the uncertainty in that estimate increase (i.e., the confidence/credible intervals get wider) when we properly account for the correlations in our data.
-
-
-``` r
-# Framework = Frequentist, Bayes
-# Distribtuion = Poisson, NB
-# Model name: GLM, GLMM (Location), GLMM (Location, nested dates), GLMM (Location, GP for correlated dates)
-# Model description?
-# TR
-# lower CI (2.5%)
-# upper CI (97.5%)
-tableTR = bind_rows(
-data.frame(Framework = "Frequentist", Distribution = "Poisson", Model_name = "GLM",
-      round(TR_1p)),
-data.frame(Framework = "Frequentist", Distribution = "Neg Binomial", Model_name = "GLM",
-      round(TR_1nb)),
-data.frame(Framework = "Bayesian", Distribution = "Neg Binomial", Model_name = "GLM",
-      round(bayesTR_1nb)),
-
-data.frame(Framework = "Frequentist", Distribution = "Poisson", Model_name = "GLMM (Location)",
-      round(TR_2p)),
-data.frame(Framework = "Frequentist", Distribution = "Neg Binomial", Model_name = "GLMM (Location)",
-      round(TR_2nb)),
-data.frame(Framework = "Bayesian", Distribution = "Neg Binomial", Model_name = "GLMM (Location)",
-      round(bayesTR_2nb)),
-
-data.frame(Framework = "Frequentist", Distribution = "Poisson", Model_name = "GLMM (Location, nested Date)",
-      round(TR_3p)),
-data.frame(Framework = "Frequentist", Distribution = "Neg Binomial", Model_name = "GLMM (Location, nested Date)",
-      round(TR_3nb)),
-data.frame(Framework = "Bayesian", Distribution = "Neg Binomial", Model_name = "GLMM (Location, nested Date)",
-      round(bayesTR_3nb)),
-
-data.frame(Framework = "Bayesian", Distribution = "Neg Binomial", Model_name = "GLMM (Location, Gaussian Process Date)",
-      round(bayesTR_4nb))
-)
-rownames(tableTR) <- NULL
-kable(tableTR, booktabs = TRUE,
-             caption = "Comparison of derived TR estimates from each model fit.") %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))  %>%
-  # column_spec(4, 
-  #             background = "lightblue")  %>%
-  pack_rows("GLM", 1, 3) %>%
-  pack_rows("GLMM (Location)", 4, 6) %>%
-  pack_rows("GLMM (Location, Date)", 7, 9) %>%
-  pack_rows("GLMM (Location, GP)", 10, 10)
-```
 
 <table class="table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:compareTR)(\#tab:compareTR)Comparison of derived TR estimates from each model fit.</caption>
@@ -1422,78 +1473,7 @@ kable(tableTR, booktabs = TRUE,
 
 ### Compare coefficients
 
-Because TR is a non-linear function of $\beta_1$, the differences int he model output get slightly distorted from the transformation. Thereofre, the $\beta_1$ coefficients are displayed as well:
-
-
-``` r
-# Framework = Frequentist, Bayes
-# Distribtuion = Poisson, NB
-# Model name: GLM, GLMM (Location), GLMM (Location, nested dates), GLMM (Location, GP for correlated dates)
-# Model description?
-# TR
-# lower CI (2.5%)
-# upper CI (97.5%)
-tableBeta = bind_rows(
-data.frame(Framework = "Frequentist", Distribution = "Poisson", 
-      Model_name = "GLM",
-      Estimate = round(summary(mod1p)$coefficients["TreatmentTrt", "Estimate"], 2),
-      SE = round(summary(mod1p)$coefficients["TreatmentTrt", "Std. Error"], 3)),
-
-data.frame(Framework = "Frequentist", Distribution = "Neg Binomial",
-           Model_name = "GLM",
-      Estimate = round(summary(mod1nb)$coefficients["TreatmentTrt", "Estimate"], 2),
-      SE = round(summary(mod1nb)$coefficients["TreatmentTrt", "Std. Error"], 3)),
-
-data.frame(Framework = "Bayesian", Distribution = "Neg Binomial", 
-           Model_name = "GLM",
-           Estimate = round(summary(brm1nb)$fixed["TreatmentTrt", "Estimate"], 2),
-      SE = round(summary(brm1nb)$fixed["TreatmentTrt", "Est.Error"], 3)),
-
-
-data.frame(Framework = "Frequentist", Distribution = "Poisson", 
-           Model_name = "GLMM (Location)",
-      Estimate = round(summary(mod2p)$coefficients["TreatmentTrt", "Estimate"], 2),
-      SE = round(summary(mod2p)$coefficients["TreatmentTrt", "Std. Error"], 3)),
-
-data.frame(Framework = "Frequentist", Distribution = "Neg Binomial",
-           Model_name = "GLMM (Location)",
-      Estimate = round(summary(mod2nb)$coefficients["TreatmentTrt", "Estimate"], 2),
-      SE = round(summary(mod2nb)$coefficients["TreatmentTrt", "Std. Error"], 3)),
-
-data.frame(Framework = "Bayesian", Distribution = "Neg Binomial", 
-           Model_name = "GLMM (Location)",
-           Estimate = round(summary(brm2nb)$fixed["TreatmentTrt", "Estimate"], 2),
-      SE = round(summary(brm2nb)$fixed["TreatmentTrt", "Est.Error"], 3)),
-
-
-data.frame(Framework = "Frequentist", Distribution = "Poisson", 
-           Model_name = "GLMM (Location, nested Date)",
-      Estimate = round(summary(mod3p)$coefficients["TreatmentTrt", "Estimate"], 2),
-      SE = round(summary(mod3p)$coefficients["TreatmentTrt", "Std. Error"], 3)),
-
-data.frame(Framework = "Frequentist", Distribution = "Neg Binomial",
-           Model_name = "GLMM (Location, nested Date)",
-      Estimate = round(summary(mod3nb)$coefficients["TreatmentTrt", "Estimate"], 2),
-      SE = round(summary(mod3nb)$coefficients["TreatmentTrt", "Std. Error"], 3)),
-
-data.frame(Framework = "Bayesian", Distribution = "Neg Binomial", Model_name = "GLMM (Location, nested Date)",
-           Estimate = round(summary(brm3nb)$fixed["TreatmentTrt", "Estimate"], 2),
-      SE = round(summary(brm3nb)$fixed["TreatmentTrt", "Est.Error"], 3)),
-
-data.frame(Framework = "Bayesian", Distribution = "Neg Binomial", Model_name = "GLMM (Location, Gaussian Process Date)",
-           Estimate = round(summary(brm4nb)$fixed["TreatmentTrt", "Estimate"], 2),
-      SE = round(summary(brm4nb)$fixed["TreatmentTrt", "Est.Error"], 3))
-)
-
-rownames(tableBeta) <- NULL
-knitr::kable(tableBeta, booktabs = TRUE,
-             caption = "Comparison of regression coefficient estimates from each model fit.")  %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))  %>%
-  pack_rows("GLM", 1, 3) %>%
-  pack_rows("GLMM (Location)", 4, 6) %>%
-  pack_rows("GLMM (Location, Date)", 7, 9) %>%
-  pack_rows("GLMM (Location, GP)", 10, 10)
-```
+Because TR is a non-linear function of $\beta_1$, the differences in the model output get slightly distorted from the transformation. Thereofre, the $\beta_1$ coefficients are displayed as well:
 
 <table class="table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:compareBetas)(\#tab:compareBetas)Comparison of regression coefficient estimates from each model fit.</caption>

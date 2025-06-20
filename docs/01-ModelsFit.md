@@ -4,7 +4,7 @@ These are the models fit to our data.
 
 For a good reference on additional details related to GLMM's, check [here] (https://bbolker.github.io/mixedmodels-misc/glmmFAQ).
 
-## Basic GLM models {#glm}
+## GLM models {#glm}
 
 The first model ignores all the spatial and temporal relationships in the data and assumes each data point is independent and identically distributed (_iid_). **This is not a good model for the data!** It is just our starting off point.
 
@@ -14,7 +14,7 @@ Our response variable is a count, therefore we use either a Poisson or negative 
  
 The model includes an offset to account for the varying time intervals between sample. (If the traps are left unchecked for more days, we naturally expect the traps to have more moths. This varying effort is accounted for by the offset.)
 
-See Section \@ref(fit_glm) for the associated model fits.
+See Section \@ref(fit-glmR) for the associated model fits in R.
 
 ### Poisson regression model
 
@@ -64,8 +64,6 @@ Here, small values for $\theta$ will lead to extra variability in the response v
 
 (https://cran.r-project.org/web/packages/pscl/vignettes/countreg.pdf)
 
-**MAKE SURE VARIANCE DEF MATCHES RESULTING SHAPE PARAM'S FROM MODEL FITS!!!**
-
 ### Bayesian model
 
 Using a Bayesian framework here builds the foundation for the more complex models that come later.
@@ -106,6 +104,9 @@ The first fix we make to the model is acknowledging that overall average moth po
 
 We also want to acknowledge that the treatment effect may vary from location to location-- sometimes we see a big difference in moth counts between control and treatment fields, and sometimes the difference is smaller. For inference though, we are only interested in the larger picture, which is the overall trapping reduction. (We are not interested in what happens at these exact locations per se, we are more interested in the average, expected treatment effect at a new location.) Therefore, we also add a treatment random effect to the model.
 
+See Section \@ref(fit-glmmR) for the associated model fits in R.
+
+
 ### GLMM mathematical model
 
 Going forward, I only show the negative binomial (NB) regression models, the Poisson versions are straightforward extensions.
@@ -134,7 +135,7 @@ $\gamma_{1k}$ is the random slope associated with location $k$, which leads to d
 
 $x_{ik}$ is an indicator variable that equals 1 if moth count $i$ is associated with location $k$ and 0 otherwise.
 
-The distributions for the $\gamma_{0k}$ and the $\gamma_{1k}$ are combined into a multivariate Normal distribution to reflect the correlation that exists between them. (The model may also be specified with uncorrelated intercept and slope, see [here](https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#model-specification))
+The distributions for the $\gamma_{0k}$ and the $\gamma_{1k}$ are combined into a multivariate Normal distribution to reflect the correlation that exists between them. (The model may also be specified with uncorrelated intercept and slope, see [here](https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#model-specification)).
 
 
 ### Bayesian version
@@ -146,23 +147,29 @@ Model:
 $$
 y_{ik}\sim NegBinom(\lambda_{ik}, \theta) \\
 log(\lambda_{ik} ) = \beta_0 + \beta_1 x_{Trt,i} + \gamma_{0k} x_{ik}  + \gamma_{1k} x_{Trt,i} x_{ik} + \mbox{ln} \left(DaysOfCatch_i\right) \\ 
-\boldsymbol\gamma_{k} \sim Normal(\mathbf{0}, \Sigma) \\
+\boldsymbol\gamma_{k} \sim Normal(\mathbf{0}, \Sigma_k) \\
 $$
 
-where $\Sigma = \begin{pmatrix}\sigma_0^2 & \rho \\\rho & \sigma_1^2 \end{pmatrix}$. With the following priors:
+<!-- $\Sigma = \begin{pmatrix}\sigma_0^2 & \rho \\\rho & \sigma_1^2 \end{pmatrix}$. -->
+
+where $\Sigma_k = D(\boldsymbol\sigma)\Omega D(\boldsymbol\sigma)$,
+$D(\boldsymbol\sigma) = \begin{pmatrix}\sigma_0^2 & 0 \\ 0 & \sigma_1^2 \end{pmatrix}$. 
+
+Priors:
 
 $$
 \boldsymbol\beta \sim Normal(\mathbf{0}, 2\mathbf{I}) \\
+\Omega \sim LKJ(\zeta = 1) \\
 \sigma^2_{0} \sim HalfCauchy(0,1) \\
 \sigma^2_{1} \sim HalfCauchy(0,1) \\
 \theta \sim HalfCauchy(0,1) \\
 $$
 
-**ADD PRIORS FOR RHO-- THE CORRELATION!!**
+In the `brms` package used to fit the models, the default setting is for the random effects to be correlated, which matches the `glmer`, `glmer.nb` functions from the `lme4` package, which is typically used to fit frequentist GLMM's in R, and is the model shown here. See the `brms` [vignette](https://cran.r-project.org/web/packages/brms/vignettes/brms_overview.pdf) for a description of the LKJ distribution. 
 
-In the packages that I use to fit the models, the default setting is for the random effects to be correlated, which matches the `glmer`, `glmer.nb` functions from the `lme4` package, which is typically used to fit frequentist GLMM's in R.
 
-Equivalently, the priors for the $\boldsymbol\beta$ coefficients can be written:
+
+The priors for the $\boldsymbol\beta$ coefficients can equivalently be written:
 
 $$
 \beta_0 \sim Normal(0, 2) \\
@@ -180,7 +187,7 @@ $$
 <!-- $$ -->
 
 
-## GLMM: RE for Location, SamplingDate {#glmm_datesC}
+## GLMM: RE for Location, SamplingDate {#glmm-dates}
 
 In this version of the model, we acknowledge that sampling on different days of the season adds to the variability of the moth counts, and that counts from the same sampling date are more similar than for a different date. In this model, however,  the correlation between sampling dates is ignored.
 
@@ -189,6 +196,8 @@ This model is included here because it is important to think about whether you h
 This model allows us to include sampling date in our model as a random effect and still fit the model quickly in a frequentist framework. 
 
 We include dates in our model because samples within a date will be more similar than samples across all dates at a location. We only include random intercepts, and do not add a random effect for date X treatment effect.
+
+See Section \@ref(fit-glmm-datesR) for the associated model fits in R.
 
 ### Frequentist version
 
@@ -203,7 +212,7 @@ where, in addition to the variables and parameters defined previously, we have
 
 $k = 1,..., K=10$ represents the locations, 
 
-$j = 1, ..., J = 117$ represents the 62 unique sampling dates,
+$j = 1, ..., J = 62$ represents the unique sampling dates,
 
 $y_{ikj}$ is moth count $i$ from location $k$ on date $j$,
 
@@ -232,16 +241,16 @@ Model:
 $$
 y_{ik}\sim NegBinom(\lambda_{ik}, \theta) \\
 log(\lambda_{ikj} ) = \beta_0 + \beta_1 x_{Trt,i} + \gamma_{0k} x_{ik}  + \gamma_{1k} x_{Trt,i} x_{ik}  + \gamma_{00j} x_{ij}  + \mbox{ln} \left(DaysOfCatch_i\right) \\
-\boldsymbol\gamma_{k} \sim Normal(\mathbf{0}, \Sigma) \\
+\boldsymbol\gamma_{k} \sim Normal(\mathbf{0}, \Sigma_k) \\
+\Sigma_k = \begin{pmatrix}\sigma_0^2 & 0 \\ 0 & \sigma_1^2 \end{pmatrix}\Omega \begin{pmatrix}\sigma_0^2 & 0 \\ 0 & \sigma_1^2 \end{pmatrix} \\
 \gamma_{00j} \sim Normal(0, \sigma^2_{00}) \\
 $$
-
-where $\Sigma = \begin{pmatrix}\sigma_0^2 & \rho \\\rho & \sigma_1^2 \end{pmatrix}$.
 
 With the following priors:
 
 $$
 \boldsymbol\beta \sim Normal(\mathbf{0}, 2\mathbf{I}) \\
+\Omega \sim LKJ(\zeta = 1) \\
 \sigma^2_{0} \sim HalfCauchy(0,1) \\
 \sigma^2_{1} \sim HalfCauchy(0,1) \\
 \sigma^2_{00} \sim HalfCauchy(0,1) \\
@@ -260,9 +269,12 @@ $$
 <!-- $$ -->
 
 
-## GLMM with Gaussian Processes: RE for Trial, GP for Date {#glmm_gp}
+## GLMM with Gaussian Processes: RE for Trial, GP for Date {#glmm-gp}
 
 Now we are in the territory where we _have_ to fit the models in a Bayesian framework. If our response variable was continuous (i.e., the regression model was based on a Normal distribution), then we could still use maximum likelihood estimation.
+
+See Section \@ref(fit-glmm-gpR) for the associated model fits in R.
+
 
 ### Bayesian mathematical model
 
@@ -278,7 +290,7 @@ Priors:
 
 $$
 \boldsymbol\beta \sim Normal(\mathbf{0}, 2\mathbf{I}) \\
-\Sigma_{\gamma} = = \begin{pmatrix}\sigma_0^2 & \rho \\\rho & \sigma_1^2 \end{pmatrix} \\
+\Sigma_{\gamma} = \begin{pmatrix}\sigma_0^2 & \rho \\\rho & \sigma_1^2 \end{pmatrix} \\
 \sigma^2_{0} \sim HalfCauchy(0,1) \\
 \sigma^2_{1} \sim HalfCauchy(0,1) \\
 \rho \sim ?? \\
@@ -292,7 +304,7 @@ where, in addition to the variables and parameters defined previously, we have
 
 $k = 1,..., K=10$ represents the locations, 
 
-$j = 1, ..., J = 117$ represents the 62 unique dates,
+$j = 1, ..., J = 62$ represents the unique dates,
 
 $y_{ikj}$ is moth count $i$ from location $k$ on date $j$,
 
