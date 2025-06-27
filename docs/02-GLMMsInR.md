@@ -127,11 +127,7 @@ datR <- datRinit %>%
          )  %>%
   mutate(mothsperday = nYSB / DaysOfCatch, # standardize the counts
          # TreatmentF = factor(Treatment), # if we need to fix levels in non-alpha order. Excluded/commented out here for simplicity
-         # LocationF = as.factor(Location),
-         # DATscaled = as.numeric(scale(DAT)),
          SamplingDateC = as.character(SamplingDate))
-         # numericDate = as.numeric(SamplingDate),
-         # numericDate = numericDate - min(numericDate) + 1)
 
 ## average counts for each location, date
 mean_cts <- datR %>%

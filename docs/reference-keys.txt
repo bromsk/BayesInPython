@@ -22,8 +22,12 @@ tab:TRBayes3nb
 fig:pBayes3nb-Fig
 tab:compareTR
 tab:compareBetas
+tab:summary1
+tab:summary2
+tab:summary3
+tab:summary4
 intro
-case-study
+CaseStudy
 case-study-objectives
 mathematical-models
 glm
@@ -104,6 +108,7 @@ compare-tr-estimates
 compare-coefficients-1
 plot-comparisons-1
 NonlinearR
+setup
 generalized-logistic-curve
 bayesian-model-2
 fitting-models-with-the-brms-package
@@ -113,4 +118,4 @@ intercept-re-a-re-no-gp
 intercept-re-a-re-with-gp-same-for-all-loc
 intercept-a-re-with-gp-diff-for-each-loc
 intercept-a-b-m-re-with-gp-diff-for-each-loc
-model-our-case-study-data
+case-study

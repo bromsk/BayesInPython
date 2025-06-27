@@ -42,7 +42,7 @@ All models are written mathematically and fit in both R and Python. Frequentist 
 While it is an essential part of any analysis, no model selection and assessment is conducted here because that is not the purpose of this tutorial. Additionally, model output is not explained because that can be found elsewhere (e.g., function help pages).
 
 
-## Case Study
+## Case Study {#CaseStudy}
 
 We are analyzing moth count data collected from traps from rice fields in Indonesia. We are testing a pheromone dispenser that will prevent moths from mating, leading to fewer eggs and larvae in the crop, and therefore less damage on the plants. One way to measure product effectiveness is to see if fewer moths are caught in the traps in the treatment fields compared to the control fields. 
 
