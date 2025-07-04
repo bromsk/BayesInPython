@@ -1,10 +1,10 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
+
 # GLMM's in Python {#GLMMsPython}
-
-
-
-
-
-
 
 ## Getting started with Python
 
@@ -16,180 +16,497 @@ Python is a lot more complicated than R!
 
 Originally, I downloaded Jupyter Notebook directly, but I didn't like the way things loaded. So, I downloaded "Anaconda" and then accessed Jupyter from there. However, I still don't love Jupyter-- the notebooks don't optimize the screen's size like RStudio does. In RStudio, I love having my code on one side of the screen, and my outputs on the other. Screens are wide, not long. 
 
-Soon, I came across the "reticulate" package, which allows for Python coding in an Rmarkdown script! So far, awesome and it is how I run the all the analyses. Here, I switch between R and Python code chunks, but the package also allows objects to be used within both languages. Pretty cool.
+Soon, I came across the "reticulate" package, which allows for Python coding in an Rmarkdown script! So far, awesome and it is how I run the all the analyses. Here, I switch between R and Python code chunks, but the package also allows objects written in one language to be used within both languages. Pretty cool. It's not for production-level code, but seems perfect for R users switching to Python.
 
-To interact with Python via RMarkdowns in RStudio, check out the "reticulate" package website to get started: 
+To interact with Python via RMarkdowns in RStudio, check out the `reticulate` package [website](https://rstudio.github.io/reticulate/articles/r_markdown.html).
 
-R Markdown Python Engine (aka the "reticulate" package):
-https://rstudio.github.io/reticulate/articles/r_markdown.html
-
+Here is another helpful link: [Primer on Python for R users](https://rstudio.github.io/reticulate/articles/python_primer.html)
 
 
-3. Set up a Python environment for your work.  Here is why that is important:
+3. Set up a Python environment for your work. (Second code chunk in the setup.) Here is why that is important:
 
 Python environments:
 "When installing Python packages it’s best practice to isolate them within a Python environment (a named Python installation that exists for a specific project or purpose). This provides a measure of isolation, so that updating a Python package for one project doesn’t impact other projects. The risk for package incompatibilities is significantly higher with Python packages than it is with R packages, because unlike CRAN, PyPI does not enforce, or even check, if the current versions of packages currently available are compatible."
 https://rstudio.github.io/reticulate/articles/python_packages.html
 
-(Anaconda and reticulate both help the user keep specific environments for each Python "project" that one may be working on.)
+Anaconda and reticulate both help the user keep specific environments for each Python "project" that one may be working on.
 
-Here is another helpful link:
-
-Primer on Python for R users:
-https://rstudio.github.io/reticulate/articles/python_primer.html
+A Python virtual environment is a basic tool to isolate project dependencies within a Python installation, while a Conda environment is a more comprehensive package manager that not only creates isolated environments but also allows for managing complex dependencies across different programming languages. To keep things simpler, I use a Python virtual environment.
 
 
+4. Install Python modules as needed.
 
+Python libraries or packages are called __modules__. To use them with `reticulate`, you first have to import them (third code chunk). The lines in the third code chunk below must be called exactly once each for each new python module used; it does not need to re-run.
+
+
+## Setup
+
+As in the R chapters, all modules (i.e., packages) are loaded and the data are uploaded and mainpulated at the start of the script. The "Getting started with Python" section above goes into details on the rhyme and reason for some of these code chunks.
+
+Because I am newer to Python, the required modules are often included in the code chunks as well as a reminder of what modules are used for what functions. They are included in the setup to ensure that there are no issues upon loading.
+
+
+``` r
+knitr::opts_chunk$set(cache = F, message = F, warning = F, 
+  out.width = '100%')
+library(kableExtra) # to make a pretty table
+library(tidyverse) # %>% function, and others
+library(reticulate) # library to use Python within R
+use_virtualenv("r-reticulate-BayesInPython")
+
+# make sure these packages are installed before installing pymer4:
+# install.packages(c("lme4", "lmerTest", "emmeans"))
+# Ensure pymer4 is installed in the desired Python environment
+# py_require("pymer4")
 ```
-## virtualenv: r-reticulate-BayesInPython
+
+``` r
+## Uncomment the code below and run once, the first time you work through the tutorial:
+
+# create a new environment
+# virtualenv_create("r-reticulate-BayesInPython")
+# 
+# # install a module
+# virtualenv_install("r-reticulate-BayesInPython", "pandas")
+# 
+# indicate that we want to use a specific virtualenv
+# use_virtualenv("r-reticulate-BayesInPython")
+# 
+
+## (Uncomment this code instead if you prefer a Conda environment) 
+# # create a new environment 
+# conda_create("r-reticulate-BayesInPython")
+# 
+# # install a module, e.g., SciPy
+# conda_install("r-reticulate-BayesInPython", "scipy")
+# 
+# # indicate that we want to use a specific condaenv
+# use_condaenv("r-reticulate-BayesInPython")
+```
+
+``` python
+## Install modules if you have not used them before
+# You may have to install the packages if you have not used them before:
+# code chunk is here for easy retrieval
+# replace module name as needed.
+!pip install staticmap
+
+# installing googlemaps needs a modification:
+# !pip install  --use-pep517 googlemaps
+
+# to install pymer4, you need to type the following commands from Terminal:
+# I think you need Anaconda installed
+## https://eshinjolly.com/pymer4/installation.html
+# conda create --name pymer4 -c ejolly -c conda-forge -c defaults pymer4
+# conda activate pymer4
 ```
 
 
-### Python modules
+``` python
+import pandas as pd
+import numpy as np
 
-Python libraries or packages are called _modules_. To use them with reticulate, you first have to import them. The lines in the code chunk below must be called exactly once each for each new python module used; it does not need to re-run.
+import pprint
+from staticmap import StaticMap, CircleMarker # plot trap locations on a map
+import arviz as az
+import matplotlib.pyplot as plt 
+from formulae import design_matrices
+
+import patsy # for dmatrix function
+
+from plotnine import * # using ggplot in Python
+import seaborn as sns 
+
+import os # save API key in .env file
+import gmplot ## ggmap 
+
+from patsy import dmatrices # for dmatrices function
+import statsmodels.api as sm # for regressions
+import math
+
+from scipy.stats import nbinom
+
+import bambi as bmb
+import pymc as pm
+
+import pickle # to write, read python objects to file
 
 
+mycolors = ["#9E0142", "#66C2A5"]
+```
+
+``` python
+## Define some functions to use in this script.
+
+# calculate trapping reduction for frequentist model fits.
+def getTR(mod):
+    """Calculate TR with confidence interval for stats model"""
+    # Function body
+    import pandas as pd
+
+    b1 = mod.params.iloc[1]
+    seb1 = mod.bse.iloc[1]
+    
+    outTR = {'TR': [round(100 * 1 - math.exp(b1))], 
+    'lowerCI': [round(100 * 1 - math.exp(b1 + 1.96*seb1))],
+    'upperCI': [round(100 * 1 - math.exp(b1 - 1.96*seb1))]}
+    df = pd.DataFrame(outTR)
+    return df
+```
+
+``` python
+## Read in the moth data:
+
+import pandas as pd
+
+datP = pd.read_csv("data/moths.csv", delimiter = ",")
+
+# check data values: 
+# (Results not shown for succinctness)
+datP.info()
+```
+
+``` python
+pd.set_option('display.max_columns', None) # Display all columns
+datP.describe(percentiles=[0.5], include = 'all')
+
+for col in datP:
+  if (datP[col].dtype == 'object'):
+    print(col)
+    print(datP[col].unique())
+```
+
+``` python
+## manipulate data as needed:
+
+# convert dates to dates in case further manipulation on them is needed:
+# but first keep object version of samplingdate:
+datP['SamplingDateC'] = datP['SamplingDate']
+cols = ['TransplantDate', 'DispInstallDate', 'TrapInstallDate', 'SamplingDate']
+for col in cols:
+    datP[col] = pd.to_datetime(datP[col])
+datP['SamplingDate'].describe()
+```
+
+``` python
+# standardize the counts
+datP['mothsperday'] = datP['nYSB'] / datP['DaysOfCatch']
+
+# un-comment if we need to fix levels in non-alpha order
+# datR <- datP %>%
+#   mutate(TreatmentF = factor(Treatment), 
+         # LocationF = as.factor(Location),
 
 
+## average counts for each location, date
+mean_cts = datP.groupby(['Location', 'Treatment', 'AssessmentNumber', 'SamplingDate', 'SamplingDateC', 'DATI'], as_index=False).agg({'nYSB': 'mean', 'mothsperday': 'mean'})
+mean_cts.describe(include='all')
+```
 
-## Set up
+## Data exploration
 
-When completing an analysis, I may skip around in my script quite a bit. Therefore, I like all packages loaded, and all data uploaded and manipulated at the start of my script.
+### The data
 
-## Outline
-
-* Introduce the data to be used throughout the tutorial.
-
-* Fit generalized linear models (GLMs, here Poisson and negative binomial regressions). Models are fit in both frequentist and Bayesian frameworks to lay the groundwork for the more complicated models.
-
-* Fit generalized linear models with random effects (GLMMs) to allow for correlations in space and time. Models are fit in both frequentist and Bayesian frameworks.
-
-## Data Exploration
-
-### Moth counts
-
-Here is what the data look like. Columns: Location, Treatment, TrapID, Longitude, Latitude, AssessmentNumber, and SamplingDate should be self-explanatory... TransplantDate is the date that the rice seedlings were transplanted into the field; DispInstallDate is the treatment installation date; TrapInstallDate is the trap installation date; "nYSB" are the moth counts (number of YSB moths); DaysOfCatch is the number of days since the trap was previously sampled  or the number of days since trap installation if it is assessment number 1; DATI is days after trap installation; DADI is days after dispenser installation; and DAT is days after transplant. Some of these columns will be discussed more later.
+Here is what the data look like after the above manipulation. 
 
 
+``` python
+# kable(head(datR, 5)) %>%
+#   kable_styling() %>%
+#   scroll_box(width = "100%", box_css = "border: 0px;")
+# convert to DF to make a pretty table:
+py_df = pd.DataFrame(datP)
+# print(datP.head(5))
+```
+
+``` r
+kable(head(py$datP, 5)) %>%
+  kable_styling() %>%
+  scroll_box(width = "100%", box_css = "border: 0px;")
+```
+
+<div style="border: 0px;overflow-x: scroll; width:100%; "><table class="table" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Location </th>
+   <th style="text-align:left;"> Treatment </th>
+   <th style="text-align:right;"> TrapID </th>
+   <th style="text-align:right;"> Longitude </th>
+   <th style="text-align:right;"> Latitude </th>
+   <th style="text-align:left;"> TransplantDate </th>
+   <th style="text-align:left;"> TrapInstallDate </th>
+   <th style="text-align:left;"> DispInstallDate </th>
+   <th style="text-align:right;"> AssessmentNumber </th>
+   <th style="text-align:left;"> SamplingDate </th>
+   <th style="text-align:right;"> nYSB </th>
+   <th style="text-align:right;"> DaysOfCatch </th>
+   <th style="text-align:right;"> DATI </th>
+   <th style="text-align:right;"> DADI </th>
+   <th style="text-align:right;"> DAT </th>
+   <th style="text-align:left;"> SamplingDateC </th>
+   <th style="text-align:right;"> mothsperday </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Loc9 </td>
+   <td style="text-align:left;"> Trt </td>
+   <td style="text-align:right;"> 201 </td>
+   <td style="text-align:right;"> 111.6028 </td>
+   <td style="text-align:right;"> -7.233634 </td>
+   <td style="text-align:left;"> 2023-08-05 18:00:00 </td>
+   <td style="text-align:left;"> 2023-08-12 18:00:00 </td>
+   <td style="text-align:left;"> 2023-08-12 18:00:00 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:left;"> 2023-08-22 18:00:00 </td>
+   <td style="text-align:right;"> 4 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 17 </td>
+   <td style="text-align:left;"> 2023-08-23 </td>
+   <td style="text-align:right;"> 0.4000000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Loc9 </td>
+   <td style="text-align:left;"> Trt </td>
+   <td style="text-align:right;"> 201 </td>
+   <td style="text-align:right;"> 111.6028 </td>
+   <td style="text-align:right;"> -7.233634 </td>
+   <td style="text-align:left;"> 2023-08-05 18:00:00 </td>
+   <td style="text-align:left;"> 2023-08-12 18:00:00 </td>
+   <td style="text-align:left;"> 2023-08-12 18:00:00 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:left;"> 2023-09-02 18:00:00 </td>
+   <td style="text-align:right;"> 6 </td>
+   <td style="text-align:right;"> 11 </td>
+   <td style="text-align:right;"> 21 </td>
+   <td style="text-align:right;"> 21 </td>
+   <td style="text-align:right;"> 28 </td>
+   <td style="text-align:left;"> 2023-09-03 </td>
+   <td style="text-align:right;"> 0.5454545 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Loc9 </td>
+   <td style="text-align:left;"> Trt </td>
+   <td style="text-align:right;"> 201 </td>
+   <td style="text-align:right;"> 111.6028 </td>
+   <td style="text-align:right;"> -7.233634 </td>
+   <td style="text-align:left;"> 2023-08-05 18:00:00 </td>
+   <td style="text-align:left;"> 2023-08-12 18:00:00 </td>
+   <td style="text-align:left;"> 2023-08-12 18:00:00 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:left;"> 2023-09-11 18:00:00 </td>
+   <td style="text-align:right;"> 6 </td>
+   <td style="text-align:right;"> 9 </td>
+   <td style="text-align:right;"> 30 </td>
+   <td style="text-align:right;"> 30 </td>
+   <td style="text-align:right;"> 37 </td>
+   <td style="text-align:left;"> 2023-09-12 </td>
+   <td style="text-align:right;"> 0.6666667 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Loc9 </td>
+   <td style="text-align:left;"> Trt </td>
+   <td style="text-align:right;"> 201 </td>
+   <td style="text-align:right;"> 111.6028 </td>
+   <td style="text-align:right;"> -7.233634 </td>
+   <td style="text-align:left;"> 2023-08-05 18:00:00 </td>
+   <td style="text-align:left;"> 2023-08-12 18:00:00 </td>
+   <td style="text-align:left;"> 2023-08-12 18:00:00 </td>
+   <td style="text-align:right;"> 4 </td>
+   <td style="text-align:left;"> 2023-09-22 18:00:00 </td>
+   <td style="text-align:right;"> 24 </td>
+   <td style="text-align:right;"> 11 </td>
+   <td style="text-align:right;"> 41 </td>
+   <td style="text-align:right;"> 41 </td>
+   <td style="text-align:right;"> 48 </td>
+   <td style="text-align:left;"> 2023-09-23 </td>
+   <td style="text-align:right;"> 2.1818182 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Loc9 </td>
+   <td style="text-align:left;"> Trt </td>
+   <td style="text-align:right;"> 201 </td>
+   <td style="text-align:right;"> 111.6028 </td>
+   <td style="text-align:right;"> -7.233634 </td>
+   <td style="text-align:left;"> 2023-08-05 18:00:00 </td>
+   <td style="text-align:left;"> 2023-08-12 18:00:00 </td>
+   <td style="text-align:left;"> 2023-08-12 18:00:00 </td>
+   <td style="text-align:right;"> 5 </td>
+   <td style="text-align:left;"> 2023-10-01 18:00:00 </td>
+   <td style="text-align:right;"> 43 </td>
+   <td style="text-align:right;"> 9 </td>
+   <td style="text-align:right;"> 50 </td>
+   <td style="text-align:right;"> 50 </td>
+   <td style="text-align:right;"> 57 </td>
+   <td style="text-align:left;"> 2023-10-02 </td>
+   <td style="text-align:right;"> 4.7777778 </td>
+  </tr>
+</tbody>
+</table></div>
+
+Column descriptions: 
+
+* **Location**-- data were collected from 10 trial locations, 
+
+* **Treatment**-- Control or Treatment (Trt), 
+
+* **TrapID**-- each trap within a trial location has a unique ID, 
+
+* **Longitude**, **Latitude**-- the coordinates of each unique trap,
+
+* **TransplantDate**-- the date that the rice seedlings were transplanted into the field,
+
+* **TrapInstallDate**-- the trap installation date, which is usually the same as the dispenser installation date, 
+
+* **DispInstallDate**-- the treatment (pheromone dispenser) installation date; 
+
+* **AssessmentNumber**-- traps are sampled 10 times each. Using assessment number is a way to standardize the sampling dates across locations, 
+
+* **SamplingDate**-- the date on which the trap was checked and moths were counted,
+
+* **nYSB**-- the moth counts (number of YSB moths) associated with each trap, location, and date, 
+
+* **DaysOfCatch**-- the number of days since the trap was previously sampled or the number of days since trap installation if it is assessment number 1,
+
+* **DATI** is days after trap installation; 
+
+* **DADI**-- days after dispenser installation; and 
+
+* **DAT**-- days after transplant. 
+
+* **mothsperday**-- moths caught per day, nYSB / DaysOfCatch, and
+
+* **SamplingDateC**-- Sampling Date as a character/string (for model in Section \\@ref(glmm_datesC)),
+
+
+### Moth counts plotted
 
 The data are the moth counts collected at each trap (average per day), within each location and throughout the season. Note how the y-axis changes for each plot in the figure.
 
+The `plotnine` module allows us to use `ggplot2` package in Python. It is fantastic to quickly make a beautiful plot using previously acquired R skills, and it does so with a fraction of the code required to make a similar figure using Python's `seaborn` and/or `matplotlib` modules.
+
+
+``` python
+from plotnine import * # using ggplot in Python
+import matplotlib.pyplot as plt 
+
+pmoths = (ggplot(datP, aes(x = 'DATI', y='mothsperday', color = 'Treatment')) +
+        geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
+        geom_smooth(se=False) +
+        facet_wrap(['Location'], scales = "free_y") +
+        scale_color_manual(values = mycolors) +
+        labs(title = "Male YSB moth counts for each location and trap",
+             subtitle = "with smoothing lines",
+             y = "Moth counts per trap per day",
+             x = "Days after installation (DAI)",
+             color = "Treatment"))
+pmoths.draw(True)
+```
+
 <img src="03-GLMMsInPython_files/figure-html/plotMothsPy-1.png" width="100%" />
+
+``` python
+# plt.show(pmoths)
+# plt.savefig("output/moth_counts.png")
+```
+
+
 
 ### Trap locations
 
 Trial locations in relation to each other. Some trial locations are closer to each other than others.
 
 
+``` python
+## average coords for each location
+loc_coords = datP.groupby(['Location'], as_index=False).agg({'Latitude': 'mean', 'Longitude': 'mean'})
+colors = ["#7F3B08", "#B35806", "#E08214", "#FDB863", "#FEE0B6", "#D8DAEB", "#B2ABD2", "#8073AC", "#542788", "#2D004B"]
+
+m = StaticMap(600, 300)
+for i in range(0, len(loc_coords["Longitude"])):
+  # add outline first to make points easier to see:
+  m.add_marker(CircleMarker((loc_coords["Longitude"][i], loc_coords["Latitude"][i]), "black", 12))
+  m.add_marker(CircleMarker((loc_coords["Longitude"][i], loc_coords["Latitude"][i]), colors[i], 10))
+
+image = m.render(zoom=7)
+image.save('output/trial_locs.png')
+```
+
+
+``` r
+knitr::include_graphics("output/trial_locs.png")
+```
+
+<div class="figure">
+<img src="output/trial_locs.png" alt="Example trial locations." width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-2)Example trial locations.</p>
+</div>
+
+<!-- ![Trial locations](output/trial_locs.png "Trial locations.") -->
 
 Within each location, the treatment traps have a slightly different alignment:
 
-<img src="03-GLMMsInPython_files/figure-html/plotTrapLocsPy-3.png" width="100%" /><img src="03-GLMMsInPython_files/figure-html/plotTrapLocsPy-4.png" width="100%" />
+
+``` python
+coords = datP[['Location', 'Treatment', 'TrapID', 'Latitude', 'Longitude']].drop_duplicates()
+# coords.describe(include = 'all')
+
+pcoords = (ggplot(datP, aes(x = 'Longitude', y='Latitude', color = 'Treatment')) +
+  geom_point() + 
+  facet_wrap(['Location'], scales = "free") +
+  scale_color_manual(values = mycolors) +
+  theme(aspect_ratio=1,
+        axis_text_x=element_blank(),
+        axis_text_y=element_blank())  +
+  geom_text(aes(label = 'TrapID'), nudge_x = 0.0002, nudge_y = 0.0002, color = "black", size = 8) +
+  scale_x_continuous(expand = (0.3, 0)) +
+  scale_y_continuous(expand = (0.3, 0)) +
+  labs(title = "Trap ID's at each location"))
+pcoords.save("output/traplocs.png")
+```
 
 
-### Timeline
+``` r
+knitr::include_graphics("output/traplocs.png")
+```
 
-<img src="03-GLMMsInPython_files/figure-html/timelinePy-7.png" width="100%" /><img src="03-GLMMsInPython_files/figure-html/timelinePy-8.png" width="100%" />
+<div class="figure">
+<img src="output/traplocs.png" alt="Example trial locations." width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-3)Example trial locations.</p>
+</div>
 
-Note that not all traps are installed on exactly the same day; not all locations have rice transplanted on exactly the same day; and not all traps are sampled on exactly the same day.
+<!-- ![Trap coords](output/traplocs.png "Trap coordinates.") -->
 
-## Basic GLM models
+## Fitted GLM models {#fit-glmPy}
 
 To start, we ignore all the spatial and temporal relationships in the data and assume each data point is independent and identically distributed (iid). **This is not a good model for the data!** It is just our starting off point.
 
 When building hierarchical Bayesian models, it is always a good idea to start simple, make sure everything works as expected, and then build up.
 
-### Mathematical model
+See Section \@ref(glm) for the associated mathematical models.
 
-Our response variable is a count, therefore we use either a Poisson or negative binomial distribution as the basis for our model. These models are known as generalized linear models (GLMs).
- 
-The model must also include an offset to account for the varying time intervals between sample. (If the traps are left unchecked for more days, we naturally expect the trap to have more moths. This varying effort is accounted for by the offset.)
+### Frequentist Poisson model
 
-#### Poisson regression model
+These models show a very tight confidence intervals for our coefficient estimates and our predictions. But also, the residual deviance is MUCH greater than the degree of freedom, indicating a lack of fit. The plot of the predictions (Figure \@ref(fig:p1p-glmFig)) overlaid on the data also demonstrate the lack of fit.
 
-We start with a poisson version of our regression model:
 
-$$
-y_i \sim Pois(\lambda_i) \\
-log(\lambda_i ) = \beta_0 + \beta_1 x_{A,i} + \mbox{ln} \left(DaysOfCatch_i\right)
-$$
+``` python
+import numpy as np
+from patsy import dmatrices # for dmatrices function
+import statsmodels.api as sm # for regressions
+import math
 
-where, for data samples $i = 1, ..., N$, 
-
-$y_i$ is moth count $i$,
-
-$\lambda_i$ is the expected moth count for sample $i$,
-
-$\beta_0$ is the intercept of the model. Here, it is the basis for the expected moth count for our control treatment.
-
-$\beta_1$ is the expected difference in moth counts between the control group and the treatment A group, 
-
-$x_{i}$ is an indicator variable that equals 1 if sample $i$ is from a treatment A field and equals 0 otherwise, and
-
-$\left(DaysOfCatch_i\right)$ is the offset to account for the varying time interval between samples. This is necessary because with a longer time interval, more moths will fly into the trap.
-
-#### Negative binomial regression model
-
-In ecology, there is always additional variability in our data than what the Poisson distribution allows. To account for the additional variability in our model, we switch to a negative binomial distribution:
-
-$$
-y_i \sim NegBinom(\lambda_i, \phi) \\
-log(\lambda_i ) = \beta_0 + \beta_1 x_{i} + \mbox{ln} \left(DaysOfCatch_i\right)
-$$
-
-"Negative binomial regression is used to model count data for which the variance is higher than the mean." (https://www.pymc.io/projects/examples/en/latest/generalized_linear_models/GLM-negative-binomial-regression.html)
-
-For the negative binomial regression, all variables and parameters are defined as before, but the model has an additional parameter, $\phi$, that allows for the additional variation. The negative binomial distribution and regression model can be written in many ways. In our models, $\phi$ is defined through the following formula where the variance associated with an expected moth count, $\lambda$, is:
-
-$$
-Var(\lambda) = \lambda + \phi \cdot\lambda^2
-$$
-
-(For a Poisson distribution, $Var(\lambda) = \lambda$.)
-
-#### Bayesian mathematical model
-
-I also fit these models using a Bayesian framework, again to build our foundation for the more complex models that come later.
-
-For the Bayesian models, I only show the more complex negative binomial version.
-
-To make our models Bayesian, we add priors to our parameters:
-
-$$
-y_i \sim NegBinom(\lambda_i, \phi) \\
-log(\lambda_i ) = \beta_0 + \beta_1 x_{A,i} + \mbox{ln} \left(DaysOfCatch_i\right) \\
-\beta_0 \sim Normal(0, 2) \\
-\beta_1 \sim Normal(0, 2) \\
-\phi \sim HalfCauchy(0,1)
-$$
-
-The models use slightly informative priors. When working on a log-scale (e.g., with Poisson or negative binomial distributions), this often becomes essential to avoid parameter estimates on the boundaries. (See Hooten and Hobbs for a good discussion on this issue.)
-
-#### Trapping reduction defined
-
-The primary metric of interest from these models is a derived parameter that we call trapping reduction (TR):
-
-$$
-TR = 100 - 100 e ^{(-\beta_1)}
-$$
-
-To obtain a 95% confidence interval for TR (for the frequentist version of our model), we use the following approximation:
-
-$$
-TR = 100 - 100 e ^{(-\beta_1 \pm 2 \cdot SE(\beta_1))}
-$$
-
-For the Bayesian version, the derived parameter is sampled as part of the MCMC iterations, and the 95% credible interval is the 2.5%, 97.5% quantiles of its resulting distribution.
-
-### Fitting the frequentist models
-
-Note: when I predict for new data, I set DaysOfCatch = 1, and then I compare to the moths per day variable (mothsperday = nYSB / DaysOfCatch). I want to exclude any patterns related to the varying time intervals.
-
-These models show a very tight confidence intervals for our predictions. But also, the residual deviance is MUCH greater than the degree of freedom, indicating a lack of fit. The plot of the predictions overlaid on the data also demonstrate the lack of fit.
-
-These models are fit using the 'statsmodels' module because of its parallel syntax to R.
-
+# POISSON regression
+form = """ nYSB ~ Treatment"""
+y, X = dmatrices(form, datP, return_type = 'dataframe')
+mod1p = sm.GLM(y, X, 
+              offset=np.log(datP["DaysOfCatch"]),
+              family = sm.families.Poisson())
+results1p = mod1p.fit()
+print(results1p.summary())
+```
 
 ```
 ##                  Generalized Linear Model Regression Results                  
@@ -199,21 +516,37 @@ These models are fit using the 'statsmodels' module because of its parallel synt
 ## Model Family:                 Poisson   Df Model:                            1
 ## Link Function:                    Log   Scale:                          1.0000
 ## Method:                          IRLS   Log-Likelihood:                -14034.
-## Date:                Wed, 18 Jun 2025   Deviance:                       25678.
-## Time:                        14:59:50   Pearson chi2:                 4.24e+04
+## Date:                Thu, 03 Jul 2025   Deviance:                       25678.
+## Time:                        21:35:32   Pearson chi2:                 4.24e+04
 ## No. Iterations:                     6   Pseudo R-squ. (CS):              1.000
 ## Covariance Type:            nonrobust                                         
-## ======================================================================================
-##                          coef    std err          z      P>|z|      [0.025      0.975]
-## --------------------------------------------------------------------------------------
-## Intercept              1.3960      0.009    162.829      0.000       1.379       1.413
-## Treatment[T.trt A]    -2.1665      0.027    -80.933      0.000      -2.219      -2.114
-## ======================================================================================
+## ====================================================================================
+##                        coef    std err          z      P>|z|      [0.025      0.975]
+## ------------------------------------------------------------------------------------
+## Intercept            1.3960      0.009    162.829      0.000       1.379       1.413
+## Treatment[T.Trt]    -2.1665      0.027    -80.933      0.000      -2.219      -2.114
+## ====================================================================================
+```
+
+``` python
+## obtain TR estimate for comparison later (custom function in Setup code)
+TR_1p = getTR(results1p)
+print(TR_1p)
 ```
 
 ```
 ##     TR  lowerCI  upperCI
 ## 0  100      100      100
+```
+
+Note: when I predict for new data, I set $DaysOfCatch = 1$, and then I compare to the moths per day variable ($mothsperday = nYSB / DaysOfCatch$). I want to exclude any patterns related to the varying time intervals.
+
+
+``` python
+# predict from poisson regression:
+preds1p = results1p.get_prediction(X, which = 'linear')
+preds1pDFtmp = preds1p.summary_frame() #summary_frame() returns a pandas DF
+preds1pDFtmp.describe()
 ```
 
 ```
@@ -228,13 +561,52 @@ These models are fit using the 'statsmodels' module because of its parallel synt
 ## max      1.396045    0.025359    1.379241    1.412849
 ```
 
-<img src="03-GLMMsInPython_files/figure-html/pois1py-11.png" width="100%" /><img src="03-GLMMsInPython_files/figure-html/pois1py-12.png" width="100%" />
+``` python
+preds1pDF = datP
+preds1pDF['exp_values'] = preds1pDFtmp['predicted'].apply(math.exp)
+preds1pDF['lowerCI'] = preds1pDFtmp['ci_lower'].apply(math.exp)
+preds1pDF['upperCI'] = preds1pDFtmp['ci_upper'].apply(math.exp)
+
+## plot predicted and actual:
+freqplot1p = (ggplot(preds1pDF, 
+                aes(x = 'DATI', y='exp_values', color = 'Treatment')) +
+        geom_line() +
+        geom_ribbon(aes(ymin = 'lowerCI', ymax = 'upperCI', fill = 'Treatment'),
+              alpha = 0.3) +
+        geom_point(aes(x='DATI', y='mothsperday', color = 'Treatment'), 
+            data = mean_cts, size = 1.1) +
+        facet_wrap(['Location'], scales = "free_y") +
+        scale_color_manual(values = mycolors) +
+        scale_fill_manual(values = mycolors) +
+        labs(title = "Poisson GLM predictions",
+             subtitle = "Lines are predictions, points are the data"))
+freqplot1p.draw(True)
+```
+
+<div class="figure">
+<img src="03-GLMMsInPython_files/figure-html/p1p-glmFigPy-1.png" alt="Poisson GLM predictions (Python)." width="100%" />
+<p class="caption">(\#fig:p1p-glmFigPy)Poisson GLM predictions (Python).</p>
+</div>
+
+``` python
+# freqplot1p.save(filename='freqplot1p.png', path='output/')
+```
+
+The model is such a bad fit to the data, it is hard to even tell what is going on in the figure above.
+
+### Frequentist NB model {#nb1Py}
+
+For the negative binomial (NB) model, our confidence intervals are a little wider, but we are still ignoring all the correlations in our data. And the plot of the predictions again indicates the lack of fit (Figure \@ref(fig:p1nb-glmFigPy)).
 
 
-The model is such a bad fit to the data, it is hard to even tell what is going on in the plot above.
+``` python
+from scipy.stats import nbinom
 
-For the negative binomial model, our confidence intervals are a little wider, but we are still ignoring all the correlations in our data. And the plot of the predictions again indicates the lack of fit.
-
+form = """ nYSB ~ Treatment"""
+y, X = dmatrices(form, datP, return_type = 'dataframe')
+mod1nb = sm.NegativeBinomial(y,X, offset=np.log(datP["DaysOfCatch"]))
+results1nb = mod1nb.fit()
+```
 
 ```
 ## Optimization terminated successfully.
@@ -244,28 +616,46 @@ For the negative binomial model, our confidence intervals are a little wider, bu
 ##          Gradient evaluations: 11
 ```
 
+``` python
+print(results1nb.summary())
+```
+
 ```
 ##                      NegativeBinomial Regression Results                      
 ## ==============================================================================
 ## Dep. Variable:                   nYSB   No. Observations:                  672
 ## Model:               NegativeBinomial   Df Residuals:                      670
 ## Method:                           MLE   Df Model:                            1
-## Date:                Wed, 18 Jun 2025   Pseudo R-squ.:                 0.06445
-## Time:                        14:59:57   Log-Likelihood:                -2438.8
+## Date:                Thu, 03 Jul 2025   Pseudo R-squ.:                 0.06445
+## Time:                        21:35:34   Log-Likelihood:                -2438.8
 ## converged:                       True   LL-Null:                       -2606.8
 ## Covariance Type:            nonrobust   LLR p-value:                 4.739e-75
-## ======================================================================================
-##                          coef    std err          z      P>|z|      [0.025      0.975]
-## --------------------------------------------------------------------------------------
-## Intercept              1.4023      0.068     20.651      0.000       1.269       1.535
-## Treatment[T.trt A]    -2.1636      0.099    -21.863      0.000      -2.358      -1.970
-## alpha                  1.5244      0.082     18.628      0.000       1.364       1.685
-## ======================================================================================
+## ====================================================================================
+##                        coef    std err          z      P>|z|      [0.025      0.975]
+## ------------------------------------------------------------------------------------
+## Intercept            1.4023      0.068     20.651      0.000       1.269       1.535
+## Treatment[T.Trt]    -2.1636      0.099    -21.863      0.000      -2.358      -1.970
+## alpha                1.5244      0.082     18.628      0.000       1.364       1.685
+## ====================================================================================
+```
+
+``` python
+## obtain TR estimate for comparison later (custom function in Setup code)
+TR_1nb = getTR(results1nb)
+print(TR_1nb)
 ```
 
 ```
 ##     TR  lowerCI  upperCI
 ## 0  100      100      100
+```
+
+
+``` python
+## code to predict moth counts from model:
+preds1nb = results1nb.get_prediction(X, which = 'linear')
+preds1nbDFtmp = preds1nb.summary_frame()
+preds1nbDFtmp.describe()
 ```
 
 ```
@@ -280,41 +670,130 @@ For the negative binomial model, our confidence intervals are a little wider, bu
 ## max      1.402260    0.071991    1.269172    1.535348
 ```
 
-<img src="03-GLMMsInPython_files/figure-html/nb1py-15.png" width="100%" /><img src="03-GLMMsInPython_files/figure-html/nb1py-16.png" width="100%" />
+``` python
+preds1nbDF = datP
+preds1nbDF['exp_values'] = preds1nbDFtmp['predicted'].apply(math.exp)
+preds1nbDF['lowerCI'] = preds1nbDFtmp['ci_lower'].apply(math.exp)
+preds1nbDF['upperCI'] = preds1nbDFtmp['ci_upper'].apply(math.exp)
 
-### Bayesian (bambi) models-- Python
 
-"Bambi" is the Python module that is *very* similar to "brms" package in R. I'm pretty sure the defaults use different algorithms though (which may affect your results), so be sure to read up on the details of both!
+
+
+## plot predicted and actual:
+freqplot1nb = (ggplot(preds1nbDF, aes(x = 'DATI', y='exp_values', color = 'Treatment')) +
+        geom_line() +
+        geom_ribbon(aes(ymin = 'lowerCI', ymax = 'upperCI', fill = 'Treatment'),
+              alpha = 0.3) +
+        geom_point(aes(x='DATI', y='mothsperday', color = 'Treatment'), 
+            data = mean_cts, size = 1.1) +
+        facet_wrap(['Location'], scales = "free_y") +
+        scale_color_manual(values = mycolors) +
+        scale_fill_manual(values = mycolors) +
+        labs(title = "Negative binomial GLM predictions",
+             subtitle = "Lines are predictions, points are the data"))
+
+freqplot1nb.draw(True)
+```
+
+<div class="figure">
+<img src="03-GLMMsInPython_files/figure-html/p1nb-glmFigPy-3.png" alt="Negative binomial GLM predictions (Python)." width="100%" />
+<p class="caption">(\#fig:p1nb-glmFigPy)Negative binomial GLM predictions (Python).</p>
+</div>
+
+``` python
+freqplot1nb.save(filename="freqplot1nb.png", path = "./output/")
+```
+
+### Bayesian (bambi) model
+
+`Bambi` is the Python module that is *very* similar to `brms` package in R. I am pretty sure the defaults use different algorithms though (which may affect your results), so be sure to read up on the details of both! However, both run `stan` on the back-end for the MCMC algorithms.
 
 Because the models take a few minutes to fit, I usually fit them when I am initially running through my code, save them, and then only load the model fit when rendering the Rmarkdown file and creating the resulting figures.
 
-The prior_summary command is helpful if you do not know what a parameter is called in 'brms'. Here, I used the command to find out what they called their $\phi$ parameter. (They call it the shape parameter.)
-
-"Bambi" created InferenceData objects. Read the reference guide-- it is very helpful!
-https://python.arviz.org/en/latest/getting_started/WorkingWithInferenceData.html#
+`Bambi` creates InferenceData objects. Read the [reference guide](https://python.arviz.org/en/latest/getting_started/WorkingWithInferenceData.html#)-- it is very helpful!
 
 
-<img src="03-GLMMsInPython_files/figure-html/nbBambi1setup-19.png" width="100%" />
+``` python
+# https://bambinos.github.io/bambi/notebooks/negative_binomial.html
+import bambi as bmb
+## build the model:
+model_bmb1nb = bmb.Model("nYSB ~ Treatment + offset(log(DaysOfCatch))", 
+                    datP, family="negativebinomial",
+                    priors = {
+                        "Intercept": bmb.Prior("Normal", mu = 0, sigma = 2),
+                        "Treatment": bmb.Prior("Normal", mu = 0, sigma = 2),
+                        "alpha": bmb.Prior("HalfCauchy", beta = 1)
+                    })
+filename = 'output/idata_bmb1nb.pkl'
+```
+
+``` python
+## not run
+import bambi as bmb
+## fit the model:
+idata_bmb1nb = model_bmb1nb.fit(tune = 500, draws=2000, chains=6, random_seed = 5000)
+# tune = warmup; draws = iter
+print(az.summary(idata_bmb1nb))
+
+# save bambi object to file.
+import pickle 
+with open(filename, 'wb') as file:
+    pickle.dump(idata_bmb1nb, file)
+```
 
 
+``` python
+import arviz as az
+import matplotlib.pyplot as plt 
+import pickle
+
+# Load the object from the file
+with open(filename, 'rb') as file:
+    idata_bmb1nb = pickle.load(file)
+
+# to see the priors:
+# model_bmb1nb
+
+# summary stats
+print(az.summary(idata_bmb1nb))
+```
 
 ```
-##                    mean     sd  hdi_3%  hdi_97%  mcse_mean  mcse_sd  ess_bulk  \
-## alpha             0.656  0.035   0.588    0.721      0.000    0.000   17917.0   
-## Intercept         1.402  0.067   1.276    1.530      0.000    0.001   18638.0   
-## Treatment[trt A] -2.159  0.099  -2.343   -1.974      0.001    0.001   17245.0   
+##                  mean     sd  hdi_3%  hdi_97%  mcse_mean  mcse_sd  ess_bulk  \
+## alpha           0.656  0.035   0.588    0.721      0.000    0.000   17917.0   
+## Intercept       1.402  0.067   1.276    1.530      0.000    0.001   18638.0   
+## Treatment[Trt] -2.159  0.099  -2.343   -1.974      0.001    0.001   17245.0   
 ## 
-##                   ess_tail  r_hat  
-## alpha               8766.0    1.0  
-## Intercept           9286.0    1.0  
-## Treatment[trt A]   10039.0    1.0
+##                 ess_tail  r_hat  
+## alpha             8766.0    1.0  
+## Intercept         9286.0    1.0  
+## Treatment[Trt]   10039.0    1.0
+```
+
+``` python
+# CALC TR:
+b1 = idata_bmb1nb.posterior["Treatment"].stack(sample=("chain", "draw")).to_dataframe(name = "Trt")
+
+TR1nb = 100 * (1 - np.exp(b1['Trt']))
+print(round(TR1nb.quantile(q=[0.025, 0.5, 0.975])))
 ```
 
 ```
 ## 0.025    86.0
 ## 0.500    88.0
 ## 0.975    90.0
-## Name: trtA, dtype: float64
+## Name: Trt, dtype: float64
+```
+
+``` python
+# Plot the predictions
+# Make predictions of the mean without offset effect:
+bmbPreds1nb = datP.copy() ## IMPORTANT DIFF FROM R!!!
+## if newdf = olddf, changes to newdf affect olddf!!!
+bmbPreds1nb["DaysOfCatch"] = 1
+predictions1nb = model_bmb1nb.predict(idata_bmb1nb, data=bmbPreds1nb, kind = "response_params", inplace = False)
+post1nb = predictions1nb.posterior
+post1nb
 ```
 
 ```{=html}
@@ -693,7 +1172,7 @@ Dimensions:        (chain: 6, draw: 2000, Treatment_dim: 1, __obs__: 672)
 Coordinates:
   * chain          (chain) int64 48B 0 1 2 3 4 5
   * draw           (draw) int64 16kB 0 1 2 3 4 5 ... 1995 1996 1997 1998 1999
-  * Treatment_dim  (Treatment_dim) &lt;U5 20B &#x27;trt A&#x27;
+  * Treatment_dim  (Treatment_dim) &lt;U3 12B &#x27;Trt&#x27;
   * __obs__        (__obs__) int64 5kB 0 1 2 3 4 5 6 ... 666 667 668 669 670 671
 Data variables:
     alpha          (chain, draw) float64 96kB 0.6959 0.6361 ... 0.6491 0.691
@@ -701,14 +1180,14 @@ Data variables:
     Treatment      (chain, draw, Treatment_dim) float64 96kB -2.08 ... -2.131
     mu             (chain, draw, __obs__) float64 65MB 0.4342 0.4342 ... 4.058
 Attributes:
-    created_at:                  2025-05-21T19:44:29.234456+00:00
+    created_at:                  2025-07-01T16:14:29.892205+00:00
     arviz_version:               0.21.0
     inference_library:           pymc
     inference_library_version:   5.22.0
-    sampling_time:               17.945131063461304
+    sampling_time:               18.31052279472351
     tuning_steps:                500
     modeling_interface:          bambi
-    modeling_interface_version:  0.15.0</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-80331cd6-2369-412b-b067-76a69c096d8c' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-80331cd6-2369-412b-b067-76a69c096d8c' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>chain</span>: 6</li><li><span class='xr-has-index'>draw</span>: 2000</li><li><span class='xr-has-index'>Treatment_dim</span>: 1</li><li><span class='xr-has-index'>__obs__</span>: 672</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-96de5fe8-64dc-4fa2-ad58-51e8f489ada0' class='xr-section-summary-in' type='checkbox'  checked><label for='section-96de5fe8-64dc-4fa2-ad58-51e8f489ada0' class='xr-section-summary' >Coordinates: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>chain</span></div><div class='xr-var-dims'>(chain)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5</div><input id='attrs-f4a3f296-0612-4791-b711-2bbcfacdb49e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f4a3f296-0612-4791-b711-2bbcfacdb49e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-14fb1e27-0157-4d14-810e-d378c702c4bd' class='xr-var-data-in' type='checkbox'><label for='data-14fb1e27-0157-4d14-810e-d378c702c4bd' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 1, 2, 3, 4, 5])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>draw</span></div><div class='xr-var-dims'>(draw)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 1996 1997 1998 1999</div><input id='attrs-13bf301e-84b9-4c4e-9e2e-27889a8178c2' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-13bf301e-84b9-4c4e-9e2e-27889a8178c2' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-16aaed33-5592-4230-ad14-97bc5e22a378' class='xr-var-data-in' type='checkbox'><label for='data-16aaed33-5592-4230-ad14-97bc5e22a378' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   0,    1,    2, ..., 1997, 1998, 1999])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>Treatment_dim</span></div><div class='xr-var-dims'>(Treatment_dim)</div><div class='xr-var-dtype'>&lt;U5</div><div class='xr-var-preview xr-preview'>&#x27;trt A&#x27;</div><input id='attrs-e6430cfb-a9bb-418a-9708-214a2c309288' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e6430cfb-a9bb-418a-9708-214a2c309288' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-34113291-8cf0-438d-8de1-b3686221be5c' class='xr-var-data-in' type='checkbox'><label for='data-34113291-8cf0-438d-8de1-b3686221be5c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;trt A&#x27;], dtype=&#x27;&lt;U5&#x27;)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>__obs__</span></div><div class='xr-var-dims'>(__obs__)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 ... 667 668 669 670 671</div><input id='attrs-2f17065d-d9c2-44dc-b44d-e3194edd2a39' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2f17065d-d9c2-44dc-b44d-e3194edd2a39' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5cbe632f-f5fe-4652-aa5a-a4ebdbf22f1e' class='xr-var-data-in' type='checkbox'><label for='data-5cbe632f-f5fe-4652-aa5a-a4ebdbf22f1e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  0,   1,   2, ..., 669, 670, 671])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-a6576f25-3b8d-45ff-9e51-129e1c818d5f' class='xr-section-summary-in' type='checkbox'  checked><label for='section-a6576f25-3b8d-45ff-9e51-129e1c818d5f' class='xr-section-summary' >Data variables: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>alpha</span></div><div class='xr-var-dims'>(chain, draw)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.6959 0.6361 ... 0.6491 0.691</div><input id='attrs-c34e641b-7311-44e7-9514-f117c768c1c4' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c34e641b-7311-44e7-9514-f117c768c1c4' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-4719c362-1525-4e9a-b3b0-e5cb056b4093' class='xr-var-data-in' type='checkbox'><label for='data-4719c362-1525-4e9a-b3b0-e5cb056b4093' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[0.69592703, 0.63605533, 0.68620635, ..., 0.67095042, 0.62715063,
+    modeling_interface_version:  0.15.0</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-74dccb94-9e8d-44f9-be82-2b7718751ae8' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-74dccb94-9e8d-44f9-be82-2b7718751ae8' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>chain</span>: 6</li><li><span class='xr-has-index'>draw</span>: 2000</li><li><span class='xr-has-index'>Treatment_dim</span>: 1</li><li><span class='xr-has-index'>__obs__</span>: 672</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-99756cb3-5828-4240-8a84-e2ba3dc37ca4' class='xr-section-summary-in' type='checkbox'  checked><label for='section-99756cb3-5828-4240-8a84-e2ba3dc37ca4' class='xr-section-summary' >Coordinates: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>chain</span></div><div class='xr-var-dims'>(chain)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5</div><input id='attrs-040cd9b7-4193-484c-baca-6bca570665b9' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-040cd9b7-4193-484c-baca-6bca570665b9' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-8e5600bb-eb2b-472f-864f-e5ca18ac854d' class='xr-var-data-in' type='checkbox'><label for='data-8e5600bb-eb2b-472f-864f-e5ca18ac854d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 1, 2, 3, 4, 5])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>draw</span></div><div class='xr-var-dims'>(draw)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 1996 1997 1998 1999</div><input id='attrs-cf41b7f1-74ba-466a-bb14-6452645af1bc' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-cf41b7f1-74ba-466a-bb14-6452645af1bc' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d77f2f0b-1cdf-43b1-8bb9-d03a21ccb003' class='xr-var-data-in' type='checkbox'><label for='data-d77f2f0b-1cdf-43b1-8bb9-d03a21ccb003' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   0,    1,    2, ..., 1997, 1998, 1999])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>Treatment_dim</span></div><div class='xr-var-dims'>(Treatment_dim)</div><div class='xr-var-dtype'>&lt;U3</div><div class='xr-var-preview xr-preview'>&#x27;Trt&#x27;</div><input id='attrs-7e445e33-6397-45f0-818c-4aa5bccfbdfe' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7e445e33-6397-45f0-818c-4aa5bccfbdfe' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a4d8565d-07b3-4f19-bdb6-9c5cc8ed7860' class='xr-var-data-in' type='checkbox'><label for='data-a4d8565d-07b3-4f19-bdb6-9c5cc8ed7860' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;Trt&#x27;], dtype=&#x27;&lt;U3&#x27;)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>__obs__</span></div><div class='xr-var-dims'>(__obs__)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 ... 667 668 669 670 671</div><input id='attrs-eff7db62-9fae-4063-b675-b72a37c77b52' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-eff7db62-9fae-4063-b675-b72a37c77b52' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-00274e71-6e0b-4954-aa19-bdaf1c9dad26' class='xr-var-data-in' type='checkbox'><label for='data-00274e71-6e0b-4954-aa19-bdaf1c9dad26' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  0,   1,   2, ..., 669, 670, 671])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-c0ec1f7e-25b2-4cfc-b7ac-5b1521153345' class='xr-section-summary-in' type='checkbox'  checked><label for='section-c0ec1f7e-25b2-4cfc-b7ac-5b1521153345' class='xr-section-summary' >Data variables: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>alpha</span></div><div class='xr-var-dims'>(chain, draw)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.6959 0.6361 ... 0.6491 0.691</div><input id='attrs-fe7d0d29-17ee-48fe-b1ac-fbe088b5676c' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-fe7d0d29-17ee-48fe-b1ac-fbe088b5676c' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7847deb4-80a4-48db-bea1-39601710a8ff' class='xr-var-data-in' type='checkbox'><label for='data-7847deb4-80a4-48db-bea1-39601710a8ff' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[0.69592703, 0.63605533, 0.68620635, ..., 0.67095042, 0.62715063,
         0.63786114],
        [0.65986889, 0.61794149, 0.65993102, ..., 0.62901943, 0.62618106,
         0.65830356],
@@ -719,7 +1198,7 @@ Attributes:
        [0.607845  , 0.60197837, 0.62735625, ..., 0.62053682, 0.69257234,
         0.70191768],
        [0.56194368, 0.73219812, 0.63673422, ..., 0.64910599, 0.64910599,
-        0.69098746]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>Intercept</span></div><div class='xr-var-dims'>(chain, draw)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.245 1.477 1.368 ... 1.411 1.401</div><input id='attrs-8c074aa3-a968-4595-9638-a3cec796c376' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8c074aa3-a968-4595-9638-a3cec796c376' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-8cecd9b2-c454-4ff2-9b13-bc5423a2f700' class='xr-var-data-in' type='checkbox'><label for='data-8cecd9b2-c454-4ff2-9b13-bc5423a2f700' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[1.24536263, 1.47708429, 1.36814688, ..., 1.50729605, 1.29322517,
+        0.69098746]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>Intercept</span></div><div class='xr-var-dims'>(chain, draw)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.245 1.477 1.368 ... 1.411 1.401</div><input id='attrs-27c30e34-653f-49b0-8e3d-4b5d477c33c7' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-27c30e34-653f-49b0-8e3d-4b5d477c33c7' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-82a4e2d3-77d3-43aa-af71-bd8287fe1ae6' class='xr-var-data-in' type='checkbox'><label for='data-82a4e2d3-77d3-43aa-af71-bd8287fe1ae6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[1.24536263, 1.47708429, 1.36814688, ..., 1.50729605, 1.29322517,
         1.47270335],
        [1.39617005, 1.37951911, 1.38522232, ..., 1.32313883, 1.41031622,
         1.37780825],
@@ -730,7 +1209,7 @@ Attributes:
        [1.36842139, 1.3211883 , 1.53664426, ..., 1.43642213, 1.3891655 ,
         1.34097588],
        [1.41683807, 1.46274752, 1.34210863, ..., 1.41098516, 1.41098516,
-        1.40057405]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>Treatment</span></div><div class='xr-var-dims'>(chain, draw, Treatment_dim)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-2.08 -2.272 ... -2.194 -2.131</div><input id='attrs-06235a42-ab5b-4900-8392-77145c37c188' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-06235a42-ab5b-4900-8392-77145c37c188' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-572cd801-c3bb-444d-8143-93996cb70688' class='xr-var-data-in' type='checkbox'><label for='data-572cd801-c3bb-444d-8143-93996cb70688' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[[-2.07969894],
+        1.40057405]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>Treatment</span></div><div class='xr-var-dims'>(chain, draw, Treatment_dim)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-2.08 -2.272 ... -2.194 -2.131</div><input id='attrs-13035d67-b3dd-4b43-8614-335194057b68' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-13035d67-b3dd-4b43-8614-335194057b68' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-baa4a12c-1645-48fd-9805-bc5cdaddd7e5' class='xr-var-data-in' type='checkbox'><label for='data-baa4a12c-1645-48fd-9805-bc5cdaddd7e5' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[[-2.07969894],
         [-2.27219906],
         [-2.1526889 ],
         ...,
@@ -770,7 +1249,7 @@ Attributes:
         ...,
         [-2.1944862 ],
         [-2.1944862 ],
-        [-2.13071552]]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mu</span></div><div class='xr-var-dims'>(chain, draw, __obs__)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.4342 0.4342 ... 4.058 4.058</div><input id='attrs-bfd3701d-20bf-40a9-8266-84f8b65e02a6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-bfd3701d-20bf-40a9-8266-84f8b65e02a6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-06c682fc-2a5d-4f87-b626-529e5ab148f6' class='xr-var-data-in' type='checkbox'><label for='data-06c682fc-2a5d-4f87-b626-529e5ab148f6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[[0.43416253, 0.43416253, 0.43416253, ..., 3.47419441,
+        [-2.13071552]]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mu</span></div><div class='xr-var-dims'>(chain, draw, __obs__)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.4342 0.4342 ... 4.058 4.058</div><input id='attrs-2cba05a7-fe6f-4440-935f-abcb4170bd50' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2cba05a7-fe6f-4440-935f-abcb4170bd50' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6184f456-7431-4e6e-896b-b70e04c4deb4' class='xr-var-data-in' type='checkbox'><label for='data-6184f456-7431-4e6e-896b-b70e04c4deb4' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[[0.43416253, 0.43416253, 0.43416253, ..., 3.47419441,
          3.47419441, 3.47419441],
         [0.45152941, 0.45152941, 0.45152941, ..., 4.38015576,
          4.38015576, 4.38015576],
@@ -810,13 +1289,20 @@ Attributes:
         [0.45680392, 0.45680392, 0.45680392, ..., 4.09999256,
          4.09999256, 4.09999256],
         [0.48184082, 0.48184082, 0.48184082, ..., 4.0575285 ,
-         4.0575285 , 4.0575285 ]]])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-bb46f2ac-448a-4be8-9a94-9115ce18290f' class='xr-section-summary-in' type='checkbox'  ><label for='section-bb46f2ac-448a-4be8-9a94-9115ce18290f' class='xr-section-summary' >Indexes: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>chain</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-606281f6-e1e7-47bc-b045-a492ea97f9b3' class='xr-index-data-in' type='checkbox'/><label for='index-606281f6-e1e7-47bc-b045-a492ea97f9b3' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([0, 1, 2, 3, 4, 5], dtype=&#x27;int64&#x27;, name=&#x27;chain&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>draw</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-16b7c912-cfe1-4941-b1d9-c274962e38ed' class='xr-index-data-in' type='checkbox'/><label for='index-16b7c912-cfe1-4941-b1d9-c274962e38ed' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([   0,    1,    2,    3,    4,    5,    6,    7,    8,    9,
+         4.0575285 , 4.0575285 ]]])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-00ba8beb-fa69-4a60-adbd-35b04f7377d7' class='xr-section-summary-in' type='checkbox'  ><label for='section-00ba8beb-fa69-4a60-adbd-35b04f7377d7' class='xr-section-summary' >Indexes: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>chain</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-55f334bd-b030-4eec-ba36-ec2a70ddf143' class='xr-index-data-in' type='checkbox'/><label for='index-55f334bd-b030-4eec-ba36-ec2a70ddf143' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([0, 1, 2, 3, 4, 5], dtype=&#x27;int64&#x27;, name=&#x27;chain&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>draw</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-e5ab3a2c-b239-4bbe-b05e-1a4955a404e8' class='xr-index-data-in' type='checkbox'/><label for='index-e5ab3a2c-b239-4bbe-b05e-1a4955a404e8' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([   0,    1,    2,    3,    4,    5,    6,    7,    8,    9,
        ...
        1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999],
-      dtype=&#x27;int64&#x27;, name=&#x27;draw&#x27;, length=2000))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>Treatment_dim</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-cb0ce6af-1fec-4940-a181-f62e421bccff' class='xr-index-data-in' type='checkbox'/><label for='index-cb0ce6af-1fec-4940-a181-f62e421bccff' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;trt A&#x27;], dtype=&#x27;object&#x27;, name=&#x27;Treatment_dim&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>__obs__</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-a814e74b-859e-4351-8794-11edc457a069' class='xr-index-data-in' type='checkbox'/><label for='index-a814e74b-859e-4351-8794-11edc457a069' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([  0,   1,   2,   3,   4,   5,   6,   7,   8,   9,
+      dtype=&#x27;int64&#x27;, name=&#x27;draw&#x27;, length=2000))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>Treatment_dim</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-566b37b0-63cd-4758-987c-8d5876cb417b' class='xr-index-data-in' type='checkbox'/><label for='index-566b37b0-63cd-4758-987c-8d5876cb417b' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;Trt&#x27;], dtype=&#x27;object&#x27;, name=&#x27;Treatment_dim&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>__obs__</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-bab955db-a383-44c3-8ab1-b47d56020904' class='xr-index-data-in' type='checkbox'/><label for='index-bab955db-a383-44c3-8ab1-b47d56020904' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([  0,   1,   2,   3,   4,   5,   6,   7,   8,   9,
        ...
        662, 663, 664, 665, 666, 667, 668, 669, 670, 671],
-      dtype=&#x27;int64&#x27;, name=&#x27;__obs__&#x27;, length=672))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-e2396feb-545b-47c4-bfda-b235a08834c8' class='xr-section-summary-in' type='checkbox'  checked><label for='section-e2396feb-545b-47c4-bfda-b235a08834c8' class='xr-section-summary' >Attributes: <span>(8)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>created_at :</span></dt><dd>2025-05-21T19:44:29.234456+00:00</dd><dt><span>arviz_version :</span></dt><dd>0.21.0</dd><dt><span>inference_library :</span></dt><dd>pymc</dd><dt><span>inference_library_version :</span></dt><dd>5.22.0</dd><dt><span>sampling_time :</span></dt><dd>17.945131063461304</dd><dt><span>tuning_steps :</span></dt><dd>500</dd><dt><span>modeling_interface :</span></dt><dd>bambi</dd><dt><span>modeling_interface_version :</span></dt><dd>0.15.0</dd></dl></div></li></ul></div></div>
+      dtype=&#x27;int64&#x27;, name=&#x27;__obs__&#x27;, length=672))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-b53eb709-d45b-4cf5-9d59-99b30a81b53a' class='xr-section-summary-in' type='checkbox'  checked><label for='section-b53eb709-d45b-4cf5-9d59-99b30a81b53a' class='xr-section-summary' >Attributes: <span>(8)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>created_at :</span></dt><dd>2025-07-01T16:14:29.892205+00:00</dd><dt><span>arviz_version :</span></dt><dd>0.21.0</dd><dt><span>inference_library :</span></dt><dd>pymc</dd><dt><span>inference_library_version :</span></dt><dd>5.22.0</dd><dt><span>sampling_time :</span></dt><dd>18.31052279472351</dd><dt><span>tuning_steps :</span></dt><dd>500</dd><dt><span>modeling_interface :</span></dt><dd>bambi</dd><dt><span>modeling_interface_version :</span></dt><dd>0.15.0</dd></dl></div></li></ul></div></div>
+```
+
+``` python
+bmbPreds1nb["preds"] = post1nb.mean(dim=["chain", "draw"])["mu"].values
+bmbPreds1nb["lowerCI"] = post1nb.quantile(dim=["chain", "draw"], q = 0.025)["mu"].values
+bmbPreds1nb["upperCI"] = post1nb.quantile(dim=["chain", "draw"], q = 0.975)["mu"].values
+bmbPreds1nb.describe()
 ```
 
 ```
@@ -860,18 +1346,39 @@ Attributes:
 ## max            1.0  101.000000  101.000000  114.000000    42.900000   
 ## std            0.0   25.120304   25.332340   25.695521     5.118438   
 ## 
-##        numericDate  exp_values     lowerCI     upperCI       preds  
-## count   672.000000  672.000000  672.000000  672.000000  672.000000  
-## mean     54.959821    2.265697    1.984167    2.597330    2.270442  
-## min       1.000000    0.467019    0.407712    0.540182    0.470203  
-## 25%      33.750000    0.467019    0.407712    0.540182    0.470203  
-## 50%      54.000000    2.265697    1.984167    2.597330    2.270442  
-## 75%      76.000000    4.064375    3.560621    4.654479    4.070682  
-## max     103.000000    4.064375    3.560621    4.654479    4.070682  
-## std      26.312575    1.800018    1.577629    2.058681    1.801580
+##        exp_values     lowerCI     upperCI       preds  
+## count  672.000000  672.000000  672.000000  672.000000  
+## mean     2.265697    1.984167    2.597330    2.270442  
+## min      0.467019    0.407712    0.540182    0.470203  
+## 25%      0.467019    0.407712    0.540182    0.470203  
+## 50%      2.265697    1.984167    2.597330    2.270442  
+## 75%      4.064375    3.560621    4.654479    4.070682  
+## max      4.064375    3.560621    4.654479    4.070682  
+## std      1.800018    1.577629    2.058681    1.801580
 ```
 
-<img src="03-GLMMsInPython_files/figure-html/nbBambi1Output-21.png" width="100%" /><img src="03-GLMMsInPython_files/figure-html/nbBambi1Output-22.png" width="100%" />
+``` python
+plot1nb = (ggplot(bmbPreds1nb, 
+                aes(x = 'DATI', y='preds', color = 'Treatment')) +
+        geom_line() +
+        geom_ribbon(aes(ymin = 'lowerCI', ymax = 'upperCI', fill = 'Treatment'),
+              alpha = 0.3) +
+        geom_point(aes(x='DATI', y='mothsperday', color = 'Treatment'), 
+            data = mean_cts, size = 1.1) +
+        facet_wrap(['Location'], scales = "free_y") +
+        scale_color_manual(values = mycolors) +
+        scale_fill_manual(values = mycolors) +
+        labs(title = "Bayes neg binom GLM",
+             subtitle = "Lines are predictions, points are the data"))
+# plot1nb.draw(True)
+plot1nb.show()
+```
+
+<img src="03-GLMMsInPython_files/figure-html/nbBambi1Output-5.png" width="100%" />
+
+``` python
+# plot1nb.save(filename='plot1nb.png', path='output/')
+```
 
 The Bayesian parameter estimates match very closely to the frequentist estimates. This is expected, but reassuring that we have built the correct foundation for the more complicated models to come. The first summary output is from the Bayesian model; the second is from the frequentist fit. (Note that in the fequentitst fit, they summarize the inverse shape parameter compared to the bambi fit.)
 
@@ -880,23 +1387,91 @@ Comparisons of TR predictions and predicted moth count values can be found at th
 
 ### Bayesian (PyMC) models-- Python
 
-For most needs, the "bambi" module should suffice. However, when I want to build my complicated non-linear function with multi-dimensional Gaussian Processes, I am going to need a more foundational module-- PyMC. Therefore, I will also build all models using this module. Learning PyMC will also help with extracting derived parameters and predictions, etc. from bambi
+For most needs, the `bambi` module should suffice. However, when I want to build my complicated non-linear function with multi-dimensional Gaussian Processes, I am going to need a more foundational module-- PyMC. Therefore, I  also build the models using this module. Learning PyMC will also help with extracting derived parameters and predictions, etc. from bambi.
 
 
+``` python
+# NB Bayes:
+#https://discourse.pymc.io/t/biased-results-from-poisson-regression-model/4349/5
+import numpy as np
+import pandas as pd
 
+from formulae import design_matrices
+import pymc as pm
+# Create the design matrix using formulae
+# Wrapping the variable in 'C()' enforces categorical values, with the first entry as the reference
+dm = design_matrices('nYSB ~ C(Treatment)', data=datP, na_action='error')
+# print(dm.common.as_dataframe().head())
+
+# Expand out into X and y
+X = dm.common.as_dataframe()
+y = dm.response.as_dataframe().squeeze() # This ensures y is 1-dimensional. 
+
+DaysOfCatch = datP['DaysOfCatch']
+
+# Create labelled coords which help the model keep track of everything(i.e., use factor names)
+c = {'predictors': X.columns, # Model now aware of number of and labels of predictors
+     'N': range(len(y))} # and number of observations
+
+with pm.Model(coords = c) as model_pymc1nb:
+    # Set the data, and convert to NumPy arrays (to use matrix multiplication
+    Xdata = pm.Data('Xdata', X.to_numpy())
+    Ydata = pm.Data('Ydata', y.to_numpy())
+    
+    # priors
+    # factor_coefs = pm.Normal('factor_coefs', mu=0, sigma=2, shape=len(X.columns))    
+    beta = pm.Normal('beta', mu=0, sigma=2, dims = 'predictors')
+    alpha = pm.HalfCauchy('alpha', beta = 1)
+
+    # TR derived parameter:
+    TR = pm.Deterministic('TR', 100 - 100 * np.exp(beta[1]))
+    
+    # likelihood:
+    mu = pm.math.exp(Xdata @ beta + # pm.math.dot(X, factor_coefs) + #@ operator is for matrix multiplication 
+                     np.log(DaysOfCatch)) 
+    pm.NegativeBinomial('y', mu=mu, alpha = alpha, observed=Ydata)
+    
+    # Sample according to your specifications, but tune for longer and take fewer draws
+    pymc1nb = pm.sample(draws=1000, tune=3000, cores=4, random_seed=45, step=pm.NUTS())#Metropolis())
+    # pymc1nb is called 'trace' in lots of the help files
+
+
+import pickle # to save PyMC object to file.
+filename = 'output/respymc1nb.pkl'
+# save bambi object to file.
+with open(filename, 'wb') as file:
+    pickle.dump(pymc1nb, file)
+```
+
+
+``` python
+# Load the object from the file
+import pickle
+filename = 'output/respymc1nb.pkl'
+with open(filename, 'rb') as file:
+    pymc1nb = pickle.load(file)
+
+# summary stats
+print(az.summary(pymc1nb))
+```
 
 ```
-##                              mean     sd  hdi_3%  hdi_97%  mcse_mean  mcse_sd  \
-## beta[Intercept]             1.402  0.067   1.279    1.532      0.001    0.001   
-## beta[C(Treatment)[trt A]]  -2.160  0.099  -2.348   -1.981      0.002    0.001   
-## alpha                       0.655  0.035   0.591    0.720      0.001    0.001   
-## TR                         88.406  1.141  86.308   90.527      0.024    0.017   
+##                            mean     sd  hdi_3%  hdi_97%  mcse_mean  mcse_sd  \
+## beta[Intercept]           1.402  0.067   1.279    1.532      0.001    0.001   
+## beta[C(Treatment)[Trt]]  -2.160  0.099  -2.348   -1.981      0.002    0.001   
+## alpha                     0.655  0.035   0.591    0.720      0.001    0.001   
+## TR                       88.406  1.141  86.308   90.527      0.024    0.017   
 ## 
-##                            ess_bulk  ess_tail  r_hat  
-## beta[Intercept]              2275.0    2726.0    1.0  
-## beta[C(Treatment)[trt A]]    2184.0    2559.0    1.0  
-## alpha                        3165.0    2350.0    1.0  
-## TR                           2184.0    2559.0    1.0
+##                          ess_bulk  ess_tail  r_hat  
+## beta[Intercept]            2275.0    2726.0    1.0  
+## beta[C(Treatment)[Trt]]    2184.0    2559.0    1.0  
+## alpha                      3165.0    2350.0    1.0  
+## TR                         2184.0    2559.0    1.0
+```
+
+``` python
+# CALC TR!
+print(az.summary(pymc1nb, var_names=['TR']))
 ```
 
 ```
@@ -907,400 +1482,9 @@ For most needs, the "bambi" module should suffice. However, when I want to build
 ## TR    1.0
 ```
 
-<img src="03-GLMMsInPython_files/figure-html/nbPyMCOutput1-25.png" width="100%" />
-
-
-## GLMM: Random effect (RE) for locations
-
-The first fix we make to the model is acknowledging that overall average  moth pressure varies from location to location (see Fig 1 of moth counts). To make this fix, we add a location random effect (RE) and our model becomes a generalized linear mixed-effects model (GLMM or GLMER).
-
-We also want to acknowledge that the treatment effect may vary from location to location-- sometimes we see a big difference in moth counts between control and treatment fields, and sometimes the difference is smaller. For inference though, we are only interested in the larger picture, which is the overall trapping reduction. (We are not interested in what happens at these exact locations per se, we are more interested in the average treatment effect.) Therefore, we also add a treatment random effect.
-
-Because dates will have different affect at different location (partially due to different planting dates), they are nested and not crossed.
-
-(Should date be planting date and not sampling date? )
-
-### GLMM mathematical model
-
-I only show the Poisson version of the model, the NB version is a straightforward extension.
-
-$$
-y_{ik} \sim Pois(\lambda_{ik}) \\
-log(\lambda_{ik} ) = \beta_0 + \beta_1 x_{A,i} + \gamma_{0k} x_{ik}  + \gamma_{1k} x_{i} x_{ik} + \mbox{ln} \left(DaysOfCatch_i\right) \\
-\gamma_{0k} \sim Normal(0, \sigma^2_{0}) \\
-\gamma_{1k} \sim Normal(0, \sigma^2_{1}) \\
-$$
-
-where, in addition to the variables and parameters defined for the GLM, we have
-
-$k = 1,..., K=10$ represents the locations, 
-
-$y_{ik}$ is moth count $i$ from location $k$,
-
-$\lambda_{ik}$ is the expected moth count for sample $i$  from location $k$,
-
-$\beta_0$ is the expected moth count for our control treatment for a new location,
-
-$\beta_1$ is the expected difference in moth counts between the control group and the treatment A group for a new location, 
-
-$\gamma_{0k}$ is the random intercept associated with location $k$, which leads to different background moth pressures at each location. All $\gamma_{0k}$ come from an iid Normal distribution.
-
-$\gamma_{1k}$ is the random slope associated with location $k$, which leads to different treatment effects at each location. All $\gamma_{1k}$ come from an iid Normal distribution, and
-
-$x_{ik}$ is an indicator variable that equals 1 if moth count $i$ is associated with location $k$ and 0 otherwise.
-
-OK, technically I should be introducing matrices here because $k = 1,..., K=10$ locations, so we need a new indicator variable for each location, but I'm going to be lazy and write it like this for now.
-
-
-#### Bayesian GLMM
-
-Here is the same model with a Bayesian framework and using a negative binomial regression:
-
-To make our models Bayesian, we add priors to our parameters:
-
-$$
-y_{ik}\sim NegBinom(\lambda_{ik}, \phi) \\
-log(\lambda_{ik} ) = \beta_0 + \beta_1 x_{A,i} + \gamma_{0k} x_{ik}  + \gamma_{1k} x_{A,i} x_{ik} + \mbox{ln} \left(DaysOfCatch_i\right) \\ 
-\gamma_{0k} \sim Normal(0, \sigma^2_{0}) \\
-\gamma_{1k} \sim Normal(0, \sigma^2_{1}) \\
-\beta_0 \sim Normal(0, 2) \\
-\beta_1 \sim Normal(0, 2) \\
-\sigma^2_{0} \sim HalfCauchy(0,1) \\
-\sigma^2_{1} \sim HalfCauchy(0,1) \\
-\phi \sim HalfCauchy(0,1) \\
-$$
-
-
-#### Bayesian GLMM -- Matrix version
-
-I DO write the Bayesian version in matrix form because it matches the coding (and is more correct given the need for a $KxK$ $Z$ design matrix):
-
-$$
-\mathbf{Y} \sim NegBinom(\boldsymbol\lambda, \phi) \\
-log(\boldsymbol\lambda) = \mathbf{X}\boldsymbol\beta + \mathbf{Z}\boldsymbol\gamma  + \mbox{ln} \left(\bf{DaysOfCatch}\right) \\
-\boldsymbol\beta \sim Normal(\mathbf{0}, 2\mathbf{I}) \\
-\boldsymbol\gamma \sim Normal(\mathbf{0}, \boldsymbol\sigma^2 \mathbf{I}) \\
-\boldsymbol\sigma^2 \sim HalfCauchy(\mathbf{0}, 1\mathbf{I})) \\
-\phi \sim HalfCauchy(0,1)
-$$
-
-
-### GLMM frequentist fit
-
-Python is a little disappointing for GLMMs. We use "pymer4" module which is just a wrapper to the R library "lme4". This is awkward here-- we are wrapping Python code inside R, and the Python code is a wrapper back to R. So, I get a warning. I am including the code here anyways for anyone working outside of reticulate and RStudio.
-
-(If we only have random intercepts, you can use the "statsmodels" module, but it cannot accommodate random intercepts and slopes, which is what we have.)
-
-You can also use the "GPBoost" module, but it is overly complicated for our small data set.
-
-The "pymer4" module installation is giving me some trouble, so I will fill in this section later.
-
-<!-- When we plot our predictions, we see that we now have better estimates for the overall mean at each location, and we see how much they vary from location to location, but there is a strong temporal pattern at each location that we are missing. -->
-
-
-
-Try ChatGPT?
-
-Google's Gemini AI is convinced that a negative binomial regression with random slopes and intercepts is possible in Python, but:
-
-* the Lmer function does not allow for neg binomial regression models. 
-
-* "statsmodels" similarly only supports binomial and Poisson models using Bayesian methods. 
-
-Therefore, we only fit the negative binomial regression model within the Bayesian framework. This is a category where R takes the win over Python!
-
-
-### GLMM Bayesian (bambi) models
-
-By default, the prior distributions of random slopes and intercepts are correlated in "brm". If the correlation is non-significant, you may want to remove that correlation to simplify your model. To remove the correlation, change the random effects term from "(1 + TreatmentF|Location)" to " (1 + TreatmentF||Location)" (has an extra vertical line), which makes them independent. (TRUE FOR BAMBI??)
-
-You'll notice that the parameter estimates are slightly different from the frequentist NB model fit here-- the more complicated your model is, the more likely you will find this is true with slightly different versions of your model (here, adding priors and fitting with a different algorithm). 
-
-Again, notice the subtle differences between "brms" and "bambi".
-
-"At the time random effects (apologies to those who hate the term :smile:) were implemented in Bambi, it was not that straightforward to put a non-diagonal correlation matrix in PyMC. Or at least it was not that simple to me. **So the default is to not use correlated intercept and slopes**, and that explains why you can’t see them in the posterior."
-From: 
-https://discourse.pymc.io/t/bambi-model-correlated-intercept-slopes/16054/2
-
-NOTE: Google Gemini says that the default IS correlated intercept, slopes. (May 21, 2025). Be careful using A.I.!
-
-<img src="03-GLMMsInPython_files/figure-html/nbBambi2setup-27.png" width="100%" />
-
-
+``` python
+# outTR1nb = round(TR1nb.quantile(q=[0.025, 0.5, 0.975]).to_pandas())
 ```
-## Data variables:
-##     alpha                     (chain, draw) float64 96kB 1.587 1.468 ... 1.625
-##     Intercept                 (chain, draw) float64 96kB 1.308 1.862 ... 1.087
-##     Treatment                 (chain, draw, Treatment_dim) float64 96kB -2.00...
-##     1|Location_sigma          (chain, draw) float64 96kB 2.241 1.428 ... 1.695
-##     Treatment|Location_sigma  (chain, draw, Treatment__expr_dim) float64 96kB ...
-##     1|Location                (chain, draw, Location__factor_dim) float64 960kB ...
-##     Treatment|Location        (chain, draw, Treatment__expr_dim, Location__factor_dim) float64 960kB ...
-```
-
-```
-##                                   mean     sd  hdi_3%  hdi_97%  mcse_mean  \
-## Intercept                        0.828  0.413   0.006    1.584      0.008   
-## Treatment[trt A]                -1.880  0.238  -2.344   -1.425      0.004   
-## alpha                            1.533  0.098   1.361    1.731      0.001   
-## 1|Location_sigma                 1.308  0.330   0.783    1.918      0.006   
-## Treatment|Location_sigma[trt A]  0.689  0.206   0.366    1.076      0.003   
-## 
-##                                  mcse_sd  ess_bulk  ess_tail  r_hat  
-## Intercept                          0.006    2812.0    4288.0    1.0  
-## Treatment[trt A]                   0.003    3876.0    5182.0    1.0  
-## alpha                              0.001   11019.0    8419.0    1.0  
-## 1|Location_sigma                   0.005    3438.0    5119.0    1.0  
-## Treatment|Location_sigma[trt A]    0.003    3678.0    6340.0    1.0
-```
-
-```
-## 0.025    75.191971
-## 0.500    84.741479
-## 0.975    90.533637
-## Name: trtA, dtype: float64
-```
-
-<img src="03-GLMMsInPython_files/figure-html/nbBambi2Output-29.png" width="100%" /><img src="03-GLMMsInPython_files/figure-html/nbBambi2Output-30.png" width="100%" />
-
-
-### GLMM Bayesian (PyMC) models-- Python
-
-Notice that my model framework is different from the tutorial within PyMC. In PyM tutorial, our beta's are the means of the random intercept and slope. Here, I explicitly keep them as separate parameters. Is their way faster than mine? Perhaps that is why they do it that way? I'm sticking with this way because this is how I have always built the more complicated models that are forthcoming. Also, it is helpful to see similar models coded in different ways-- helps you become more familiar with the programming and betters your understanding of the model itself.
-
-<img src="03-GLMMsInPython_files/figure-html/nbPyMCsetup2-33.png" width="100%" />
-
-
-
-Starting with these models, I specify which variables for which I want to see the posteriors and summary statistics. In general, we don't usually want the output for any latent variables as that would overwhelm our screens and are not the parameters of most interest right now.
-
-
-```
-##                 mean     sd  hdi_3%  hdi_97%  mcse_mean  mcse_sd  ess_bulk  \
-## beta_coefs[0]  0.823  1.041  -1.171    2.761      0.024    0.019    1916.0   
-## beta_coefs[1] -1.946  0.075  -2.093   -1.811      0.001    0.001    3830.0   
-## alpha          1.385  0.089   1.219    1.548      0.001    0.002    3926.0   
-## sigma0         0.804  0.446   0.042    1.519      0.030    0.010     182.0   
-## sigma1         0.778  0.445   0.014    1.470      0.032    0.010     179.0   
-## 
-##                ess_tail  r_hat  
-## beta_coefs[0]    2156.0   1.00  
-## beta_coefs[1]    2607.0   1.00  
-## alpha            2374.0   1.00  
-## sigma0            187.0   1.02  
-## sigma1            259.0   1.02
-```
-
-```
-##      mean     sd  hdi_3%  hdi_97%  mcse_mean  mcse_sd  ess_bulk  ess_tail  \
-## TR  85.68  1.075  83.688   87.695      0.017    0.019    3830.0    2607.0   
-## 
-##     r_hat  
-## TR    1.0
-```
-
-<img src="03-GLMMsInPython_files/figure-html/nbPyMCOutput2-35.png" width="100%" />
-
-
-## GLMM: RE for location, crossed SamplingDate
-
-### Crossed GLMM frequentist fit
-
-Not done because relies on the "lmer" wrapper.
-
-### Crossed GLMM Bayes (bambi) version
-
-Output is slightly different from "brms" output, especially the predictions for Loc9. Differences might be due to correlated versus not correlated RE's for location.
-
-<img src="03-GLMMsInPython_files/figure-html/nbBambi3setup-37.png" width="100%" />
-
-
-```
-##        Formula: nYSB ~ Treatment + (Treatment|Location) +  (1|SamplingDateC) + offset(log(DaysOfCatch))
-##         Family: negativebinomial
-##           Link: mu = log
-##   Observations: 672
-##         Priors: 
-##     target = mu
-##         Common-level effects
-##             Intercept ~ Normal(mu: 0.0, sigma: 2.0)
-##             Treatment ~ Normal(mu: 0.0, sigma: 2.0)
-##         
-##         Group-level effects
-##             1|Location ~ Normal(mu: 0.0, sigma: HalfCauchy(beta: 1.0))
-##             Treatment|Location ~ Normal(mu: 0.0, sigma: HalfCauchy(beta: 1.0))
-##             1|SamplingDateC ~ Normal(mu: 0.0, sigma: HalfCauchy(beta: 1.0))
-##         
-##         Offset effects
-##             offset(log(DaysOfCatch)) ~ 1
-##         
-##         Auxiliary parameters
-##             alpha ~ HalfCauchy(beta: 1.0)
-```
-
-```
-## Data variables:
-##     alpha                     (chain, draw) float64 96kB 2.219 2.856 ... 2.755
-##     Intercept                 (chain, draw) float64 96kB 1.312 1.222 ... 0.6862
-##     Treatment                 (chain, draw, Treatment_dim) float64 96kB -1.75...
-##     1|Location_sigma          (chain, draw) float64 96kB 1.372 1.166 ... 1.378
-##     Treatment|Location_sigma  (chain, draw, Treatment__expr_dim) float64 96kB ...
-##     1|SamplingDateC_sigma     (chain, draw) float64 96kB 0.6889 ... 0.6428
-##     1|Location                (chain, draw, Location__factor_dim) float64 960kB ...
-##     Treatment|Location        (chain, draw, Treatment__expr_dim, Location__factor_dim) float64 960kB ...
-##     1|SamplingDateC           (chain, draw, SamplingDateC__factor_dim) float64 6MB ...
-```
-
-```
-##                                   mean     sd  hdi_3%  hdi_97%  mcse_mean  \
-## Intercept                        0.665  0.383  -0.083    1.354      0.007   
-## Treatment[trt A]                -1.744  0.229  -2.163   -1.305      0.004   
-## alpha                            2.575  0.216   2.177    2.986      0.002   
-## 1|Location_sigma                 1.140  0.293   0.669    1.670      0.004   
-## Treatment|Location_sigma[trt A]  0.649  0.196   0.341    1.011      0.003   
-## 1|SamplingDateC_sigma            0.677  0.081   0.525    0.826      0.001   
-## 
-##                                  mcse_sd  ess_bulk  ess_tail  r_hat  
-## Intercept                          0.005    2709.0    4640.0    1.0  
-## Treatment[trt A]                   0.003    3858.0    5287.0    1.0  
-## alpha                              0.002   14286.0    8620.0    1.0  
-## 1|Location_sigma                   0.005    4666.0    6886.0    1.0  
-## Treatment|Location_sigma[trt A]    0.003    5124.0    6701.0    1.0  
-## 1|SamplingDateC_sigma              0.001    3394.0    6034.0    1.0
-```
-
-```
-## 0.025    72.321235
-## 0.500    82.592386
-## 0.975    88.791648
-## Name: trtA, dtype: float64
-```
-
-```
-##            TrapID   Longitude    Latitude                 TransplantDate  \
-## count  672.000000  672.000000  672.000000                            672   
-## mean   152.500000  108.684570   -6.895572  2023-08-16 01:25:42.857142784   
-## min    101.000000  106.451339   -7.421778            2023-07-24 00:00:00   
-## 25%    102.750000  106.653911   -7.242430            2023-08-06 00:00:00   
-## 50%    152.500000  107.809442   -6.876379            2023-08-12 00:00:00   
-## 75%    202.250000  110.998138   -6.740433            2023-08-26 00:00:00   
-## max    204.000000  111.621353   -6.178671            2023-09-09 00:00:00   
-## std     50.049752    2.101653    0.417043                            NaN   
-## 
-##                      TrapInstallDate                DispInstallDate  \
-## count                            672                            440   
-## mean   2023-08-20 08:34:17.142857216  2023-08-20 04:34:54.545454592   
-## min              2023-08-04 00:00:00            2023-08-04 00:00:00   
-## 25%              2023-08-11 00:00:00            2023-08-11 00:00:00   
-## 50%              2023-08-17 00:00:00            2023-08-16 00:00:00   
-## 75%              2023-08-31 00:00:00            2023-08-31 00:00:00   
-## max              2023-09-10 00:00:00            2023-09-10 00:00:00   
-## std                              NaN                            NaN   
-## 
-##        AssessmentNumber                   SamplingDate        nYSB  \
-## count        672.000000                            672  672.000000   
-## mean           4.750000  2023-10-06 23:02:08.571428608   22.558036   
-## min            1.000000            2023-08-14 00:00:00    0.000000   
-## 25%            3.000000            2023-09-15 18:00:00    2.000000   
-## 50%            5.000000            2023-10-06 00:00:00    5.000000   
-## 75%            7.000000            2023-10-28 00:00:00   17.000000   
-## max           10.000000            2023-11-24 00:00:00  429.000000   
-## std            2.498882                            NaN   51.304964   
-## 
-##        DaysOfCatch        DATI        DADI         DAT  mothsperday  \
-## count        672.0  672.000000  440.000000  672.000000   672.000000   
-## mean           1.0   47.602679   48.038636   51.900298     2.266169   
-## min            1.0    8.000000   10.000000   11.000000     0.000000   
-## 25%            1.0   29.750000   30.000000   31.000000     0.200000   
-## 50%            1.0   50.000000   50.000000   52.000000     0.500000   
-## 75%            1.0   70.000000   70.000000   73.000000     1.706818   
-## max            1.0  101.000000  101.000000  114.000000    42.900000   
-## std            0.0   25.120304   25.332340   25.695521     5.118438   
-## 
-##        numericDate  exp_values     lowerCI     upperCI       preds  
-## count   672.000000  672.000000  672.000000  672.000000  672.000000  
-## mean     54.959821    2.265697    1.378515    3.406094    2.190364  
-## min       1.000000    0.467019    0.019608    0.081111    0.043083  
-## 25%      33.750000    0.467019    0.171155    0.467459    0.289862  
-## 50%      54.000000    2.265697    0.396414    1.073091    0.683043  
-## 75%      76.000000    4.064375    1.240226    3.321541    2.079838  
-## max     103.000000    4.064375   16.136019   45.167927   27.262243  
-## std      26.312575    1.800018    2.589362    6.435736    4.104133
-```
-
-<img src="03-GLMMsInPython_files/figure-html/nbBambi3Output-39.png" width="100%" /><img src="03-GLMMsInPython_files/figure-html/nbBambi3Output-40.png" width="100%" />
-
-### Crossed GLMM Bayes (PyMC) version
-
-To be filled in later.
-
-
-
-
-
-
-
-## GLMM with Gaussian Processes: RE for Trial, GP for Date
-
-Now we are in the territory where we have to fit the models in a Bayesian framework. If our response variable was continuous (i.e., the regression model was based on a Normal distribution), then we could still use maximum likelihood estimation.
-
-### Gaussian Process Bayes (bambi) version
-
-* Use numeric version of sampling date for better algorithm stability. Still, we have a warning about a divergent transition. Ideally, we would tweak the model and look at the data carefully so fix this warning, but because we are working with made up data, we will not worry abotu the warning for now.
-
-* Different from "brms"-- I do not estimate separeate parameters for each Location-- that option was causing many divergent warnings.
-
-* Can only do "hsgp" version that is dimension reduction version. Here, we have only 10 assessments per date-location, so we are already working with limited dimensions.
-
-From the hsgp documentation (https://www.pymc.io/projects/examples/en/latest/gaussian_processes/HSGP-Basic.html): "For smaller data sets, the full unapproximated GP may still be more efficient."
-
-<img src="03-GLMMsInPython_files/figure-html/nbBambi4setup-43.png" width="100%" />
-
-
-```
-## Data variables:
-##     alpha                     (chain, draw) float64 32kB 2.461 2.766 ... 2.483
-##     Intercept                 (chain, draw) float64 32kB 0.4429 ... 0.4649
-##     Treatment                 (chain, draw, Treatment_dim) float64 32kB -2.13...
-##     hsgp_sigma                (chain, draw) float64 32kB 0.6263 0.544 ... 0.636
-##     hsgp_ell                  (chain, draw) float64 32kB 9.935 7.088 ... 11.63
-##     hsgp_weights_raw          (chain, draw, hsgp_weights_dim, hsgp_by) float64 2MB ...
-##     1|Location_sigma          (chain, draw) float64 32kB 1.114 1.016 ... 1.064
-##     Treatment|Location_sigma  (chain, draw, Treatment__expr_dim) float64 32kB ...
-##     hsgp_weights              (chain, draw, hsgp_weights_dim, hsgp_by) float64 2MB ...
-##     hsgp                      (chain, draw, __obs__) float64 22MB 0.04379 ......
-##     1|Location                (chain, draw, Location__factor_dim) float64 320kB ...
-##     Treatment|Location        (chain, draw, Treatment__expr_dim, Location__factor_dim) float64 320kB ...
-```
-
-```
-##                                   mean     sd  hdi_3%  hdi_97%  mcse_mean  \
-## Intercept                        0.752  0.407  -0.002    1.517      0.015   
-## Treatment[trt A]                -1.826  0.224  -2.231   -1.390      0.007   
-## alpha                            2.686  0.224   2.277    3.109      0.003   
-## 1|Location_sigma                 1.257  0.326   0.769    1.882      0.009   
-## Treatment|Location_sigma[trt A]  0.676  0.199   0.365    1.044      0.006   
-## hsgp_sigma                       0.702  0.147   0.514    0.891      0.006   
-## hsgp_ell                         8.589  2.305   3.852   12.498      0.120   
-## 
-##                                  mcse_sd  ess_bulk  ess_tail  r_hat  
-## Intercept                          0.009     764.0    1466.0   1.01  
-## Treatment[trt A]                   0.005     962.0    1661.0   1.01  
-## alpha                              0.004    6101.0    3061.0   1.00  
-## 1|Location_sigma                   0.008    1340.0    1956.0   1.00  
-## Treatment|Location_sigma[trt A]    0.006    1306.0    1941.0   1.00  
-## hsgp_sigma                         0.019     958.0     517.0   1.00  
-## hsgp_ell                           0.129     540.0     305.0   1.01
-```
-
-```
-## 0.025    75.0
-## 0.500    84.0
-## 0.975    90.0
-## Name: trtA, dtype: float64
-```
-
-<img src="03-GLMMsInPython_files/figure-html/nbBambi4Output-45.png" width="100%" /><img src="03-GLMMsInPython_files/figure-html/nbBambi4Output-46.png" width="100%" />
 
 
 ## Summary of estimates
@@ -1310,38 +1494,39 @@ From the hsgp documentation (https://www.pymc.io/projects/examples/en/latest/gau
 Here, the trapping reduction estimates from all of the models are compared. As expected, the median TR estimates are very close from model to model, but the uncertainty in that estimate increase (i.e., the confidence/credible intervals get wider) when we properly account for the correlations in our data.
 
 
-```
-##   Framework  Distribution               Model_name    TR  lowerCI  upperCI
-## 0  Bayesian  Neg Binomial                      GLM  86.0     88.0     90.0
-## 1  Bayesian  Neg Binomial          GLMM (location)  75.0     85.0     91.0
-## 2  Bayesian  Neg Binomial    GLMM (location, date)  72.0     83.0     89.0
-## 3  Bayesian  Neg Binomial  GLMM (location) with GP  75.0     84.0     90.0
-```
+``` python
+data = np.array([round(TR_1nb.quantile(q=[0.025, 0.5, 0.975]))) 
+                 # round(TR2nb.quantile(q=[0.025, 0.5, 0.975])), 
+                 # round(TR3nb.quantile(q=[0.025, 0.5, 0.975])),
+                 # round(TR4nb.quantile(q=[0.025, 0.5, 0.975]))])
 
-<img src="03-GLMMsInPython_files/figure-html/allTRestimates-49.png" width="100%" />
+df = pd.DataFrame(data, columns = ["TR", "lowerCI", "upperCI"])
+df["Model_name"] = ["GLM", "GLMM (location)", "GLMM (location, date)", "GLMM (location) with GP"]
+df["Distribution"] = ["Neg Binomial", "Neg Binomial", "Neg Binomial", "Neg Binomial"]
+df["Framework"] = ["Bayesian", "Bayesian", "Bayesian", "Bayesian"]
+print(df[["Framework", "Distribution", "Model_name", "TR", "lowerCI", "upperCI"]])
+```
 
 ### Compare coefficients
 
-Because TR is a non-linear function of $\beta_1$, the differences int he model output get slightly distorted from the transformation. Thereofre, the $\beta_1$ coefficients are displayed as well:
+Because TR is a non-linear function of $\beta_1$, the differences in the model output get slightly distorted from the transformation. Thereofre, the $\beta_1$ coefficients are displayed as well:
 
 
-```
-##     mean     sd
-## 0 -2.159  0.099
-## 1 -1.880  0.238
-## 2 -1.744  0.229
-## 3 -1.826  0.224
-```
+``` python
+dfB = pd.concat([az.summary(idata_bmb1nb, var_names=["Treatment"])[["mean", "sd"]],
+az.summary(idata_bmb2nb, var_names=["Treatment"])[["mean", "sd"]]], ignore_index=True)
 
-```
-##   Framework  Distribution               Model_name   mean     sd
-## 0  Bayesian  Neg Binomial                      GLM -2.159  0.099
-## 1  Bayesian  Neg Binomial          GLMM (location) -1.880  0.238
-## 2  Bayesian  Neg Binomial    GLMM (location, date) -1.744  0.229
-## 3  Bayesian  Neg Binomial  GLMM (location) with GP -1.826  0.224
-```
+dfB = pd.concat([dfB,
+az.summary(idata_bmb3nb, var_names=["Treatment"])[["mean", "sd"]]], ignore_index=True)
+dfB = pd.concat([dfB,
+az.summary(idata_bmb4nb, var_names=["Treatment"])[["mean", "sd"]]], ignore_index=True)
+dfB
 
-<img src="03-GLMMsInPython_files/figure-html/allBetas-51.png" width="100%" />
+dfB["Model_name"] = ["GLM", "GLMM (location)", "GLMM (location, date)", "GLMM (location) with GP"]
+dfB["Distribution"] = ["Neg Binomial", "Neg Binomial", "Neg Binomial", "Neg Binomial"]
+dfB["Framework"] = ["Bayesian", "Bayesian", "Bayesian", "Bayesian"]
+print(dfB[["Framework", "Distribution", "Model_name", "mean", "sd"]])
+```
 
 
 ### Plot comparisons

@@ -1,9 +1,13 @@
 --- 
 title: "Bayesian models in R and Python"
 author: "Kristin Broms"
-date: "2025-06-23"
+date: "2025-07-03"
 site: bookdown::bookdown_site
-output: bookdown::gitbook
+output: 
+  bookdown::gitbook:
+    config:
+      toc:
+        collapse: section
 documentclass: book
 bibliography: [book.bib, packages.bib]
 biblio-style: apalike

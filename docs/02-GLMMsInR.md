@@ -2,7 +2,7 @@
 
 When completing an analysis, I may skip around in my script quite a bit. Therefore, I like all packages loaded, and all data uploaded and manipulated at the start of my script.
 
-## Setup code
+## Setup
 
 
 ``` r
@@ -108,6 +108,7 @@ brmspredplot = function(preddata, plottitle = "") {
 # read in the data:
 datRinit = read.csv("data/moths.csv")
 # check data values: 
+# (Results not shown for succinctness)
 str(datRinit)
 summary(datRinit)
 lapply(datRinit, function(x) {
@@ -140,7 +141,7 @@ mean_cts <- datR %>%
 ```
 
 
-## Data Exploration
+## Data exploration
 
 ### The data
 
@@ -469,9 +470,9 @@ print(p1p_glm)
 
 The model is such a bad fit to the data, it is hard to even tell what is going on in the figure above.
 
-### Frequentist negative binomial model {#nb1}
+### Frequentist NB model {#nb1}
 
-For the negative binomial model, our confidence intervals are a little wider, but we are still ignoring all the correlations in our data. And the plot of the predictions again indicates the lack of fit (Figure \@ref(fig:p1nb-glmFig)).
+For the negative binomial (NB) model, our confidence intervals are a little wider, but we are still ignoring all the correlations in our data. And the plot of the predictions again indicates the lack of fit (Figure \@ref(fig:p1nb-glmFig)).
 
 
 ``` r
@@ -1013,7 +1014,7 @@ print(bayes_p2nb)
 Again, the figure looks almost identical to the the frequent predictions (Figure \@ref(fig:p2nb-glmmFig)). 
 
 
-## GLMM: RE for Location, SamplingDate {#fit-glmm-datesR}
+## GLMM: RE for location, sampling date {#fit-glmm-datesR}
 
 In this version of the model, we acknowledge that sampling on different days of the season adds to the variability of the moth counts, and that counts from the same sampling date are more similar than for a different date. In this model, however,  the correlation between sampling dates is ignored.
 
