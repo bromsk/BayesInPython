@@ -16,11 +16,7 @@ This chapter begins with almost the same setup code as Chapter \@ref(GLMMsR), co
 
 
 ``` r
-knitr::opts_chunk$set(cache = T, message =F, warning = F,  #echo=F,
-                      # dpi = 36, out.width="600px", out.height="600px")
-  # fig.width = 8,
-  # fig.height = 5,
-  out.width = '100%')
+knitr::opts_chunk$set(cache = T, message =F, warning = F,  out.width = '100%')
 
 ## R libraries:
 # uncomment and change package name to download any required packages
@@ -48,26 +44,6 @@ library(ggmcmc) # ggs()
 mycolors = c("#9E0142", "#66C2A5")
 ```
 
-``` r
-# define some functions to use in this script.
-
-## calculate trapping reduction for frequentist model fits.
-getTR <- function (mod, coefs = -1) {
-  b1 = summary(mod)$coef[coefs,1]
-  seb1 = summary(mod)$coef[coefs,2]
-  (TR = round(100 * (1- exp(b1)),1))
-  (higher = round(100 * (1 - exp(b1 - 1.96*seb1)),1))
-  (lower = round(100 * (1 - exp(b1 + 1.96*seb1)),1)) 
-  data.frame(#Treatment = names(TR),
-             TR = as.numeric(TR), 
-             lowerCI = as.numeric(lower),
-             upperCI = as.numeric(higher))   
-}
-
-## NA = 0 in sum
-`%+%` <- function(x, y)  mapply(sum, x, y, MoreArgs = list(na.rm = TRUE))
-#
-```
 
 ``` r
 # read in the data:
@@ -83,7 +59,7 @@ lapply(datRinit, function(x) {
 ```
 
 ``` r
-# manipulate data as needed:
+# manipulate data:
 datR <- datRinit %>%
   # convert dates to dates (instead of character string):
   mutate(TransplantDate = ymd(TransplantDate),
@@ -92,7 +68,6 @@ datR <- datRinit %>%
          SamplingDate = ymd(SamplingDate)
          )  %>%
   mutate(mothsperday = nYSB / DaysOfCatch, # standardize the counts
-         # TreatmentF = factor(Treatment), # if we need to fix levels in non-alpha order. Excluded/commented out here for simplicity
          SamplingDateC = as.character(SamplingDate))
 
 ## data manipulation that was not included in previous R chapter:
@@ -152,6 +127,14 @@ plot(t, beta, type = "l", xlab = "Days after installation (DAI)",
 ```
 
 <img src="04-NonlinearInR_files/figure-html/SimData-1.png" width="100%" />
+
+``` r
+plot(t, TR, type = "l", xlab = "Days after installation (DAI)",
+     ylab = "Trapping Reduction",
+     main = "How trapping reduction may change through a season")
+```
+
+<img src="04-NonlinearInR_files/figure-html/SimData-2.png" width="100%" />
 
 This [shiny app](https://bromsk.shinyapps.io/GeneralizedLogisticCurves/) allows you to play around with how the parameter values affect the curve. It is helpful in understanding the model and setting priors for the model.
 
@@ -359,37 +342,6 @@ Table: (\#tab:summary1)True parameter values.
 |B         |    0.1|
 |M         |   50.0|
 |shape     |    5.0|
-
-``` r
-# Calc TR
-modtranformed <- ggs(fit1) 
-# str(modtranformed)
-A1 <- modtranformed %>% 
-  filter(Parameter == c("b_A_Intercept"), 
-         Iteration > 500) # remove burn-in
-B1 <- modtranformed %>% 
-  filter(Parameter == c("b_B_Intercept"),
-         Iteration > 500) # remove burn-in
-M1 <- modtranformed %>% 
-  filter(Parameter == c("b_M_Intercept"),
-         Iteration > 500) # remove burn-in
-DAImatrix = matrix(DAI, nrow = nrow(A1), ncol = length(DAI), byrow = T)
-tmp = apply(DAImatrix, 2, function(x) x - M1$value) # nIter x nDAI
-beta1 = apply(tmp, 2, function(x) -1 * A1$value * (1 - 1 / (1 + exp(-1 * B1$value * x ))))
-TR = 100 * (1 - exp(beta1))
-
-TR1 <- data.frame(TR = round(apply(TR, 2, median), 1), 
-           lowerCI = round(apply(TR, 2, quantile, 0.025), 1), 
-          upperCI = round(apply(TR, 2, quantile, 0.975), 1),
-          DAI = DAI)
-ggplot(TR1) +
-  geom_line(aes(DAI, TR), linewidth = 1.2) +
-  geom_ribbon(aes(DAI, ymin = lowerCI, ymax = upperCI), alpha = 0.3) +
-  geom_line(data = simdata1, aes(DAI, TR), color = "purple", linewidth = 1.2) +
-  geom_point(data = simdata1, aes(DAI, TR), color = "purple", size = 1.2) +
-  labs(title = "Predicted and true TR curve")
-```
-
 <img src="04-NonlinearInR_files/figure-html/output1-1.png" width="100%" />
 
 ### Intercept RE, no GP
@@ -518,46 +470,6 @@ Table: (\#tab:summary2)True parameter values.
 |b0 SD     |    0.8|
 |shape     |    5.0|
 
-
-``` r
-# Calc TR
-modtranformed <- ggs(fit2) 
-# get b0 estimates for each location:
-meanb0est <- modtranformed %>%
-  filter(Parameter == "b_b0_Intercept") %>%
-  summarize(med = median(value))
-# modtranformed %>%
-#   filter(grepl("r_", Parameter)) %>%
-#   group_by(Parameter) %>%
-#   summarize(med = median(value) + meanb0est$med)
-# round(b0, 2)
-# str(modtranformed)
-estA <- modtranformed %>% 
-  filter(Parameter == c("b_A_Intercept"), 
-         Iteration > 500) # remove burn-in
-estB <- modtranformed %>% 
-  filter(Parameter == c("b_B_Intercept"),
-         Iteration > 500) # remove burn-in
-estM <- modtranformed %>% 
-  filter(Parameter == c("b_M_Intercept"),
-         Iteration > 500) # remove burn-in
-DAImatrix = matrix(DAI, nrow = nrow(estA), ncol = length(DAI), byrow = T)
-tmp = apply(DAImatrix, 2, function(x) x - estM$value) # nIter x nDAI
-beta1 = apply(tmp, 2, function(x) -1 * estA$value * (1 - 1 / (1 + exp(-1 * estB$value * x ))))
-TR = 100 * (1 - exp(beta1))
-
-TRdf <- data.frame(TR = round(apply(TR, 2, median), 1), 
-           lowerCI = round(apply(TR, 2, quantile, 0.025), 1), 
-          upperCI = round(apply(TR, 2, quantile, 0.975), 1),
-          DAI = DAI)
-ggplot(TRdf) +
-  geom_line(aes(DAI, TR), linewidth = 1.2) +
-  geom_ribbon(aes(DAI, ymin = lowerCI, ymax = upperCI), alpha = 0.3) +
-  geom_line(data = simdata2, aes(DAI, TR), color = "purple", linewidth = 1.2) +
-  geom_point(data = simdata2, aes(DAI, TR), color = "purple", size = 1.2) +
-  labs(title = "Predicted and true TR curve") 
-```
-
 <img src="04-NonlinearInR_files/figure-html/output2-1.png" width="100%" />
 
 ### Intercept RE, A RE, no GP
@@ -626,28 +538,12 @@ fit3 <- brm(bf(nYSB ~ b0 - (A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) )))) * numT
 saveRDS(fit3, "output/fit3.RDS")
 ```
 
-``` r
-fit3 <- readRDS("output/fit3.RDS")
-# summary(fit3)
-# prior_summary(fit3)
-# plot(fit3)
-# conditional_effects(fit3, "DAI:numTrt")
-
-kable(round(summary(fit3)$fixed, 2))
-```
-
-
-
 |             | Estimate| Est.Error| l-95% CI| u-95% CI| Rhat| Bulk_ESS| Tail_ESS|
 |:------------|--------:|---------:|--------:|--------:|----:|--------:|--------:|
 |b0_Intercept |     1.97|      0.38|     1.19|     2.69|    1|  1272.87|  1712.52|
 |A_Intercept  |     3.32|      0.47|     2.54|     4.33|    1|  2596.16|  2481.24|
 |B_Intercept  |     0.08|      0.01|     0.06|     0.10|    1|  3208.98|  2929.41|
 |M_Intercept  |    46.20|      4.45|    36.25|    53.58|    1|  2930.38|  2218.12|
-
-``` r
-kable(round(summary(fit3)$random$Location, 2))
-```
 
 
 
@@ -656,21 +552,11 @@ kable(round(summary(fit3)$random$Location, 2))
 |sd(b0_Intercept) |     0.75|      0.37|     0.33|     1.74|    1|  1560.44|  1659.58|
 |sd(A_Intercept)  |     0.41|      0.39|     0.01|     1.40|    1|  1625.72|  1934.23|
 
-``` r
-kable(round(summary(fit3)$spec_pars, 2))
-```
-
 
 
 |      | Estimate| Est.Error| l-95% CI| u-95% CI| Rhat| Bulk_ESS| Tail_ESS|
 |:-----|--------:|---------:|--------:|--------:|----:|--------:|--------:|
 |shape |      5.1|      0.59|     4.08|     6.39|    1|  7515.83|  4013.53|
-
-``` r
-kable(data.frame(Parameter = c("b0 mean", "A mean", "B", "M", "b0 SD", 
-                               "A SD", "shape"),
-           Values = c(b0mean,-1*Amean, B, M,  b0sd, Asd, shape_param)), caption = "True parameter values.")
-```
 
 
 
@@ -685,56 +571,6 @@ Table: (\#tab:summary3)True parameter values.
 |b0 SD     |    0.8|
 |A SD      |    0.5|
 |shape     |    5.0|
-
-``` r
-# Calc TR
-modtranformed <- ggs(fit3) # transform MCMC output into a table
-# get b0 estimates for each location:
-meanb0est <- modtranformed %>%
-  filter(Parameter == "b_b0_Intercept") %>%
-  summarize(med = median(value))
-# modtranformed %>%
-#   filter(grepl("r_Location__b0", Parameter)) %>%
-#   group_by(Parameter) %>%
-#   summarize(med = median(value) + meanb0est$med)
-# round(b0, 2)
-# str(modtranformed)
-# look at location-specific A estimates:
-estA <- modtranformed %>% 
-  filter(Parameter == c("b_A_Intercept"), 
-         Iteration > 500) 
-# modtranformed %>%
-#   filter(grepl("r_Location__A", Parameter)) %>%
-#   group_by(Parameter) %>%
-#   summarize(meddiff = median(value)) %>%
-#   mutate(med = meddiff + median(estA$value))
-# round(-1*A, 2)
-
-# calculate overall avg TR for new location:
-estB <- modtranformed %>% 
-  filter(Parameter == c("b_B_Intercept"),
-         Iteration > 500) # remove burn-in
-estM <- modtranformed %>% 
-  filter(Parameter == c("b_M_Intercept"),
-         Iteration > 500) # remove burn-in
-DAImatrix = matrix(DAI, nrow = nrow(estA), ncol = length(DAI), byrow = T)
-tmp = apply(DAImatrix, 2, function(x) x - estM$value) # nIter x nDAI
-beta1 = apply(tmp, 2, function(x) -1 * estA$value * (1 - 1 / (1 + exp(-1 * estB$value * x ))))
-TR = 100 * (1 - exp(beta1))
-
-TRdf <- data.frame(TR = round(apply(TR, 2, median), 1), 
-           lowerCI = round(apply(TR, 2, quantile, 0.025), 1), 
-          upperCI = round(apply(TR, 2, quantile, 0.975), 1),
-          DAI = DAI)
-ggplot(TRdf) +
-  geom_line(aes(DAI, TR), linewidth = 1.2) +
-  geom_ribbon(aes(DAI, ymin = lowerCI, ymax = upperCI), alpha = 0.3) +
-  geom_line(data = simdata3, aes(DAI, TR), color = "purple", linewidth = 1.2) +
-  geom_point(data = simdata3, aes(DAI, TR), color = "purple", size = 1.2) +
-  labs(title = "Predicted and true TR curve") + 
-  facet_wrap(~Location)
-```
-
 <img src="04-NonlinearInR_files/figure-html/output3-1.png" width="100%" />
 
 
@@ -838,19 +674,6 @@ fit4 <- brm(bf(nYSB ~  b0 - (A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) )))) * num
 saveRDS(fit4, "output/fit4.RDS")
 ```
 
-``` r
-fit4 <- readRDS("output/fit4.RDS")
-# summary(fit4)
-# plot(fit4)
-# conditional_effects(fit4, "DAI:numTrt")
-# plot(conditional_effects(fit4, "DAI:numTrt"), points = T)
-# # 
-
-kable(round(summary(fit4)$fixed, 2))
-```
-
-
-
 |              | Estimate| Est.Error| l-95% CI| u-95% CI| Rhat| Bulk_ESS| Tail_ESS|
 |:-------------|--------:|---------:|--------:|--------:|----:|--------:|--------:|
 |b0_Intercept  |     0.03|      1.98|    -3.83|     3.87|    1|  6293.96|  3941.04|
@@ -859,20 +682,12 @@ kable(round(summary(fit4)$fixed, 2))
 |B_Intercept   |     0.16|      0.04|     0.10|     0.24|    1|  4417.63|  4250.12|
 |M_Intercept   |    54.59|      2.08|    50.13|    58.39|    1|  6223.34|  3734.31|
 
-``` r
-kable(round(summary(fit4)$random$Location, 2))
-```
-
 
 
 |                 | Estimate| Est.Error| l-95% CI| u-95% CI| Rhat| Bulk_ESS| Tail_ESS|
 |:----------------|--------:|---------:|--------:|--------:|----:|--------:|--------:|
 |sd(b0_Intercept) |     1.68|      0.72|     0.81|     3.59|    1|  3169.49|  3885.51|
 |sd(A_Intercept)  |     1.29|      0.63|     0.55|     2.92|    1|  2315.48|  3296.98|
-
-``` r
-kable(round(summary(fit4)$gp, 2))
-```
 
 
 
@@ -881,21 +696,11 @@ kable(round(summary(fit4)$gp, 2))
 |sdgp(gpP_gpDAI)   |     0.51|      0.34|     0.18|     1.35|    1|  3283.72|  3522.94|
 |lscale(gpP_gpDAI) |     0.25|      0.12|     0.12|     0.49|    1|  1728.95|  2061.37|
 
-``` r
-kable(round(summary(fit4)$spec_pars, 2))
-```
-
 
 
 |      | Estimate| Est.Error| l-95% CI| u-95% CI| Rhat| Bulk_ESS| Tail_ESS|
 |:-----|--------:|---------:|--------:|--------:|----:|--------:|--------:|
 |shape |      1.8|      0.13|     1.55|     2.06|    1| 10598.95|  4617.74|
-
-``` r
-kable(data.frame(Parameter = c("b0 mean", "A mean", "B", "M", "b0 SD", 
-                               "A SD", "tau", "l", "shape"),
-           Values = c(b0mean,-1*Amean, B, M,  b0sd, Asd, tau, l, shape_param)), caption = "True parameter values.")
-```
 
 
 
@@ -912,60 +717,6 @@ Table: (\#tab:summary4)True parameter values.
 |tau       |    3.0|
 |l         |   30.0|
 |shape     |    5.0|
-
-
-``` r
-# Calc TR:
-modtranformed <- ggs(fit4) # transform MCMC output into a table
-# unique(modtranformed$Parameter)
-# get b0 estimates for each location:
-meanb0est <- modtranformed %>%
-  filter(Parameter == "b_b0_Intercept") %>%
-  summarize(med = median(value))
-meanGP0est <- modtranformed %>%
-  filter(Parameter == "b_gpP_Intercept") %>%
-  summarize(med = median(value))
-# modtranformed %>%
-#   filter(grepl("r_Location__b0", Parameter)) %>%
-#   group_by(Parameter) %>%
-#   summarize(med = median(value) + meanb0est$med + meanGP0est$med)
-# round(b0, 2)
-# str(modtranformed)
-# look at location-specific A estimates:
-estA <- modtranformed %>% 
-  filter(Parameter == c("b_A_Intercept"), 
-         Iteration > 500) 
-# modtranformed %>%
-#   filter(grepl("r_Location__A", Parameter)) %>%
-#   group_by(Parameter) %>%
-#   summarize(meddiff = median(value)) %>%
-#   mutate(med = meddiff + median(estA$value))
-# round(-1*A, 2)
-
-# calculate overall avg TR for new location:
-estB <- modtranformed %>% 
-  filter(Parameter == c("b_B_Intercept"),
-         Iteration > 500) # remove burn-in
-estM <- modtranformed %>% 
-  filter(Parameter == c("b_M_Intercept"),
-         Iteration > 500) # remove burn-in
-DAImatrix = matrix(DAI, nrow = nrow(estA), ncol = length(DAI), byrow = T)
-tmp = apply(DAImatrix, 2, function(x) x - estM$value) # nIter x nDAI
-beta1 = apply(tmp, 2, function(x) -1 * estA$value * (1 - 1 / (1 + exp(-1 * estB$value * x ))))
-TR = 100 * (1 - exp(beta1))
-
-TRdf <- data.frame(TR = round(apply(TR, 2, median), 1), 
-           lowerCI = round(apply(TR, 2, quantile, 0.025), 1), 
-          upperCI = round(apply(TR, 2, quantile, 0.975), 1),
-          DAI = DAI)
-ggplot(TRdf) +
-  geom_line(aes(DAI, TR), linewidth = 1.2) +
-  geom_ribbon(aes(DAI, ymin = lowerCI, ymax = upperCI), alpha = 0.3) +
-  geom_line(data = simdata4, aes(DAI, TR), color = "purple", linewidth = 1.2) +
-  geom_point(data = simdata4, aes(DAI, TR), color = "purple", size = 1.2) +
-  labs(title = "Predicted and true TR curve") +
-  facet_wrap(~Location)
-```
 
 <img src="04-NonlinearInR_files/figure-html/output4-1.png" width="100%" />
 
@@ -1085,60 +836,6 @@ fit5 <- brm(bf(nYSB ~  b0 - (A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) )))) * num
 saveRDS(fit5, "output/fit5.RDS")
 ```
 
-
-
-``` r
-# Calc TR
-modtranformed <- ggs(fit5) # transform MCMC output into a table
-# unique(modtranformed$Parameter)
-# get b0 estimates for each location:
-meanb0est <- modtranformed %>%
-  filter(Parameter == "b_b0_Intercept") %>%
-  summarize(med = median(value))
-meanGP0est <- modtranformed %>%
-  filter(Parameter == "b_gpP_Intercept") %>%
-  summarize(med = median(value))
-# modtranformed %>%
-#   filter(grepl("r_Location__b0", Parameter)) %>%
-#   group_by(Parameter) %>%
-#   summarize(med = median(value) + meanb0est$med + meanGP0est$med)
-# round(b0, 2)
-# str(modtranformed)
-# look at location-specific A estimates:
-estA <- modtranformed %>% 
-  filter(Parameter == c("b_A_Intercept"), 
-         Iteration > 500) 
-# modtranformed %>%
-#   filter(grepl("r_Location__A", Parameter)) %>%
-#   group_by(Parameter) %>%
-#   summarize(meddiff = median(value)) %>%
-#   mutate(med = meddiff + median(estA$value))
-# round(-1*A, 2)
-
-# calculate overall avg TR for new location:
-estB <- modtranformed %>% 
-  filter(Parameter == c("b_B_Intercept"),
-         Iteration > 500) # remove burn-in
-estM <- modtranformed %>% 
-  filter(Parameter == c("b_M_Intercept"),
-         Iteration > 500) # remove burn-in
-DAImatrix = matrix(DAI, nrow = nrow(estA), ncol = length(DAI), byrow = T)
-tmp = apply(DAImatrix, 2, function(x) x - estM$value) # nIter x nDAI
-beta1 = apply(tmp, 2, function(x) -1 * estA$value * (1 - 1 / (1 + exp(-1 * estB$value * x ))))
-TR = 100 * (1 - exp(beta1))
-
-TRdf <- data.frame(TR = round(apply(TR, 2, median), 1), 
-           lowerCI = round(apply(TR, 2, quantile, 0.025), 1), 
-          upperCI = round(apply(TR, 2, quantile, 0.975), 1),
-          DAI = DAI)
-ggplot(TRdf) +
-  geom_line(aes(DAI, TR), linewidth = 1.2) +
-  geom_ribbon(aes(DAI, ymin = lowerCI, ymax = upperCI), alpha = 0.3) +
-  geom_line(data = simdata5, aes(DAI, TR), color = "purple", linewidth = 1.2) +
-  geom_point(data = simdata5, aes(DAI, TR), color = "purple", size = 1.2) +
-  labs(title = "Predicted and true TR curve") +
-  facet_wrap(~Location)
-```
 
 <img src="04-NonlinearInR_files/figure-html/output5-1.png" width="100%" />
 
@@ -1266,60 +963,6 @@ saveRDS(fit6, "output/fit6.RDS")
 ```
 
 
-
-``` r
-# Calc TR:
-modtranformed <- ggs(fit6) # transform MCMC output into a table
-# unique(modtranformed$Parameter)
-# get b0 estimates for each location:
-meanb0est <- modtranformed %>%
-  filter(Parameter == "b_b0_Intercept") %>%
-  summarize(med = median(value))
-meanGP0est <- modtranformed %>%
-  filter(Parameter == "b_gpP_Intercept") %>%
-  summarize(med = median(value))
-# modtranformed %>%
-#   filter(grepl("r_Location__b0", Parameter)) %>%
-#   group_by(Parameter) %>%
-#   summarize(med = median(value) + meanb0est$med + meanGP0est$med)
-# round(b0, 2)
-# str(modtranformed)
-# look at location-specific A estimates:
-estA <- modtranformed %>% 
-  filter(Parameter == c("b_A_Intercept"), 
-         Iteration > 500) 
-# modtranformed %>%
-#   filter(grepl("r_Location__A", Parameter)) %>%
-#   group_by(Parameter) %>%
-#   summarize(meddiff = median(value)) %>%
-#   mutate(med = meddiff + median(estA$value))
-# round(-1*A, 2)
-
-# calculate overall avg TR for new location:
-estB <- modtranformed %>% 
-  filter(Parameter == c("b_B_Intercept"),
-         Iteration > 500) # remove burn-in
-estM <- modtranformed %>% 
-  filter(Parameter == c("b_M_Intercept"),
-         Iteration > 500) # remove burn-in
-DAImatrix = matrix(DAI, nrow = nrow(estA), ncol = length(DAI), byrow = T)
-tmp = apply(DAImatrix, 2, function(x) x - estM$value) # nIter x nDAI
-beta1 = apply(tmp, 2, function(x) -1 * estA$value * (1 - 1 / (1 + exp(-1 * estB$value * x ))))
-TR = 100 * (1 - exp(beta1))
-
-TRdf <- data.frame(TR = round(apply(TR, 2, median), 1), 
-           lowerCI = round(apply(TR, 2, quantile, 0.025), 1), 
-          upperCI = round(apply(TR, 2, quantile, 0.975), 1),
-          DAI = DAI)
-ggplot(TRdf) +
-  geom_line(aes(DAI, TR), linewidth = 1.2) +
-  geom_ribbon(aes(DAI, ymin = lowerCI, ymax = upperCI), alpha = 0.3) +
-  geom_line(data = simdata6, aes(DAI, TR), color = "purple", linewidth = 1.2) +
-  geom_point(data = simdata6, aes(DAI, TR), color = "purple", size = 1.2) +
-  facet_wrap(~Location) +
-  labs(title = "Predicted and true TR curve")
-```
-
 <img src="04-NonlinearInR_files/figure-html/output6-1.png" width="100%" />
 
 
@@ -1360,173 +1003,6 @@ fitR <- brm(bf(nYSB ~  b0 -
 saveRDS(fitR, "output/fitR.RDS")
 ```
 
-``` r
-fitR <- readRDS("output/fitR.RDS")
-summary(fitR)
-```
-
-```
-##  Family: negbinomial 
-##   Links: mu = log; shape = identity 
-## Formula: nYSB ~ b0 - (A * (1 - 1/(1 + exp(-1 * B * (DAI - M))))) * numTrt + gpP + log(DaysOfCatch) 
-##          b0 ~ (1 | Location)
-##          gpP ~ 1 + gp(DAI, by = Location)
-##          A ~ 1 + (1 | Location)
-##          B ~ 1
-##          M ~ 1
-##    Data: datR (Number of observations: 672) 
-##   Draws: 6 chains, each with iter = 2000; warmup = 1000; thin = 1;
-##          total post-warmup draws = 6000
-## 
-## Gaussian Process Hyperparameters:
-##                                Estimate Est.Error l-95% CI u-95% CI Rhat
-## sdgp(gpP_gpDAILocationLoc1)        1.54      1.23     0.45     4.69 1.00
-## sdgp(gpP_gpDAILocationLoc10)       2.07      1.40     0.70     5.55 1.00
-## sdgp(gpP_gpDAILocationLoc2)        1.44      1.16     0.39     4.43 1.00
-## sdgp(gpP_gpDAILocationLoc3)        1.00      1.21     0.03     4.02 1.01
-## sdgp(gpP_gpDAILocationLoc4)        0.44      0.69     0.01     2.32 1.00
-## sdgp(gpP_gpDAILocationLoc5)        1.23      0.54     0.61     2.54 1.00
-## sdgp(gpP_gpDAILocationLoc6)        0.41      0.65     0.01     2.01 1.00
-## sdgp(gpP_gpDAILocationLoc7)        1.34      0.46     0.78     2.41 1.00
-## sdgp(gpP_gpDAILocationLoc8)        0.59      0.77     0.18     1.57 1.00
-## sdgp(gpP_gpDAILocationLoc9)        1.21      0.61     0.58     2.73 1.00
-## lscale(gpP_gpDAILocationLoc1)      0.27      0.07     0.16     0.44 1.00
-## lscale(gpP_gpDAILocationLoc10)     0.26      0.06     0.16     0.38 1.00
-## lscale(gpP_gpDAILocationLoc2)      0.25      0.11     0.12     0.50 1.01
-## lscale(gpP_gpDAILocationLoc3)      0.36      0.19     0.16     0.82 1.01
-## lscale(gpP_gpDAILocationLoc4)      0.41      0.35     0.13     1.25 1.00
-## lscale(gpP_gpDAILocationLoc5)      0.07      0.05     0.01     0.18 1.00
-## lscale(gpP_gpDAILocationLoc6)      0.41      0.23     0.16     0.98 1.00
-## lscale(gpP_gpDAILocationLoc7)      0.04      0.04     0.01     0.17 1.01
-## lscale(gpP_gpDAILocationLoc8)      0.11      1.31     0.02     0.34 1.00
-## lscale(gpP_gpDAILocationLoc9)      0.07      0.06     0.01     0.21 1.01
-##                                Bulk_ESS Tail_ESS
-## sdgp(gpP_gpDAILocationLoc1)        2047     3096
-## sdgp(gpP_gpDAILocationLoc10)       1805     2737
-## sdgp(gpP_gpDAILocationLoc2)        1402     2052
-## sdgp(gpP_gpDAILocationLoc3)         899     1741
-## sdgp(gpP_gpDAILocationLoc4)        2303     3162
-## sdgp(gpP_gpDAILocationLoc5)        1922     2175
-## sdgp(gpP_gpDAILocationLoc6)        2055     2972
-## sdgp(gpP_gpDAILocationLoc7)        1796     2029
-## sdgp(gpP_gpDAILocationLoc8)        1320     1183
-## sdgp(gpP_gpDAILocationLoc9)        1720     1979
-## lscale(gpP_gpDAILocationLoc1)      2196     2939
-## lscale(gpP_gpDAILocationLoc10)     2330     3042
-## lscale(gpP_gpDAILocationLoc2)      1006     2112
-## lscale(gpP_gpDAILocationLoc3)      2033     2894
-## lscale(gpP_gpDAILocationLoc4)      4518     3323
-## lscale(gpP_gpDAILocationLoc5)       800     1109
-## lscale(gpP_gpDAILocationLoc6)      5200     3951
-## lscale(gpP_gpDAILocationLoc7)       470      556
-## lscale(gpP_gpDAILocationLoc8)      1448      458
-## lscale(gpP_gpDAILocationLoc9)      1072     1242
-## 
-## Multilevel Hyperparameters:
-## ~Location (Number of levels: 10) 
-##                  Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## sd(b0_Intercept)     1.18      0.40     0.59     2.15 1.00     1841     1875
-## sd(A_Intercept)      1.69      0.60     0.87     3.20 1.00     1988     3118
-## 
-## Regression Coefficients:
-##               Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## b0_Intercept      0.01      2.04    -4.01     4.05 1.00     4704     4544
-## gpP_Intercept     0.50      2.09    -3.65     4.58 1.00     4317     4277
-## A_Intercept       3.93      0.83     2.42     5.64 1.00     2637     2942
-## B_Intercept       0.02      0.00     0.01     0.03 1.00     3675     3997
-## M_Intercept      36.72     18.62     3.19    72.02 1.00     2686     2744
-## 
-## Further Distributional Parameters:
-##       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## shape     3.91      0.38     3.22     4.72 1.00     3108     4183
-## 
-## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
-## and Tail_ESS are effective sample size measures, and Rhat is the potential
-## scale reduction factor on split chains (at convergence, Rhat = 1).
-```
-
-``` r
-# plot(fitR)
-# conditional_effects(fitR, "DAI:numTrt")
-# plot(conditional_effects(fitR, "DAI:numTrt"), points = T)
-# # 
-```
-
-
-``` r
-# Calc TR:
-modtranformed <- ggs(fitR) # transform MCMC output into a table
-# unique(modtranformed$Parameter)
-# get b0 estimates for each location:
-meanb0est <- modtranformed %>%
-  filter(Parameter == "b_b0_Intercept") %>%
-  summarize(med = median(value))
-meanGP0est <- modtranformed %>%
-  filter(Parameter == "b_gpP_Intercept") %>%
-  summarize(med = median(value))
-# modtranformed %>%
-#   filter(grepl("r_Location__b0", Parameter)) %>%
-#   group_by(Parameter) %>%
-#   summarize(med = median(value) + meanb0est$med + meanGP0est$med)
-
-# str(modtranformed)
-# look at location-specific A estimates:
-estA <- modtranformed %>% 
-  filter(Parameter == c("b_A_Intercept"), 
-         Iteration > 500) 
-# modtranformed %>%
-#   filter(grepl("r_Location__A", Parameter)) %>%
-#   group_by(Parameter) %>%
-#   summarize(meddiff = median(value)) %>%
-#   mutate(med = meddiff + median(estA$value))
-
-# calculate overall avg TR for new location:
-estB <- modtranformed %>% 
-  filter(Parameter == c("b_B_Intercept"),
-         Iteration > 500) # remove burn-in
-estM <- modtranformed %>% 
-  filter(Parameter == c("b_M_Intercept"),
-         Iteration > 500) # remove burn-in
-DAI = 1:150
-DAImatrix = matrix(DAI, nrow = nrow(estA), ncol = length(DAI), byrow = T)
-tmp = apply(DAImatrix, 2, function(x) x - estM$value) # nIter x nDAI
-beta1 = apply(tmp, 2, function(x) -1 * estA$value * (1 - 1 / (1 + exp(-1 * estB$value * x ))))
-TR = 100 * (1 - exp(beta1))
-
-TRdf <- data.frame(TR = round(apply(TR, 2, median), 1), 
-           lowerCI = round(apply(TR, 2, quantile, 0.025), 1), 
-          upperCI = round(apply(TR, 2, quantile, 0.975), 1),
-          DAI = DAI)
-ggplot(TRdf) +
-  geom_line(aes(DAI, TR), linewidth = 1.2) +
-  geom_ribbon(aes(DAI, ymin = lowerCI, ymax = upperCI), alpha = 0.3) +
-  labs(title = "Predicted TR curve") +
-  ylim(0, 100)
-```
 
 <img src="04-NonlinearInR_files/figure-html/outputR-1.png" width="100%" />
-
-``` r
-## predict moth counts for each location.
-# preds = posterior_predict(fitR, newdata = datR %>% mutate(DaysOfCatch = 1))
-predsbrm <- fitted(fitR,
-                   scale = "linear",
-                   newdata = datR  %>% mutate(DaysOfCatch = 1))
-# str(predsbrm)
-predsDF <- bind_cols(datR,
-                     preds = predsbrm[,"Estimate"],
-                     lowerCI = predsbrm[, "Q2.5"],
-                     upperCI = predsbrm[, "Q97.5"])
-# str(preds) # nIter x nrow(simdata)
-# predsDF <- bind_cols(datR,
-#                      preds = apply(preds, 2, median),
-#                      lowerCI = apply(preds, 2, quantile, 0.025),
-#                      upperCI = apply(preds, 2, quantile, 0.975))
-ggplot(predsDF) +
-  geom_line(aes(DAI, preds, color = Treatment)) +
-  geom_ribbon(aes(DAI, ymin = lowerCI, ymax = upperCI, fill = Treatment), alpha = 0.3) +
-  geom_point(data = mean_cts, aes(DAI, log(mean_mothsperday), color = Treatment)) +
-  facet_wrap(~Location, scales = "free_y")
-```
-
 <img src="04-NonlinearInR_files/figure-html/predsR-1.png" width="100%" />

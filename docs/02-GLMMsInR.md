@@ -1,17 +1,12 @@
 # GLMM's in R {#GLMMsR}
 
-When completing an analysis, I may skip around in my script quite a bit. Therefore, I like all packages loaded, and all data uploaded and manipulated at the start of my script.
+When completing an analysis, I may skip around in my script quite a bit. Therefore, I like all packages loaded, and all data uploaded and manipulated at the start of my script (i.e., Section \@ref(Setup)).
 
-## Setup
+## Setup {#Setup}
+
 
 
 ``` r
-knitr::opts_chunk$set(cache = T, message =F, warning = F,  #echo=F,
-                      # dpi = 36, out.width="600px", out.height="600px")
-  # fig.width = 8,
-  # fig.height = 5,
-  out.width = '100%')
-
 ## R libraries:
 # uncomment and change package name to download any required packages
 # install.packages("kableExtra") 
@@ -21,7 +16,7 @@ library(magrittr)
 library(tidyverse)
 library(kableExtra)
 library(ggmap)
-# usethis::edit_r_environ()
+# usethis::edit_r_environ() ## to save passwords in the hidden .Renviron file
 register_google(Sys.getenv("ggmapKey")) # (key saved on hidden file for security)
 
 # to run Bayesian models. Set appropriate nCores for your machine
@@ -29,10 +24,6 @@ library(brms)
 nCores = 6 # nCores -2 so your machine doesn't overheat
 library(ggmcmc) # ggs()
 
-## to use jags, you first need to download. For a Mac, go to terminal:
-# brew install jags
-# instructions from: https://gist.github.com/casallas/8411082
-library(rjags) # no longer included
 
 ## Package and example code to find colors
 # library(RColorBrewer)
@@ -155,6 +146,7 @@ kable(head(datR, 5)) %>%
 ```
 
 <div style="border: 0px;overflow-x: scroll; width:100%; "><table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>(\#tab:viewdata)(\#tab:viewdata)Case study data.</caption>
  <thead>
   <tr>
    <th style="text-align:left;"> Location </th>
@@ -328,7 +320,10 @@ ggplot(datR,
        color = "Treatment")
 ```
 
-<img src="02-GLMMsInR_files/figure-html/plotMoths-1.png" width="100%" />
+<div class="figure">
+<img src="02-GLMMsInR_files/figure-html/plotMoths-1.png" alt="Moth counts by location." width="100%" />
+<p class="caption">(\#fig:plotMoths)Moth counts by location.</p>
+</div>
 
 ### Trap locations
 
@@ -347,7 +342,10 @@ ggmap(basemap) +
   scale_color_brewer(palette = "PuOr") 
 ```
 
-<img src="02-GLMMsInR_files/figure-html/LocsFig-1.png" width="100%" />
+<div class="figure">
+<img src="02-GLMMsInR_files/figure-html/LocsFig-1.png" alt="Trial locations." width="100%" />
+<p class="caption">(\#fig:LocsFig)Trial locations.</p>
+</div>
 
 Within each location, the treatment traps have a slightly different alignment:
 
@@ -370,7 +368,10 @@ ggplot(coords,
   labs(title = "Trap coordinates for each location")
 ```
 
-<img src="02-GLMMsInR_files/figure-html/TrapsPlotted-1.png" width="100%" />
+<div class="figure">
+<img src="02-GLMMsInR_files/figure-html/TrapsPlotted-1.png" alt="Trap coordinates for each location." width="100%" />
+<p class="caption">(\#fig:TrapsPlotted)Trap coordinates for each location.</p>
+</div>
 
 
 ## Fitted GLM models {#fit-glmR}
@@ -416,9 +417,13 @@ summary(mod1p)
 ## Number of Fisher Scoring iterations: 6
 ```
 
+#### Predictions 
+
+See Section \@ref(defineTR) for definition of trapping reduction (TR).
+
 
 ``` r
-## obtain TR estimate for comparison later (custom function in Setup code)
+## obtain TR estimate for comparison later (custom function from Setup code)
 TR_1p <- getTR(mod1p) 
 kable(TR_1p)  %>%
   kable_styling(full_width = F)
@@ -442,6 +447,8 @@ kable(TR_1p)  %>%
 </tbody>
 </table>
 
+For a check of model fit, I compare predicted moths per day to the observed moths per day.
+
 Note: when I predict for new data, I set $DaysOfCatch = 1$, and then I compare to the moths per day variable ($mothsperday = nYSB / DaysOfCatch$). I want to exclude any patterns related to the varying time intervals.
 
 
@@ -452,14 +459,14 @@ tmp = predict(mod1p, se = T, type = "link",
 # str(tmp)
 preds1p <- data.frame(datR, 
                       preds = tmp$fit,
-                      lowerCI = tmp$fit + 2*tmp$se.fit,
-                      upperCI = tmp$fit - 2*tmp$se.fit)
+                      lowerCI = tmp$fit + 1.96*tmp$se.fit,
+                      upperCI = tmp$fit - 1.96*tmp$se.fit)
 preds1p %<>%
   mutate(preds = exp(preds),
          lowerCI = exp(lowerCI),
          upperCI = exp(upperCI))
 
-p1p_glm = predplot(preds1p, "Poisson GLM predictions") # custom function
+p1p_glm = predplot(preds1p, "Poisson GLM predictions") # custom function from Setup
 print(p1p_glm)
 ```
 
@@ -509,6 +516,8 @@ summary(mod1nb)
 ## 
 ##  2 x log-likelihood:  -4877.5410
 ```
+
+#### Predictions
 
 
 ``` r
@@ -581,7 +590,7 @@ brm1nb <- brm(formula = nYSB ~ Treatment + offset(log(DaysOfCatch)),
 saveRDS(brm1nb, "output/brm1nb.RDS")
 ```
 
-The prior_summary command is helpful if you do not know what a parameter is called in `brms` and it is shows the prior distributions. Here, I used the command to find out what they called their $\theta$ parameter. (They call it the shape parameter.)
+The prior_summary command is helpful if you do not know what a parameter is called in `brms`-- it is shows the prior distributions. Here, I used the command to find out what they called their $\theta$ parameter. (They call it the shape parameter.)
 
 
 ``` r
@@ -622,19 +631,13 @@ Table: (\#tab:compareShape1nb)Shape parameter estimate from the Bayesian framewo
 |:-----|--------:|---------:|--------:|--------:|
 |shape |    0.655|     0.035|    0.588|    0.726|
 
-<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
-<caption>(\#tab:compareShape1nb)(\#tab:compareShape1nb)Shape parameter estimate from the frequentist framework.</caption>
- <thead>
-  <tr>
-   <th style="text-align:right;"> x </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:right;"> 0.656 </td>
-  </tr>
-</tbody>
-</table>
+
+
+Table: (\#tab:compareShape1nb)Shape parameter estimate from the frequentist framework.
+
+|     x|
+|-----:|
+| 0.656|
 
 The matching parameter estimates are expected, but reassuring that we have built the correct foundation for the more complicated models to come. 
 
@@ -700,7 +703,7 @@ The figure looks almost identical to the the frequent predictions (Figure \@ref(
 
 The first fix we make to the model is acknowledging that overall average  moth pressure varies from location to location (see Fig \@ref(fig:mothctsFig) of moth counts). To make this fix, we add a location random effect (RE) and our model becomes a generalized linear mixed-effects model (GLMM or GLMER).
 
-We also want to acknowledge that the treatment effect may vary from location to location-- sometimes we see a big difference in moth counts between control and treatment fields, and sometimes the difference is smaller. For inference though, we are only interested in the larger picture, which is the overall trapping reduction. (We are not interested in what happens at these exact locations per se, we are more interested in the average treatment effect.) Therefore, we also add a treatment random effect.
+We also want to acknowledge that the treatment effect may vary from location to location-- sometimes we see a big difference in moth counts between control and treatment fields, and sometimes the difference is smaller. For inference though, we are only interested in the larger picture, which is the overall trapping reduction. (We are not interested in what happens at these exact locations per se, we are more interested in the average treatment effect.) Therefore, we also add a treatment random effect (i.e., random slopes).
 
 See Section \@ref(glmm) for the associated mathematical models.
 
@@ -1314,7 +1317,79 @@ brm4nb <- readRDS("output/brm4nb.RDS")
 # summary(brm4nb)
 # bayes_R2(brm4nb) # 0.824
 
-# prior_summary(brm4nb)
+prior_summary(brm4nb)
+```
+
+```
+##                 prior     class                coef    group resp dpar nlpar lb
+##           normal(0,2)         b                                                
+##           normal(0,2)         b        TreatmentTrt                            
+##           normal(0,2) Intercept                                                
+##  lkj_corr_cholesky(1)         L                                                
+##  lkj_corr_cholesky(1)         L                     Location                   
+##                (flat)    lscale                                               0
+##           cauchy(0,1)    lscale  gpDATILocationLoc1                           0
+##           cauchy(0,1)    lscale gpDATILocationLoc10                           0
+##           cauchy(0,1)    lscale  gpDATILocationLoc2                           0
+##           cauchy(0,1)    lscale  gpDATILocationLoc3                           0
+##           cauchy(0,1)    lscale  gpDATILocationLoc4                           0
+##           cauchy(0,1)    lscale  gpDATILocationLoc5                           0
+##           cauchy(0,1)    lscale  gpDATILocationLoc6                           0
+##           cauchy(0,1)    lscale  gpDATILocationLoc7                           0
+##           cauchy(0,1)    lscale  gpDATILocationLoc8                           0
+##           cauchy(0,1)    lscale  gpDATILocationLoc9                           0
+##           cauchy(0,1)        sd                                               0
+##           cauchy(0,1)        sd                     Location                  0
+##           cauchy(0,1)        sd           Intercept Location                  0
+##           cauchy(0,1)        sd        TreatmentTrt Location                  0
+##           normal(0,2)      sdgp                                               0
+##           normal(0,2)      sdgp  gpDATILocationLoc1                           0
+##           normal(0,2)      sdgp gpDATILocationLoc10                           0
+##           normal(0,2)      sdgp  gpDATILocationLoc2                           0
+##           normal(0,2)      sdgp  gpDATILocationLoc3                           0
+##           normal(0,2)      sdgp  gpDATILocationLoc4                           0
+##           normal(0,2)      sdgp  gpDATILocationLoc5                           0
+##           normal(0,2)      sdgp  gpDATILocationLoc6                           0
+##           normal(0,2)      sdgp  gpDATILocationLoc7                           0
+##           normal(0,2)      sdgp  gpDATILocationLoc8                           0
+##           normal(0,2)      sdgp  gpDATILocationLoc9                           0
+##           cauchy(0,1)     shape                                               0
+##  ub       source
+##             user
+##     (vectorized)
+##             user
+##          default
+##     (vectorized)
+##          default
+##             user
+##             user
+##             user
+##             user
+##             user
+##             user
+##             user
+##             user
+##             user
+##             user
+##             user
+##     (vectorized)
+##     (vectorized)
+##     (vectorized)
+##             user
+##     (vectorized)
+##     (vectorized)
+##     (vectorized)
+##     (vectorized)
+##     (vectorized)
+##     (vectorized)
+##     (vectorized)
+##     (vectorized)
+##     (vectorized)
+##     (vectorized)
+##             user
+```
+
+``` r
 # prior_summary(brm4nb, all = FALSE)
 # 
 ```

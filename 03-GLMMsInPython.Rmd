@@ -1,7 +1,7 @@
 ---
 output: html_document
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 # GLMM's in Python {#GLMMsPython}
@@ -16,7 +16,7 @@ Python is a lot more complicated than R!
 
 Originally, I downloaded Jupyter Notebook directly, but I didn't like the way things loaded. So, I downloaded "Anaconda" and then accessed Jupyter from there. However, I still don't love Jupyter-- the notebooks don't optimize the screen's size like RStudio does. In RStudio, I love having my code on one side of the screen, and my outputs on the other. Screens are wide, not long. 
 
-Soon, I came across the "reticulate" package, which allows for Python coding in an Rmarkdown script! So far, awesome and it is how I run the all the analyses. Here, I switch between R and Python code chunks, but the package also allows objects written in one language to be used within both languages. Pretty cool. It's not for production-level code, but seems perfect for R users switching to Python.
+Soon, I came across the "reticulate" package, which allows for Python coding in an Rmarkdown script! So far, awesome and it is how I run the all the analyses. Here, I switch between R and Python code chunks, but the package also allows objects written in one language to be used within both languages. Pretty cool. It's not for production-level code, but seems perfect for R users switching to Python. 
 
 To interact with Python via RMarkdowns in RStudio, check out the `reticulate` package [website](https://rstudio.github.io/reticulate/articles/r_markdown.html).
 
@@ -41,10 +41,13 @@ Python libraries or packages are called __modules__. To use them with `reticulat
 
 ## Setup
 
-As in the R chapters, all modules (i.e., packages) are loaded and the data are uploaded and mainpulated at the start of the script. The "Getting started with Python" section above goes into details on the rhyme and reason for some of these code chunks.
+As in the R chapters, all modules (i.e., packages) are loaded and the data are uploaded and manipulated at the start of the script. The "Getting started with Python" section above goes into details on the rhyme and reason for some of these code chunks.
 
 Because I am newer to Python, the required modules are often included in the code chunks as well as a reminder of what modules are used for what functions. They are included in the setup to ensure that there are no issues upon loading.
-
+```{r knitrStart, include=F, cache = F, message=F, warning=FALSE, results = "hide"}
+knitr::opts_chunk$set(cache = T, message = F, warning = F, 
+  out.width = '100%')
+```
 ```{r reticulate, include=TRUE, cache = F, message=F, warning=FALSE, results = "hide"}
 
 knitr::opts_chunk$set(cache = T, message = F, warning = F, 
@@ -54,7 +57,7 @@ library(tidyverse) # %>% function, and others
 library(reticulate) # library to use Python within R
 use_virtualenv("r-reticulate-BayesInPython")
 
-# make sure these packages are installed before installing pymer4:
+# make sure these packages are installed in R before installing pymer4:
 # install.packages(c("lme4", "lmerTest", "emmeans"))
 # Ensure pymer4 is installed in the desired Python environment
 # py_require("pymer4")
@@ -87,16 +90,16 @@ use_virtualenv("r-reticulate-BayesInPython")
 ```
 ```{python install_modules, eval = F}
 ## Install modules if you have not used them before
-# You may have to install the packages if you have not used them before:
+
 # code chunk is here for easy retrieval
 # replace module name as needed.
 !pip install staticmap
 
-# installing googlemaps needs a modification:
+# installing googlemaps needs a modification to the command above:
 # !pip install  --use-pep517 googlemaps
 
 # to install pymer4, you need to type the following commands from Terminal:
-# I think you need Anaconda installed
+# you may need Anaconda installed
 ## https://eshinjolly.com/pymer4/installation.html
 # conda create --name pymer4 -c ejolly -c conda-forge -c defaults pymer4
 # conda activate pymer4
@@ -133,7 +136,7 @@ import pymc as pm
 import pickle # to write, read python objects to file
 
 
-mycolors = ["#9E0142", "#66C2A5"]
+mycolors = ["#9E0142", "#66C2A5"] # color names from R script
 
 ```
 ```{python functionsPy}
@@ -155,7 +158,7 @@ def getTR(mod):
     return df
 
 ```
-```{python readdatPy, results = "hide", jupyter_compat = TRUE}
+```{python readdatPy, results = "hide"}
 ## Read in the moth data:
 
 import pandas as pd
@@ -208,7 +211,8 @@ mean_cts.describe(include='all')
 
 Here is what the data look like after the above manipulation. 
 
-(While one can easily print the data frame from Python)
+(While one can easily print the data frame from Python, here I make the output "pretty" within the Rmarkdown/bookdown environment using the `knitr` function from R.)
+
 ```{r}
 kable(head(py$datP, 5)) %>%
   kable_styling() %>%
@@ -271,8 +275,6 @@ pmoths = (ggplot(datP, aes(x = 'DATI', y='mothsperday', color = 'Treatment')) +
              x = "Days after installation (DAI)",
              color = "Treatment"))
 pmoths.draw(True)
-# plt.show(pmoths)
-# plt.savefig("output/moth_counts.png")
 ```
 
 ```{python plotMothsPySeaborn, eval = F, include = F}
@@ -319,13 +321,13 @@ image = m.render(zoom=7)
 image.save('output/trial_locs.png')
 ```
 
-```{r, fig.cap = "Example trial locations."}
+```{r, fig.cap = "Example trial locations.", echo = F}
 knitr::include_graphics("output/trial_locs.png")
 ```
 
 <!-- ![Trial locations](output/trial_locs.png "Trial locations.") -->
 
-Within each location, the treatment traps have a slightly different alignment:
+Within each location, the treatment traps have a slightly different alignment. The R version of this figure naturally renders in an easier to read fashion.
 
 ```{python plotTrapLocsPy}
 coords = datP[['Location', 'Treatment', 'TrapID', 'Latitude', 'Longitude']].drop_duplicates()
@@ -338,7 +340,7 @@ pcoords = (ggplot(datP, aes(x = 'Longitude', y='Latitude', color = 'Treatment'))
   theme(aspect_ratio=1,
         axis_text_x=element_blank(),
         axis_text_y=element_blank())  +
-  geom_text(aes(label = 'TrapID'), nudge_x = 0.0002, nudge_y = 0.0002, color = "black", size = 8) +
+    geom_text(aes(label = 'TrapID'), nudge_x = 0.0002, nudge_y = 0.0002, color = "black", size = 8) +
   scale_x_continuous(expand = (0.3, 0)) +
   scale_y_continuous(expand = (0.3, 0)) +
   labs(title = "Trap ID's at each location"))

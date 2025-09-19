@@ -1,16 +1,24 @@
 # GLMM's in R {#GLMMsR}
 
-When completing an analysis, I may skip around in my script quite a bit. Therefore, I like all packages loaded, and all data uploaded and manipulated at the start of my script.
+When completing an analysis, I may skip around in my script quite a bit. Therefore, I like all packages loaded, and all data uploaded and manipulated at the start of my script (i.e., Section \@ref(Setup)).
 
-## Setup
+## Setup {#Setup}
 
-```{r libs_and_setup, include = T, cache = F, message=F, warning=FALSE, results = "hide"}
+```{r knitr_code, include = F, cache = F, message=F, warning=FALSE, results = "hide"}
 knitr::opts_chunk$set(cache = T, message =F, warning = F,  #echo=F,
                       # dpi = 36, out.width="600px", out.height="600px")
   # fig.width = 8,
   # fig.height = 5,
   out.width = '100%')
 
+
+## to use jags, you first need to download. For a Mac, go to terminal:
+# brew install jags
+# instructions from: https://gist.github.com/casallas/8411082
+# library(rjags) # no longer included
+
+```
+```{r libs_and_setup, include = T, cache = F, message=F, warning=FALSE, results = "hide"}
 ## R libraries:
 # uncomment and change package name to download any required packages
 # install.packages("kableExtra") 
@@ -20,7 +28,7 @@ library(magrittr)
 library(tidyverse)
 library(kableExtra)
 library(ggmap)
-# usethis::edit_r_environ()
+# usethis::edit_r_environ() ## to save passwords in the hidden .Renviron file
 register_google(Sys.getenv("ggmapKey")) # (key saved on hidden file for security)
 
 # to run Bayesian models. Set appropriate nCores for your machine
@@ -28,10 +36,6 @@ library(brms)
 nCores = 6 # nCores -2 so your machine doesn't overheat
 library(ggmcmc) # ggs()
 
-## to use jags, you first need to download. For a Mac, go to terminal:
-# brew install jags
-# instructions from: https://gist.github.com/casallas/8411082
-library(rjags) # no longer included
 
 ## Package and example code to find colors
 # library(RColorBrewer)
@@ -48,8 +52,8 @@ getTR <- function (mod, coefs = -1) {
   b1 = summary(mod)$coef[coefs,1]
   seb1 = summary(mod)$coef[coefs,2]
   (TR = round(100 * (1- exp(b1)),1))
-  (higher = round(100 * (1 - exp(b1 - 1.96*seb1)),1))
-  (lower = round(100 * (1 - exp(b1 + 1.96*seb1)),1)) 
+  (higher = round(100 * (1 - exp(b1 - 2*seb1)),1))
+  (lower = round(100 * (1 - exp(b1 + 2*seb1)),1)) 
   data.frame(#Treatment = names(TR),
              TR = as.numeric(TR), 
              lowerCI = as.numeric(lower),
@@ -146,7 +150,7 @@ mean_cts <- datR %>%
 
 Here is what the data look like after the above manipulation. 
 
-```{r viewdata}
+```{r viewdata, tab.cap = "Case study data."}
 kable(head(datR, 5)) %>%
   kable_styling() %>%
   scroll_box(width = "100%", box_css = "border: 0px;")
@@ -190,7 +194,7 @@ Column descriptions:
 
 The data are the moth counts collected at each trap (average per day), within each location and throughout the season. Note how the y-axis changes for each plot in the figure.
 
-```{r plotMoths, fig.width = 8, fig.height = 5}
+```{r plotMoths, fig.width = 8, fig.height = 5, fig.cap = "Moth counts by location."}
 ggplot(datR,
        aes(DATI, mothsperday, color = Treatment)) +
   geom_jitter(height = 0, width = 0.75, alpha = 0.5) +
@@ -208,7 +212,7 @@ ggplot(datR,
 
 Trial locations in relation to each other. Some trial locations are closer to each other than others.
 
-```{r LocsFig}
+```{r LocsFig, fig.cap = "Trial locations."}
 
 basemap <- get_googlemap(c(lon = mean(datR$Longitude, na.rm = T),
                            lat = mean(datR$Latitude, na.rm = T)),
@@ -223,7 +227,7 @@ ggmap(basemap) +
 
 Within each location, the treatment traps have a slightly different alignment:
 
-```{r TrapsPlotted}
+```{r TrapsPlotted, fig.cap = "Trap coordinates for each location."}
 coords <- datR %>%
   dplyr::select(Location, Treatment, TrapID, Latitude, Longitude) %>%
   unique()
@@ -264,12 +268,18 @@ mod1p <- glm(nYSB ~ Treatment,
 summary(mod1p)
 ```
 
+#### Predictions 
+
+See Section \@ref(defineTR) for definition of trapping reduction (TR).
+
 ```{r TR1p, tab.cap = "Trapping reduction estimate for the Poisson GLM model."}
-## obtain TR estimate for comparison later (custom function in Setup code)
+## obtain TR estimate for comparison later (custom function from Setup code)
 TR_1p <- getTR(mod1p) 
 kable(TR_1p)  %>%
   kable_styling(full_width = F)
 ```
+
+For a check of model fit, I compare predicted moths per day to the observed moths per day.
 
 Note: when I predict for new data, I set $DaysOfCatch = 1$, and then I compare to the moths per day variable ($mothsperday = nYSB / DaysOfCatch$). I want to exclude any patterns related to the varying time intervals.
 
@@ -287,7 +297,7 @@ preds1p %<>%
          lowerCI = exp(lowerCI),
          upperCI = exp(upperCI))
 
-p1p_glm = predplot(preds1p, "Poisson GLM predictions") # custom function
+p1p_glm = predplot(preds1p, "Poisson GLM predictions") # custom function from Setup
 print(p1p_glm)
 
 ```
@@ -304,6 +314,8 @@ mod1nb <- glm.nb(nYSB ~ Treatment +
              data = datR)
 summary(mod1nb)
 ```
+
+#### Predictions
 
 ```{r TR1nb, tab.cap = "Trapping reduction estimate for the negative binomial GLM model."}
 
@@ -352,7 +364,7 @@ brm1nb <- brm(formula = nYSB ~ Treatment + offset(log(DaysOfCatch)),
 saveRDS(brm1nb, "output/brm1nb.RDS")
 ```
 
-The prior_summary command is helpful if you do not know what a parameter is called in `brms` and it is shows the prior distributions. Here, I used the command to find out what they called their $\theta$ parameter. (They call it the shape parameter.)
+The prior_summary command is helpful if you do not know what a parameter is called in `brms`-- it is shows the prior distributions. Here, I used the command to find out what they called their $\theta$ parameter. (They call it the shape parameter.)
 
 ```{r}
 brm1nb <- readRDS("output/brm1nb.RDS")
@@ -367,8 +379,7 @@ kable(round(summary(mod1nb)$coef, 3), caption = "Coefficient estimates from the 
 ```
 ```{r compareShape1nb, echo = F}
 kable(round(summary(brm1nb)$spec_pars[,1:4], 3), caption = "Shape parameter estimate from the Bayesian framework.")
-kable(round(summary(mod1nb)$theta, 3), caption = "Shape parameter estimate from the frequentist framework.") %>%
-  kable_styling(full_width = F)
+kable(round(summary(mod1nb)$theta, 3), caption = "Shape parameter estimate from the frequentist framework.")
 ```
 
 The matching parameter estimates are expected, but reassuring that we have built the correct foundation for the more complicated models to come. 
@@ -411,7 +422,7 @@ The figure looks almost identical to the the frequent predictions (Figure \@ref(
 
 The first fix we make to the model is acknowledging that overall average  moth pressure varies from location to location (see Fig \@ref(fig:mothctsFig) of moth counts). To make this fix, we add a location random effect (RE) and our model becomes a generalized linear mixed-effects model (GLMM or GLMER).
 
-We also want to acknowledge that the treatment effect may vary from location to location-- sometimes we see a big difference in moth counts between control and treatment fields, and sometimes the difference is smaller. For inference though, we are only interested in the larger picture, which is the overall trapping reduction. (We are not interested in what happens at these exact locations per se, we are more interested in the average treatment effect.) Therefore, we also add a treatment random effect.
+We also want to acknowledge that the treatment effect may vary from location to location-- sometimes we see a big difference in moth counts between control and treatment fields, and sometimes the difference is smaller. For inference though, we are only interested in the larger picture, which is the overall trapping reduction. (We are not interested in what happens at these exact locations per se, we are more interested in the average treatment effect.) Therefore, we also add a treatment random effect (i.e., random slopes).
 
 See Section \@ref(glmm) for the associated mathematical models.
 
@@ -523,8 +534,7 @@ kable(round(summary(mod2nb)$coef, 3), caption = "Coefficient estimates from the 
 ```{r compareShape2nb, echo = F}
 kable(round(summary(brm2nb)$spec_pars[,1:4], 3), caption = "Shape parameter estimate from the Bayesian GLMM")
 kable(gsub("\\)", "", gsub(".*\\(", "", summary(mod2nb)$family)), 
-      caption = "Shape parameter estimate from the frequentist GLMM") %>%
-  kable_styling(full_width = F)
+      caption = "Shape parameter estimate from the frequentist GLMM") 
 ```
 
 ```{r TRBayes2nb}
@@ -561,7 +571,7 @@ Again, the figure looks almost identical to the the frequent predictions (Figure
 
 In this version of the model, we acknowledge that sampling on different days of the season adds to the variability of the moth counts, and that counts from the same sampling date are more similar than for a different date. In this model, however,  the correlation between sampling dates is ignored.
 
-This model is included here because it is important to think about whether you have nested or crossed random effects (if applicable). Here, we are assuming crossed random effects because Java island is fairly homogeneous in terms of weather and ecosystem so it may make sense for all samples from one date to be grouped together. However, one could also argue for nested RE's for this case study. 
+This model is included here because it is important to think about whether you have nested or crossed random effects (if applicable) because the options may lead to _very_ different estimates of your uncertainty. Here, we are assuming crossed random effects because Java island is fairly homogeneous in terms of weather and ecosystem so it may make sense for all samples from one date to be grouped together. However, one could also argue for nested RE's for this case study. 
 
 This model allows us to include sampling date in our model as a random effect and still fit the model quickly in a frequentist framework. 
 
@@ -673,8 +683,7 @@ kable(round(summary(mod3nb)$coef, 3), caption = "Coefficient estimates from the 
 ```{r compareShape3nb, echo = F}
 kable(round(summary(brm3nb)$spec_pars[,1:4], 3), caption = "Shape parameter estimate from the Bayesian framework.")
 kable(gsub("\\)", "", gsub(".*\\(", "", summary(mod3nb)$family)), 
-      caption = "Shape parameter estimate from the frequentist framework.") %>%
-  kable_styling(full_width = F)
+      caption = "Shape parameter estimate from the frequentist framework.")
 ```
 
 
@@ -780,8 +789,6 @@ brm4nb <- readRDS("output/brm4nb.RDS")
 # bayes_R2(brm4nb) # 0.824
 
 # prior_summary(brm4nb)
-# prior_summary(brm4nb, all = FALSE)
-# 
 ```
 
 ```{r TRBayes4nb}
@@ -818,11 +825,11 @@ print(bayes_p4nb)
 
 ```
 
-## Summary of estimates
+## Comparing model results
 
 ### Compare TR estimates {#compareTR}
 
-Here, the trapping reduction estimates from all of the models are compared. As expected, the median TR estimates are very close from model to model, but the uncertainty in that estimate increase (i.e., the confidence/credible intervals get wider) when we properly account for the correlations in our data.
+Here, the trapping reduction estimates from all of the models are compared. As expected, the median TR estimates are very close from model to model, but the uncertainty in that estimate increases (i.e., the confidence/credible intervals get wider) when we properly account for the correlations in our data.
 
 ```{r compareTR, echo = F, tab.cap = "Comparison of derived TR estimates from each model fit."}
 
@@ -948,7 +955,7 @@ cowplot::plot_grid(p1p_glm + theme(legend.position="none"),
                    p1nb_glm + theme(legend.position="none"))
 ```
 
-Side-by-side comparison of the frequentist vs Bayes negative binomial GLM predictions.
+Side-by-side comparison of the frequentist vs Bayes negative binomial GLM predictions. They are almost identical, as expected.
 
 ```{r all_plots1b}
 cowplot::plot_grid(p1nb_glm + theme(legend.position="none"),
@@ -964,7 +971,7 @@ cowplot::plot_grid(p2p_glmm + theme(legend.position="none"),
                    p2nb_glmm + theme(legend.position="none"))
 ```
 
-Side-by-side comparison of the frequentist vs Bayes negative binomial GLMM (Location RE) predictions.
+Side-by-side comparison of the frequentist vs Bayes negative binomial GLMM (Location RE) predictions. Again, they are almost identical, as expected.
 
 ```{r all_plots2b}
 cowplot::plot_grid(p2nb_glmm + theme(legend.position="none"),
@@ -972,11 +979,9 @@ cowplot::plot_grid(p2nb_glmm + theme(legend.position="none"),
 ```
 
 
-#### GLMM's (Location RE, nested Date)
+#### GLMM's (RE for location, date)
 
-Note: These models are a great fit to the data that we have! But, they are overly confident and will not be good at predicting at new locations and new sampling dates.
-
-Side-by-side comparison of the frequentist Poisson vs negative  binomial GLMM (Location RE) predictions.
+Side-by-side comparison of the frequentist Poisson vs negative  binomial GLMM (Location RE) predictions. Same patterns but notice how the y-axis varies between plots.
 
 ```{r all_plots3}
 cowplot::plot_grid(p3p_glmm + theme(legend.position="none"), 
@@ -993,7 +998,7 @@ cowplot::plot_grid(p3nb_glmm + theme(legend.position="none"),
 
 #### GLMM's: nested Date vs Gaussian Process Date
 
-Once we properly account for the correlations in our sampling dates, we have much more uncertainty in our overall TR predictions (see table above) , and the predicted counts are "smoothed" over time for some of the locations.
+Once we properly account for the correlations in our sampling dates, we have a reasonable uncertainty in our overall TR predictions and the predicted counts are "smoothed" over time for some of the locations.
 
 ```{r all_plots4}
 cowplot::plot_grid(bayes_p3nb + theme(legend.position="none"),

@@ -15,11 +15,7 @@ To include this potential change over time, a nonlinear relationship between mot
 This chapter begins with almost the same setup code as Chapter \@ref(GLMMsR), copied here for easier reference. A few of the functions used in Chapter \@ref(GLMMsR) are excluded from this script because they are not needed and an extra data manipulation is completed-- a numeric version of the "Treatment" cateogrical variable is created for these models.
 
 ```{r libs_and_setup, include = T, cache = F, message=F, warning=FALSE, results = "hide"}
-knitr::opts_chunk$set(cache = T, message =F, warning = F,  #echo=F,
-                      # dpi = 36, out.width="600px", out.height="600px")
-  # fig.width = 8,
-  # fig.height = 5,
-  out.width = '100%')
+knitr::opts_chunk$set(cache = T, message =F, warning = F,  out.width = '100%')
 
 ## R libraries:
 # uncomment and change package name to download any required packages
@@ -46,7 +42,7 @@ library(ggmcmc) # ggs()
 # brewer.pal(11, "Spectral")
 mycolors = c("#9E0142", "#66C2A5")
 ```
-``` {r functions}
+``` {r functions, include = F}
 
 # define some functions to use in this script.
 
@@ -82,7 +78,7 @@ lapply(datRinit, function(x) {
 })
 ```
 ```{r data_manip, results = "hide"}
-# manipulate data as needed:
+# manipulate data:
 datR <- datRinit %>%
   # convert dates to dates (instead of character string):
   mutate(TransplantDate = ymd(TransplantDate),
@@ -91,7 +87,6 @@ datR <- datRinit %>%
          SamplingDate = ymd(SamplingDate)
          )  %>%
   mutate(mothsperday = nYSB / DaysOfCatch, # standardize the counts
-         # TreatmentF = factor(Treatment), # if we need to fix levels in non-alpha order. Excluded/commented out here for simplicity
          SamplingDateC = as.character(SamplingDate))
 
 ## data manipulation that was not included in previous R chapter:
@@ -149,6 +144,10 @@ TR = 100 * (1 - exp(beta))
 plot(t, beta, type = "l", xlab = "Days after installation (DAI)",
      ylab =  expression(paste("Regression coefficient, ", beta[1])),
      main = expression(paste("How ", beta[1], " may change through a field season")))
+
+plot(t, TR, type = "l", xlab = "Days after installation (DAI)",
+     ylab = "Trapping Reduction",
+     main = "How trapping reduction may change through a season")
 ```
 
 This [shiny app](https://bromsk.shinyapps.io/GeneralizedLogisticCurves/) allows you to play around with how the parameter values affect the curve. It is helpful in understanding the model and setting priors for the model.
@@ -306,7 +305,7 @@ saveRDS(fit1, "output/fit1.RDS")
 
 The model estimates are very close to the true parameter values. We do not expect the parameters to match exactly due to the simulated noise in the data, but with many different simulated data sets, we expected the average of the estimated values to converge to the true values.
 
-```{r summary1, tab.cap = "Model estimates of the fixed effects parameters."}
+```{r summary1, tab.cap = "Model estimates of the fixed effects parameters.", echo = F}
 fit1 <- readRDS("output/fit1.RDS")
 # plot(fit1)
 # prior_summary(fit1)
@@ -317,7 +316,7 @@ kable(data.frame(Parameter = c("b0", "A", "B", "M", "shape"),
            Values = c(b0, -1*A, B, M, shape_param)), caption = "True parameter values.")
 
 ```
-```{r output1}
+```{r output1, echo = F}
 # Calc TR
 modtranformed <- ggs(fit1) 
 # str(modtranformed)
@@ -406,7 +405,7 @@ saveRDS(fit2, "output/fit2.RDS")
 
 Again, the model estimates are close to the true parameter values.
 
-```{r summary2}
+```{r summary2, echo = F}
 fit2 <- readRDS("output/fit2.RDS")
 # some plots to help assess model fit:
 # plot(fit2)
@@ -428,7 +427,7 @@ kable(data.frame(Parameter = c("b0 mean", "A", "B", "M", "b0 SD", "shape"),
 
 ```
 
-```{r output2}
+```{r output2, echo= F}
 # Calc TR
 modtranformed <- ggs(fit2) 
 # get b0 estimates for each location:
@@ -530,7 +529,7 @@ fit3 <- brm(bf(nYSB ~ b0 - (A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) )))) * numT
               chains = nCores, cores = nCores) 
 saveRDS(fit3, "output/fit3.RDS")
 ```
-```{r summary3}
+```{r summary3, echo= F}
 fit3 <- readRDS("output/fit3.RDS")
 # summary(fit3)
 # prior_summary(fit3)
@@ -545,7 +544,7 @@ kable(data.frame(Parameter = c("b0 mean", "A mean", "B", "M", "b0 SD",
            Values = c(b0mean,-1*Amean, B, M,  b0sd, Asd, shape_param)), caption = "True parameter values.")
 
 ```
-```{r output3}
+```{r output3, echo= F}
 # Calc TR
 modtranformed <- ggs(fit3) # transform MCMC output into a table
 # get b0 estimates for each location:
@@ -705,7 +704,7 @@ fit4 <- brm(bf(nYSB ~  b0 - (A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) )))) * num
               chains = nCores, cores = nCores) 
 saveRDS(fit4, "output/fit4.RDS")
 ```
-```{r summary4}
+```{r summary4, echo= F}
 fit4 <- readRDS("output/fit4.RDS")
 # summary(fit4)
 # plot(fit4)
@@ -723,7 +722,7 @@ kable(data.frame(Parameter = c("b0 mean", "A mean", "B", "M", "b0 SD",
 
 ```
 
-```{r output4}
+```{r output4, echo= F}
 # Calc TR:
 modtranformed <- ggs(fit4) # transform MCMC output into a table
 # unique(modtranformed$Parameter)
@@ -904,7 +903,7 @@ fit5 <- brm(bf(nYSB ~  b0 - (A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) )))) * num
               chains = nCores, cores = nCores) 
 saveRDS(fit5, "output/fit5.RDS")
 ```
-```{r summary5, include = F}
+```{r summary5, include = F, echo= F}
 fit5 <- readRDS("output/fit5.RDS")
 # summary(fit5)
 # plot(fit5)
@@ -926,7 +925,7 @@ kable(data.frame(Parameter = rownames(summary(fit5)$gp),
 
 ```
 
-```{r output5}
+```{r output5, echo= F}
 # Calc TR
 modtranformed <- ggs(fit5) # transform MCMC output into a table
 # unique(modtranformed$Parameter)
@@ -1136,7 +1135,7 @@ kable(data.frame(Parameter = rownames(summary(fit6)$gp),
 
 ```
 
-```{r output6}
+```{r output6, echo= F}
 # Calc TR:
 modtranformed <- ggs(fit6) # transform MCMC output into a table
 # unique(modtranformed$Parameter)
@@ -1240,7 +1239,7 @@ fitR <- brm(bf(nYSB ~  b0 -
               chains = nCores, cores = nCores) 
 saveRDS(fitR, "output/fitR.RDS")
 ```
-```{r summaryR}
+```{r summaryR, include = F, echo= F}
 fitR <- readRDS("output/fitR.RDS")
 summary(fitR)
 # plot(fitR)
@@ -1250,7 +1249,7 @@ summary(fitR)
 
 ```
 
-```{r outputR}
+```{r outputR, echo= F}
 
 # Calc TR:
 modtranformed <- ggs(fitR) # transform MCMC output into a table
@@ -1298,11 +1297,13 @@ TRdf <- data.frame(TR = round(apply(TR, 2, median), 1),
 ggplot(TRdf) +
   geom_line(aes(DAI, TR), linewidth = 1.2) +
   geom_ribbon(aes(DAI, ymin = lowerCI, ymax = upperCI), alpha = 0.3) +
-  labs(title = "Predicted TR curve") +
+  labs(title = "Predicted trapping reduction loss over the season",
+       y = "Trapping Reduction",
+       x = "Days after installation (DAI)") +
   ylim(0, 100)
 
 ```
-```{r predsR}
+```{r predsR, echo = F}
 
 ## predict moth counts for each location.
 # preds = posterior_predict(fitR, newdata = datR %>% mutate(DaysOfCatch = 1))
@@ -1320,8 +1321,12 @@ predsDF <- bind_cols(datR,
 #                      lowerCI = apply(preds, 2, quantile, 0.025),
 #                      upperCI = apply(preds, 2, quantile, 0.975))
 ggplot(predsDF) +
-  geom_line(aes(DAI, preds, color = Treatment)) +
-  geom_ribbon(aes(DAI, ymin = lowerCI, ymax = upperCI, fill = Treatment), alpha = 0.3) +
-  geom_point(data = mean_cts, aes(DAI, log(mean_mothsperday), color = Treatment)) +
-  facet_wrap(~Location, scales = "free_y")
+  geom_line(aes(DAI, exp(preds), color = Treatment)) +
+  geom_ribbon(aes(DAI, ymin = exp(lowerCI), ymax = exp(upperCI), fill = Treatment), alpha = 0.3) +
+  geom_point(data = mean_cts, aes(DAI, mean_mothsperday, color = Treatment)) +
+  facet_wrap(~Location, scales = "free_y") +
+  labs(title = "Predicted moth counts for each location",
+       subtitle = "Lines are predictions; points are the data",
+       x = "Days after installation (DAI)",
+       y = "Moth counts")
 ```

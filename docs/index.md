@@ -1,7 +1,7 @@
 --- 
 title: "Bayesian models in R and Python"
 author: "Kristin Broms"
-date: "2025-07-03"
+date: "2025-07-15"
 site: bookdown::bookdown_site
 output: 
   bookdown::gitbook:
@@ -73,3 +73,21 @@ If trapping reduction were 100%, no moths would ever be caught in the treatment 
 It should also be noted that treatment performance may decline over time. Perhaps there is not enough pheromone in the dispenser to last for the entire season, or the ecosystem may change during the season in a way that somehow lessens product performance (e.g., the pheromones from the plants may change and interact with the product.)
 
 
+## Why Bayes? {#WhyBayes}
+
+I am not looking to write a novel here, so I assume the reader is familiar with Bayesian models and the reasons for choosing this framework.  
+
+I would love to fit frequentist regression models to these data; it would be much simpler and much, much faster. However, for this work, it was extremely important that we correctly capture the uncertainty around the point estimates and the derived parameters, and for this complex data set, that can only done within the Bayesian framework. This is especially true when a non-linear relationship between the dependent and independent variables is incorporated in the model (Chapter \@ref(NonlinearR)).
+
+Machine learning (ML) methods were not applied because of the complex spatio-temporal interactions in the data; the limited size of the data set(s); and because we are interested in inference and understanding the relationships between the dependent and indepedent variables (we are not interested in just prediction).
+
+
+## What about AI? {#AI}
+
+AI isnot quite ready to do complex model building, but it can still be useful in the process.
+
+Hadley Wickham has done amazing work my entire career, and he has done it again-- put together a cool R package called `ellmer` that utilizes LLM's for R and Python. The [vignette](https://ellmer.tidyverse.org/articles/ellmer.html) for this package has some great ideas, such as:
+
+* Use LLM to look for flaws in the statistical reasoning.
+
+* Use LLM to convert the R code to Python.
