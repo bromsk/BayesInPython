@@ -111,3 +111,4 @@ intercept-re-a-re-with-gp-same-for-all-loc
 intercept-a-re-with-gp-diff-for-each-loc
 intercept-a-b-m-re-with-gp-diff-for-each-loc
 case-study
+tab:summary6

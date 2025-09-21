@@ -6,84 +6,20 @@ editor_options:
 
 # Nonlinear Bayesian Models in R {#NonlinearR}
 
-As mentioned in Section \@ref(CaseStudy), the treatment group for these data is a pheromone dispenser. Eventually, given enough time, the dispenser has to run out of pheromone and the moth counts in the treatment and control groups are expected to have the same expected counts for a given location. Mathematically, $\beta_1 \to 0$ as $t \to \infty$. The timeline for this to happen may or may not happen during the field season, but we want to be sure to include this potential dynamic in the model to statistically test whether the loss of performance is observed or not.
+As mentioned in Section \@ref(CaseStudy), the treatment group for these data is a pheromone dispenser. Eventually, given enough time, the dispenser has to run out of pheromone and the moth counts in the treatment and control groups are expected to have the same expected counts for a given location. In other words, Trapping reduction goes from a max value to 0 over time. Mathematically, $\beta_1 \to 0$ as $t \to \infty$. The timeline for this to happen may or may not happen during the field season, but we want to be sure to include this potential dynamic in the model to statistically test whether the loss of performance is observed or not.
 
 To include this potential change over time, a nonlinear relationship between moth counts and treatment effect is needed in our model. In particular, $\beta_1$ should have an asymmetric sigmoidal curve. Here, I use a generalized logistic curve to get an appropriate shape.
 
+**Code is not included here for easier readability. Please follow along using [this](https://github.com/bromsk/BayesInPython/blob/main/docs/04-NonlinearInR.md) R script to run the code yourself.**
+
 ## Setup 
 
-This chapter begins with almost the same setup code as Chapter \@ref(GLMMsR), copied here for easier reference. A few of the functions used in Chapter \@ref(GLMMsR) are excluded from this script because they are not needed and an extra data manipulation is completed-- a numeric version of the "Treatment" cateogrical variable is created for these models.
+This chapter has similar setup code to Chapter \@ref(GLMMsR). Check the [script](https://github.com/bromsk/BayesInPython/blob/main/docs/04-NonlinearInR.md) to see the code.  
 
 
-``` r
-knitr::opts_chunk$set(cache = T, message =F, warning = F,  out.width = '100%')
-
-## R libraries:
-# uncomment and change package name to download any required packages
-# install.packages("kableExtra") 
-library(MASS)
-library(lme4)
-library(magrittr)
-library(truncnorm)
-library(tidyverse)
-library(kableExtra)
-library(ggmap)
-# usethis::edit_r_environ()
-register_google(Sys.getenv("ggmapKey")) # (key saved on hidden file for security)
-
-# to run Bayesian models. Set appropriate nCores for your machine
-library(brms)
-nCores = 6 # nCores -2 so your machine doesn't overheat
-library(ggmcmc) # ggs()
 
 
-## Package and example code to find colors
-# library(RColorBrewer)
-# display.brewer.pal(11, "Spectral")
-# brewer.pal(11, "Spectral")
-mycolors = c("#9E0142", "#66C2A5")
-```
 
-
-``` r
-# read in the data:
-datRinit = read.csv("data/moths.csv")
-
-# check data values: 
-str(datRinit)
-summary(datRinit)
-lapply(datRinit, function(x) {
-  if (is.character(x))
-    unique(x)
-})
-```
-
-``` r
-# manipulate data:
-datR <- datRinit %>%
-  # convert dates to dates (instead of character string):
-  mutate(TransplantDate = ymd(TransplantDate),
-         DispInstallDate = ymd(DispInstallDate),
-         TrapInstallDate = ymd(TrapInstallDate),
-         SamplingDate = ymd(SamplingDate)
-         )  %>%
-  mutate(mothsperday = nYSB / DaysOfCatch, # standardize the counts
-         SamplingDateC = as.character(SamplingDate))
-
-## data manipulation that was not included in previous R chapter:
-datR %<>%
-  mutate(numTrt = ifelse(Treatment == "Control", 0, 1),
-         DAI = DATI)
-
-## average counts for each location, date
-mean_cts <- datR %>%
-  group_by(Location, Treatment,
-           AssessmentNumber,
-           SamplingDate, DAI) %>%
-  summarize(mean_cts = mean(nYSB, na.rm = T),
-            mean_mothsperday = mean(mothsperday)) %>%
-  ungroup()
-```
 
 
 ## Generalized Logistic Curve
@@ -107,34 +43,9 @@ $v$ affects where the inflection point occurs, and
 
 $M$ relates to the starting time of when the curve begins.
 
+<img src="04-NonlinearInR_files/figure-html/SimData-1.png" width="100%" /><img src="04-NonlinearInR_files/figure-html/SimData-2.png" width="100%" />
 
-``` r
-A = -3 # left asymptote
-K = 0 # right asymptote
-B = 0.06 # (decay rate if b < 0; growth if b > 0)
-v = 0.2 # affects where inflection point is
-# Q = 9 # related to y at time 0 (how long until y starts to go to 0)
-m = 50 # expected DAI when TR failure is midway
-Q = exp(B*m)
-C = 1
-
-t = 0:150
-beta = A + ( (K - A)  / ( (C + Q * exp(-1 * t * B)) ^ (1 / v) ) )
-TR = 100 * (1 - exp(beta))
-plot(t, beta, type = "l", xlab = "Days after installation (DAI)",
-     ylab =  expression(paste("Regression coefficient, ", beta[1])),
-     main = expression(paste("How ", beta[1], " may change through a field season")))
-```
-
-<img src="04-NonlinearInR_files/figure-html/SimData-1.png" width="100%" />
-
-``` r
-plot(t, TR, type = "l", xlab = "Days after installation (DAI)",
-     ylab = "Trapping Reduction",
-     main = "How trapping reduction may change through a season")
-```
-
-<img src="04-NonlinearInR_files/figure-html/SimData-2.png" width="100%" />
+As a reminder, $TR = 100 - 100 e^{(-\beta_1)}$.
 
 This [shiny app](https://bromsk.shinyapps.io/GeneralizedLogisticCurves/) allows you to play around with how the parameter values affect the curve. It is helpful in understanding the model and setting priors for the model.
 
@@ -214,26 +125,11 @@ For now, we assume that each location shares all of the same nonlinear, logistic
 
 ## Fitting models with the brms package
 
-Before fitting the above model to our data, we continue to slowly build up our model and test it by fitting the model to simulated data. The simulated data has an obvious drop in product performance while the "real" data has a much more subtle drop.
+Before fitting the above model to our data, we continue to slowly build up our model and test it by fitting the model to simulated data.
 
 Setting priors in a nonlinear model is non-trivial! Make sure the ranges of your priors make sense.
 
 
-``` r
-# shared sim data components:
-DAI = 11:114
-DAIsampled = seq(11, 114, by = 7)
-Treatment = c("Control", "Trt")
-Location = c("A", "B", "C", "D", "E")
-nLocs = length(Location)
-Trap = 1:4
-
-shape_param = 5
-
-simdataBase <- expand_grid(Location, Treatment, Trap, DAI = DAIsampled) %>%
-  mutate(DaysOfCatch = 1,
-         numTrt = ifelse(Treatment == "Control", 0, 1))
-```
 
 ### No RE, no GP
 
@@ -245,64 +141,12 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1}(t) x_{Trt,i} + \mbox{ln} \left(DaysOfC
 \beta_{1,t} = A \left(1 - \frac{1}{(1 + e^{-B(t-M)})}\right) \\
 $$
 
-
-``` r
-set.seed(0528)
-b0 = 2
-A = -3
-B = 0.1
-M = 50
-b1 = A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) )))
-
-simdata1 <- simdataBase %>%
-  mutate(b1 = A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) ))),
-         TR = 100 * (1 - exp(b1)),
-         muTmp = exp(b0 + b1*numTrt),
-         nYSB = rnbinom(n=nrow(simdataBase), mu = muTmp, size = shape_param))
-
-ggplot(simdata1, aes(DAI, nYSB, color = Treatment)) +
-  geom_point() +
-  geom_smooth() + 
-  facet_wrap(~Location) +
-  labs(title = "Simulated moth counts for 5 locations",
-       xlab = "Days after installation (DAI)",
-       ylab = "Number of moths per trap per day")
-```
+In this model, each location has the same maximum trapping reduction (TR), and experiences the same loss in TR over the season, i.e., all locations share a common $\beta(t)$. Each location has similar moth counts as well.
 
 <img src="04-NonlinearInR_files/figure-html/simdata1-1.png" width="100%" />
 
-``` r
-prior1 <- prior(normal(0,2), nlpar = "b0") +
-  prior(normal(0, 2), lb = 0, nlpar = "A") + 
-  prior(normal(0, 0.5), lb = 0, nlpar = "B") +
-  prior(uniform(0, 120), lb = 0, ub = 120, nlpar = "M") +
-  prior(cauchy(0,1), lb = 0, class = "shape")
-
-fit1 <- brm(bf(nYSB ~ b0 - (A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) )))) * numTrt +
-                log(DaysOfCatch), # offset() is implicit in nonlinear formula
-              b0 + A + B + M ~ 1,
-              nl = TRUE), 
-              control = list(adapt_delta = 0.9),
-              data = simdata1, 
-              family = negbinomial,
-              prior = prior1,
-              warmup = 1000, iter = 2000, 
-              seed = 5000,
-              chains = nCores, cores = nCores) 
-saveRDS(fit1, "output/fit1.RDS")
-```
 
 The model estimates are very close to the true parameter values. We do not expect the parameters to match exactly due to the simulated noise in the data, but with many different simulated data sets, we expected the average of the estimated values to converge to the true values.
-
-
-``` r
-fit1 <- readRDS("output/fit1.RDS")
-# plot(fit1)
-# prior_summary(fit1)
-
-kable(round(summary(fit1)$fixed, 2))
-```
-
 
 
 Table: (\#tab:summary1)Model estimates of the fixed effects parameters.
@@ -314,10 +158,6 @@ Table: (\#tab:summary1)Model estimates of the fixed effects parameters.
 |B_Intercept  |     0.12|      0.02|     0.08|     0.17|    1|  2741.00|  3352.33|
 |M_Intercept  |    53.18|      2.22|    48.41|    57.13|    1|  2631.54|  2855.89|
 
-``` r
-kable(round(summary(fit1)$spec_pars, 2))
-```
-
 
 
 Table: (\#tab:summary1)Model estimates of the fixed effects parameters.
@@ -325,11 +165,6 @@ Table: (\#tab:summary1)Model estimates of the fixed effects parameters.
 |      | Estimate| Est.Error| l-95% CI| u-95% CI| Rhat| Bulk_ESS| Tail_ESS|
 |:-----|--------:|---------:|--------:|--------:|----:|--------:|--------:|
 |shape |     5.48|      0.65|     4.35|     6.89|    1|  4519.58|  4149.31|
-
-``` r
-kable(data.frame(Parameter = c("b0", "A", "B", "M", "shape"),
-           Values = c(b0, -1*A, B, M, shape_param)), caption = "True parameter values.")
-```
 
 
 
@@ -346,7 +181,7 @@ Table: (\#tab:summary1)True parameter values.
 
 ### Intercept RE, no GP
 
-This simulation study now includes the intercept RE, allowing for different background moth pressures at each location:
+This simulation study now includes the intercept RE, allowing for different background moth pressures at each location, but all location still share a common $\beta(t)$.
 
 $$
 y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
@@ -354,75 +189,10 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + \m
 \beta_{1,t} = A \left(1 - \frac{1}{(1 + e^{-B(t-M)})}\right) \\
 $$
 
-
-``` r
-set.seed(0528)
-b0mean = 2
-b0sd = 0.8
-b0 = rnorm(n = nLocs, b0mean, sd = b0sd) # now have 5 intercepts for 5 loc's
-A = -3
-B = 0.1
-M = 50
-b1 = A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) )))
-
-simdata2 = simdataBase %>%
-  left_join(data.frame(b0, Location))
-simdata2 %<>%
-  mutate(b1 = A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) ))),
-         TR = 100 * (1 - exp(b1)),
-         muTmp = exp(b0 + b1*numTrt),
-         nYSB = rnbinom(n=nrow(simdataBase), mu = muTmp, size = 5))
-ggplot(simdata2, aes(DAI, nYSB, color = Treatment)) +
-  geom_point() +
-  geom_smooth() + 
-  facet_wrap(~Location)  +
-  labs(title = "Simulated moth counts for 5 locations",
-       xlab = "Days after installation (DAI)",
-       ylab = "Number of moths per trap per day")
-```
-
 <img src="04-NonlinearInR_files/figure-html/simdata2-1.png" width="100%" />
 
-``` r
-prior2 <- prior(normal(0,2), nlpar = "b0") +
-  prior(normal(0, 2), lb = 0, nlpar = "A") + 
-  prior(normal(0, 0.5), lb = 0, nlpar = "B") +
-  prior(uniform(0, 120), lb = 0, ub = 120, nlpar = "M")
-
-fit2 <- brm(bf(nYSB ~ b0 - (A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) )))) * numTrt +                 log(DaysOfCatch), # offset() is implicit in nonlinear formula
-              b0 ~ 1 + (1|Location),
-              A + B + M ~ 1,
-              nl = TRUE), 
-              control = list(adapt_delta = 0.9),
-              data = simdata2, 
-              family = negbinomial,
-              prior = prior2,
-              warmup = 1000, iter = 2000, 
-              seed = 5000,
-              chains = nCores, cores = nCores) 
-saveRDS(fit2, "output/fit2.RDS")
-```
 
 Again, the model estimates are close to the true parameter values.
-
-
-``` r
-fit2 <- readRDS("output/fit2.RDS")
-# some plots to help assess model fit:
-# plot(fit2)
-# conditional_effects(fit2, "DAI:numTrt")
-# # # 
-# conditions <- data.frame(Location = unique(simdata2$Location))
-# rownames(conditions) <- unique(simdata2$Location)
-# me_loss <- conditional_effects(
-#   fit2, conditions = conditions,
-#   re_formula = NULL, method = "predict"
-# )
-# plot(me_loss, ncol = 5, points = TRUE)
-
-kable(round(summary(fit2)$fixed, 2))
-```
-
 
 
 |             | Estimate| Est.Error| l-95% CI| u-95% CI| Rhat| Bulk_ESS| Tail_ESS|
@@ -432,30 +202,17 @@ kable(round(summary(fit2)$fixed, 2))
 |B_Intercept  |     0.08|      0.01|     0.06|     0.11|    1|  2387.35|  2859.84|
 |M_Intercept  |    45.97|      3.56|    38.07|    52.12|    1|  2354.74|  2246.43|
 
-``` r
-kable(round(summary(fit2)$random$Location, 2))
-```
-
 
 
 |                 | Estimate| Est.Error| l-95% CI| u-95% CI| Rhat| Bulk_ESS| Tail_ESS|
 |:----------------|--------:|---------:|--------:|--------:|----:|--------:|--------:|
 |sd(b0_Intercept) |     0.77|      0.43|     0.34|     2.02|    1|   987.54|   751.96|
 
-``` r
-kable(round(summary(fit2)$spec_pars, 2))
-```
-
 
 
 |      | Estimate| Est.Error| l-95% CI| u-95% CI| Rhat| Bulk_ESS| Tail_ESS|
 |:-----|--------:|---------:|--------:|--------:|----:|--------:|--------:|
 |shape |     5.25|      0.61|     4.18|     6.52|    1|  3583.03|  2191.34|
-
-``` r
-kable(data.frame(Parameter = c("b0 mean", "A", "B", "M", "b0 SD", "shape"),
-           Values = c(b0mean,-1*A, B, M,  b0sd, shape_param)), caption = "True parameter values.")
-```
 
 
 
@@ -474,7 +231,7 @@ Table: (\#tab:summary2)True parameter values.
 
 ### Intercept RE, A RE, no GP
 
-This simulation study now adds the random effects to the left asymptote of the logistic curve, the $A$ parameter, allowing for different max trapping reduction (min $\beta_1$ values) at each location:
+This simulation now adds random effects to the left asymptote of the logistic curve, the $A$ parameter, allowing for different max trapping reduction (min $\beta_1$ values) at each location. *For this model, we will now have different trapping reduction (TR) curves for each location.*
 
 $$
 y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
@@ -482,61 +239,8 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1,k}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + 
 \beta_{1,k}(t) = A_k \left(1 - \frac{1}{(1 + e^{-B(t-M)})}\right) \\
 $$
 
-
-``` r
-set.seed(0528)
-b0mean = 2
-b0sd = 0.8
-b0 = rnorm(n = nLocs, b0mean, sd = b0sd) 
-Amean = -3
-Asd = 0.5
-A = rnorm(n = nLocs, Amean, sd = Asd)
-B = 0.1
-M = 50
-
-simdata3 <- simdataBase %>%
-  left_join(data.frame(b0, Location))  %>%
-  left_join(data.frame(A, Location))
-
-simdata3 %<>%
-  mutate(b1 = A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) ))),
-         TR = 100 * (1 - exp(b1)),
-         muTmp = exp(b0 + b1*numTrt),
-         nYSB = rnbinom(n=nrow(simdata3), mu = muTmp, size = 5))
-
-ggplot(simdata3, aes(DAI, nYSB, color = Treatment)) +
-  geom_point() +
-  geom_smooth() + 
-  facet_wrap(~Location) +
-  labs(title = "Simulated moth counts for 5 locations",
-       xlab = "Days after installation (DAI)",
-       ylab = "Number of moths per trap per day")
-```
-
 <img src="04-NonlinearInR_files/figure-html/simdata3-1.png" width="100%" />
 
-``` r
-prior3 <- prior(normal(0,2), nlpar = "b0") +
-  prior(normal(0, 2), lb = 0, nlpar = "A") + 
-  prior(normal(0, 0.5), lb = 0, nlpar = "B") +
-  prior(uniform(0, 120), lb = 0, ub = 120, nlpar = "M") +
-  prior(cauchy(0,1), lb = 0, class = "shape")
-
-fit3 <- brm(bf(nYSB ~ b0 - (A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) )))) * numTrt +
-                log(DaysOfCatch), # offset() is implicit in nonlinear formula
-              b0 ~ 1 + (1|Location),
-              A  ~ 1 + (1|Location),
-              B + M ~ 1,
-              nl = TRUE), 
-              control = list(adapt_delta = 0.9),
-              data = simdata3, 
-              family = negbinomial,
-              prior = prior3,
-              warmup = 1000, iter = 2000, 
-              seed = 5000,
-              chains = nCores, cores = nCores) 
-saveRDS(fit3, "output/fit3.RDS")
-```
 
 |             | Estimate| Est.Error| l-95% CI| u-95% CI| Rhat| Bulk_ESS| Tail_ESS|
 |:------------|--------:|---------:|--------:|--------:|----:|--------:|--------:|
@@ -576,7 +280,7 @@ Table: (\#tab:summary3)True parameter values.
 
 ### Intercept RE, A RE, WITH GP (same for all loc)
 
-Now we add the Gaussian Process to the model, explicitly allowing for the correlated change in background moth pressure over time. However, we start with using the same GP for all locations:
+Now we add the Gaussian Process to the model, explicitly allowing for the correlated change in background moth pressure over time. This allows for peaks and dramatic changes in a moth population over time, which mimics what is observed. We start with using the same GP for all locations.
 
 $$
 y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
@@ -586,93 +290,11 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1,k}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + 
 \sigma_{lm} = \tau \cdot e^{-\frac{|d_l - d_m|^2}{l^2}}
 $$
 
-
-``` r
-# simulate the GP:
-x = DAIsampled # runif(100)
-d = abs(outer(x, x, "-")) # compute distance matrix, d_{ij} = |x_i - x_j|
-l = 30 # length scale- smaller l is more wiggle
-tau = 3
-Sigma_SE = tau * exp(-d^2/(2*l^2)) # squared exponential kernel
-set.seed(100)
-for (i in 1:length(Location)) {
-  GP = as.vector(mvtnorm::rmvnorm(1,sigma=Sigma_SE))
-  # plot(DAIsampled, GP, type = "l")
-  if (i == 1) {
-   out = data.frame(DAI = DAIsampled,
-             GP = as.vector(GP),
-             Location = Location[i])
-  } else {
-    out %<>%
-      bind_rows(data.frame(DAI = DAIsampled,
-             GP = as.vector(GP),
-             Location = Location[i]))
-  }
-}
-
-# str(dat)
-set.seed(0530)
-b0mean = 1
-b0sd = 1.5
-Amean = -3
-Asd = 0.5
-b0 = rnorm(n = nLocs, b0mean, sd = b0sd) 
-A = rnorm(n = nLocs, Amean, sd = Asd)
-B = 0.1
-M = 50
-
-simdata4 <- simdataBase %>%
-  left_join(data.frame(b0, Location))  %>%
-  left_join(data.frame(A, Location)) %>%
-  left_join(out)
-# head(simdata4)
-simdata4 %<>%
-  mutate(b1 = A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) ))),
-         TR = 100 * (1 - exp(b1)),
-         muTmp = exp(b0 + b1*numTrt + GP),
-         nYSB = rnbinom(n=nrow(simdata4), mu = muTmp, size = 30))
-# print(sum(is.na(simdata4$nYSB)))
-simdata4 %<>%
-  mutate(nYSB = ifelse(is.na(nYSB), 0, nYSB))
-# hist(simdata4$nYSB)
-ggplot(simdata4, aes(DAI, nYSB, color = Treatment)) +
-  geom_point() +
-  geom_smooth() + 
-  facet_wrap(~Location, scales = "free") +
-  labs(title = "Simulated moth counts for 5 locations",
-       xlab = "Days after installation (DAI)",
-       ylab = "Number of moths per trap per day")
-```
-
 <img src="04-NonlinearInR_files/figure-html/simdata4-1.png" width="100%" />
 
-``` r
-# https://bookdown.org/content/4857/adventures-in-covariance.html#continuous-categories-and-the-gaussian-process
-prior4 <- prior(normal(0,2), nlpar = "b0") +
-  prior(normal(0, 2), lb = 0, nlpar = "A") + 
-  prior(normal(0, 0.5), lb = 0, nlpar = "B") +
-  prior(uniform(0, 120), lb = 0, ub = 120, nlpar = "M") +
-  prior(cauchy(0,1), lb = 0, class = "shape") +
-  prior(cauchy(0,50), lb = 0, class = "lscale", nlpar = "gpP") +
-  prior(cauchy(0,1), lb = 0, class = "sdgp", nlpar = "gpP")
 
-fit4 <- brm(bf(nYSB ~  b0 - (A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) )))) * numTrt + 
-              gpP + 
-              log(DaysOfCatch), 
-              b0 ~ (1|Location),
-              gpP ~ 1 + gp(DAI), # GP absorbs the intercept
-              A  ~ 1 + (1|Location),
-              B + M ~ 1,
-              nl = TRUE), 
-              control = list(adapt_delta = 0.9),
-              data = simdata4, 
-              family = negbinomial,
-              prior = prior4,
-              warmup = 1000, iter = 2000, 
-              seed = 5000,
-              chains = nCores, cores = nCores) 
-saveRDS(fit4, "output/fit4.RDS")
-```
+The model still does a good job estimating the parameters.
+
 
 |              | Estimate| Est.Error| l-95% CI| u-95% CI| Rhat| Bulk_ESS| Tail_ESS|
 |:-------------|--------:|---------:|--------:|--------:|----:|--------:|--------:|
@@ -726,7 +348,7 @@ Table: (\#tab:summary4)True parameter values.
 
 Starting here, I include 9 locations for each simulation as I found more locations were required for the model to estimate the parameters.
 
-This model has different GP's or each location (as in Sections \@ref(glmm-gp) and \@ref(fit-glmm-gpR)):
+This model has different GP's or each location (as in Sections \@ref(glmm-gp) and \@ref(fit-glmm-gpR)). Allowing for a differen GP for each location leads to more variety in the moth populations across the locations and more closely mimics what is observed in the field.
 
 $$
 y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
@@ -736,105 +358,8 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1,k}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + 
 \sigma_{k,lm} = \tau_k \cdot e^{-\frac{|d_l - d_m|^2}{l_k^2}}
 $$
 
-``` r
-Location = c("A", "B", "C", "D", "E", "F", "G", "H", "I")
-Trap = 1:4
-nLocs = length(Location)
-
-# simulate the GP:
-set.seed(100)
-x = DAIsampled # runif(100)
-d = abs(outer(x, x, "-")) # compute distance matrix, d_{ij} = |x_i - x_j|
-l_mean = 30
-l_sd = 10
-tau_mean = 3
-tau_sd = 1
-l = rnorm(n = nLocs, mean = l_mean, sd = l_sd) # smaller l is more wiggle
-tau = rnorm(n = nLocs, mean = tau_mean, sd = tau_sd)
-for (i in 1:nLocs) {
-  Sigma_SE = tau[i] * exp(-d^2/(2*l[i]^2)) # squared exponential kernel
-  GP = as.vector(mvtnorm::rmvnorm(1,sigma=Sigma_SE))
-  if (all(GP<0)) GP = abs(GP)
-  # GP = abs(GP)
-  # plot(DAIsampled, GP, type = "l")
-  if (i == 1) {
-   out = data.frame(DAI = DAIsampled,
-             GP = as.vector(GP),
-             Location = Location[i])
-  } else {
-    out %<>%
-      bind_rows(data.frame(DAI = DAIsampled,
-             GP = as.vector(GP),
-             Location = Location[i]))
-  }
-}
-#
-
-set.seed(0530)
-b0mean = 1
-b0sd = 1.5
-Amean = -3
-Asd = 0.5
-b0 = rnorm(n = nLocs, b0mean, sd = b0sd) # now have 5 intercepts for 5 loc's
-A = rnorm(n = nLocs, Amean, sd = Asd)
-B = 0.1
-M = 50
-
-simdata5 <- expand_grid(Location, Treatment, Trap, DAI= DAIsampled) %>%
-  mutate(DaysOfCatch = 1,
-         numTrt = ifelse(Treatment == "Control", 0, 1)) %>%
-  left_join(data.frame(b0, Location))  %>%
-  left_join(data.frame(A, Location)) %>%
-  left_join(out)
-# head(simdata5)
-shape_param = 30 # DIFFERENT!
-simdata5 %<>%
-  mutate(b1 = A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) ))),
-         TR = 100 * (1 - exp(b1)),
-         muTmp = exp(b0 + b1*numTrt + GP),
-         nYSB = rnbinom(n=nrow(simdata5), mu = muTmp, size = shape_param))
-# print(sum(is.na(simdata5$nYSB)))
-simdata5 %<>%
-  mutate(nYSB = ifelse(is.na(nYSB), 0, nYSB))
-# hist(simdata4$nYSB)
-ggplot(simdata5, aes(DAI, nYSB, color = Treatment)) +
-  geom_point() +
-  geom_smooth() + 
-  facet_wrap(~Location, scales = "free") +
-  labs(title = "Simulated moth counts for 9 locations",
-       xlab = "Days after installation (DAI)",
-       ylab = "Number of moths per trap per day")
-```
-
 <img src="04-NonlinearInR_files/figure-html/simdata5-1.png" width="100%" />
 
-``` r
-# https://bookdown.org/content/4857/adventures-in-covariance.html#continuous-categories-and-the-gaussian-process
-prior5 <- prior(normal(0,2), nlpar = "b0") +
-  prior(normal(0, 2), lb = 0, nlpar = "A") + 
-  prior(normal(0, 0.5), lb = 0, nlpar = "B") +
-  prior(uniform(0, 120), lb = 0, ub = 120, nlpar = "M") +
-  prior(cauchy(0,1), lb = 0, class = "shape") +
-  prior(cauchy(0,50), lb = 0, class = "lscale", nlpar = "gpP") +
-  prior(cauchy(0,10), lb = 0, class = "sdgp", nlpar = "gpP")
-
-fit5 <- brm(bf(nYSB ~  b0 - (A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) )))) * numTrt +
-              gpP + 
-              log(DaysOfCatch), 
-              b0 ~ (1|Location),
-              gpP ~ 1 + gp(DAI, by = Location), # GP absorbs the intercept
-              A  ~ 1 + (1|Location),
-              B + M ~ 1,
-              nl = TRUE), 
-              control = list(adapt_delta = 0.9),
-              data = simdata5, 
-              prior = prior5,
-              family = negbinomial,
-              warmup = 1000, iter = 2000, 
-              seed = 5000,
-              chains = nCores, cores = nCores) 
-saveRDS(fit5, "output/fit5.RDS")
-```
 
 
 <img src="04-NonlinearInR_files/figure-html/output5-1.png" width="100%" />
@@ -843,7 +368,7 @@ saveRDS(fit5, "output/fit5.RDS")
 
 ### Intercept, A, B, M RE, with GP (DIFF for each loc)
 
-In this most complex model, I make $B$ and $M$ random effects in the logistic curve, in addition to the $A$ parameter:
+In this most complex model, I make $B$ and $M$ random effects in the logistic curve, in addition to the $A$ parameter. This allows for the TR curve to vary in multiple ways among the locations.
 
 $$
 y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
@@ -853,155 +378,25 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1,k}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + 
 \sigma_{k,lm} = \tau_k \cdot e^{-\frac{|d_l - d_m|^2}{l_k^2}}
 $$
 
-
-``` r
-set.seed(600)
-Location = c("A", "B", "C", "D", "E", "F", "G", "H", "I")
-nLocs = length(Location)
-
-# simulate the GP:
-x = DAIsampled # runif(100)
-d = abs(outer(x, x, "-")) # compute distance matrix, d_{ij} = |x_i - x_j|
-l_mean = 30
-l_sd = 10
-tau_mean = 1
-tau_sd = 0.5
-l = rnorm(n = nLocs, mean = l_mean, sd = l_sd) # smaller l is more wiggle
-tau = rnorm(n = nLocs, mean = tau_mean, sd = tau_sd)
-# set.seed(100)
-for (i in 1:nLocs) {
-  Sigma_SE = tau[i]^2 * exp(-d^2/(2*l[i]^2)) # squared exponential kernel
-  GP = as.vector(mvtnorm::rmvnorm(1,sigma=Sigma_SE))
-  if (all(GP<0)) GP = abs(GP)
-  # GP = abs(GP)
-  # plot(DAIsampled, GP, type = "l")
-  if (i == 1) {
-   out = data.frame(DAI = DAIsampled,
-             GP = as.vector(GP),
-             Location = Location[i])
-  } else {
-    out %<>%
-      bind_rows(data.frame(DAI = DAIsampled,
-             GP = as.vector(GP),
-             Location = Location[i]))
-  }
-}
-#
-
-# set.seed(0530)
-b0mean = 1
-b0sd = 0.5
-Amean = -3
-Asd = 0.5
-b0 = rnorm(n = b0mean, 1, sd = b0sd) # now have 5 intercepts for 5 loc's
-A = rnorm(n = nLocs, Amean, sd = Asd)
-
-Bmean = 0.1
-Bsd = 0.02
-Mmean = 50
-Msd = 10
-B = rtruncnorm(n = nLocs,a = 0, mean = Bmean, sd =Bsd)
-M = rtruncnorm(n = nLocs, a = 0, mean = Mmean, sd = Msd)
-
-simdata6 <- expand_grid(Location, Treatment, Trap, DAI = DAIsampled) %>%
-  mutate(DaysOfCatch = 1,
-         numTrt = ifelse(Treatment == "Control", 0, 1)) %>%
-  left_join(data.frame(b0, Location))  %>%
-  left_join(data.frame(A, Location)) %>%
-  left_join(data.frame(B, Location)) %>%
-  left_join(data.frame(M, Location)) %>%
-  left_join(out)
-# head(simdata4)
-shape_param = 30
-simdata6 %<>%
-  mutate(b1 = A * (1 - (1 / (1 + exp(-1 * B * (DAI - M) )))),
-         TR = 100 * (1 - exp(b1)),
-         muTmp = exp(b0 + b1*numTrt + GP),
-         nYSB = rnbinom(n=nrow(simdata6), mu = muTmp, size = shape_param))
-# print(sum(is.na(simdata6$nYSB)))
-simdata6 %<>%
-  mutate(nYSB = ifelse(is.na(nYSB), 0, nYSB))
-# hist(simdata4$nYSB)
-ggplot(simdata6, aes(DAI, nYSB, color = Treatment)) +
-  geom_point() +
-  geom_smooth() + 
-  facet_wrap(~Location, scales = "free") +
-  labs(title = "Simulated moth counts for 9 locations",
-       xlab = "Days after installation (DAI)",
-       ylab = "Number of moths per trap per day")
-```
-
 <img src="04-NonlinearInR_files/figure-html/simdata6-1.png" width="100%" />
 
-``` r
-# https://bookdown.org/content/4857/adventures-in-covariance.html#continuous-categories-and-the-gaussian-process
-prior6 <- prior(normal(0,2), nlpar = "b0") +
-  prior(normal(0, 2), lb = 0, nlpar = "A") + 
-  prior(normal(0, 0.5), lb = 0, nlpar = "B") +
-  prior(uniform(0, 120), lb = 0, ub = 120, nlpar = "M") +
-  prior(cauchy(0,1), lb = 0, class = "shape") +
-  prior(cauchy(0,50), lb = 0, class = "lscale", nlpar = "gpP") +
-  prior(cauchy(0,10), lb = 0, class = "sdgp", nlpar = "gpP")
-
-fit6 <- brm(bf(nYSB ~  b0 - (A * (1 - (1 / (1 + exp(-1 * B * (DAI - M) ))))) * numTrt +
-              gpP + 
-              log(DaysOfCatch), 
-              b0 ~ 1 + (1|Location),
-              gpP ~ 1 + gp(DAI, by = Location), # GP absorbs the intercept
-              A  ~ 1 + (1|Location),
-              B  ~ 1 + (1|Location),
-              M  ~ 1 + (1|Location),
-              nl = TRUE), 
-              control = list(adapt_delta = 0.9),
-              data = simdata6, 
-              family = negbinomial,
-              prior = prior6,
-              warmup = 1000, iter = 2000, 
-              seed = 5000,
-              chains = nCores, cores = nCores) 
-saveRDS(fit6, "output/fit6.RDS")
-```
 
 
 <img src="04-NonlinearInR_files/figure-html/output6-1.png" width="100%" />
 
 
+This model did not fit the data well. Priors may need to be tweaked, or more locations may be required to estimate all of the parameters well. 
+
 ## Case study
 
-Too many divergent warnings with model with intercept, A, B, M RE, with GP (DIFF for each loc). (M was multimodal)
+Too many divergent warnings with the most complex model, i.e., the model with intercept, A, B, M RE, with GP (DIFF for each loc). (M was multi-modal in that model fit.)
 
-Use constant B, M instead.
+Use constant B, M model instead.
 
-
-``` r
-# https://bookdown.org/content/4857/adventures-in-covariance.html#continuous-categories-and-the-gaussian-process
-prior6 <- prior(normal(0,2), nlpar = "b0") +
-  prior(normal(0, 2), lb = 0, nlpar = "A") + 
-  prior(normal(0, 0.5), lb = 0, nlpar = "B") +
-  prior(uniform(0, 120), lb = 0, ub = 120, nlpar = "M") +
-  prior(cauchy(0,1), lb = 0, class = "shape") +
-  prior(cauchy(0,50), lb = 0, class = "lscale", nlpar = "gpP") +
-  prior(cauchy(0,10), lb = 0, class = "sdgp", nlpar = "gpP")
+The model fits the data well, is interpretable, and converges well.
 
 
-fitR <- brm(bf(nYSB ~  b0 - 
-                 (A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) )))) * numTrt +
-              gpP + 
-              log(DaysOfCatch), 
-              b0 ~ (1|Location),
-              gpP ~ 1 + gp(DAI, by = Location), # GP absorbs the intercept
-              A  ~ 1 + (1|Location),
-              B + M ~ 1,
-              nl = TRUE), 
-              control = list(adapt_delta = 0.9),
-              data = datR, 
-              family = negbinomial,
-              prior = prior6,
-              warmup = 1000, iter = 2000, 
-              seed = 5000,
-              chains = nCores, cores = nCores) 
-saveRDS(fitR, "output/fitR.RDS")
-```
+
 
 
 <img src="04-NonlinearInR_files/figure-html/outputR-1.png" width="100%" />

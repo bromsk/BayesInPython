@@ -56,70 +56,6 @@
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 
 
-<style type="text/css">
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-</style>
 
 <style type="text/css">
   
@@ -268,71 +204,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="NonlinearR" class="section level1 hasAnchor" number="5">
 <h1><span class="header-section-number">Chapter 5</span> Nonlinear Bayesian Models in R<a href="NonlinearR.html#NonlinearR" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>As mentioned in Section <a href="index.html#CaseStudy">1.1</a>, the treatment group for these data is a pheromone dispenser. Eventually, given enough time, the dispenser has to run out of pheromone and the moth counts in the treatment and control groups are expected to have the same expected counts for a given location. Mathematically, <span class="math inline">\(\beta_1 \to 0\)</span> as <span class="math inline">\(t \to \infty\)</span>. The timeline for this to happen may or may not happen during the field season, but we want to be sure to include this potential dynamic in the model to statistically test whether the loss of performance is observed or not.</p>
+<p>As mentioned in Section <a href="index.html#CaseStudy">1.1</a>, the treatment group for these data is a pheromone dispenser. Eventually, given enough time, the dispenser has to run out of pheromone and the moth counts in the treatment and control groups are expected to have the same expected counts for a given location. In other words, Trapping reduction goes from a max value to 0 over time. Mathematically, <span class="math inline">\(\beta_1 \to 0\)</span> as <span class="math inline">\(t \to \infty\)</span>. The timeline for this to happen may or may not happen during the field season, but we want to be sure to include this potential dynamic in the model to statistically test whether the loss of performance is observed or not.</p>
 <p>To include this potential change over time, a nonlinear relationship between moth counts and treatment effect is needed in our model. In particular, <span class="math inline">\(\beta_1\)</span> should have an asymmetric sigmoidal curve. Here, I use a generalized logistic curve to get an appropriate shape.</p>
+<p><strong>Code is not included here for easier readability. Please follow along using <a href="https://github.com/bromsk/BayesInPython/blob/main/docs/04-NonlinearInR.md">this</a> R script to run the code yourself.</strong></p>
 <div id="setup-1" class="section level2 hasAnchor" number="5.1">
 <h2><span class="header-section-number">5.1</span> Setup<a href="NonlinearR.html#setup-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>This chapter begins with almost the same setup code as Chapter <a href="GLMMsR.html#GLMMsR">3</a>, copied here for easier reference. A few of the functions used in Chapter <a href="GLMMsR.html#GLMMsR">3</a> are excluded from this script because they are not needed and an extra data manipulation is completed– a numeric version of the “Treatment” cateogrical variable is created for these models.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="NonlinearR.html#cb1-1" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">cache =</span> T, <span class="at">message =</span>F, <span class="at">warning =</span> F,  <span class="at">out.width =</span> <span class="st">&#39;100%&#39;</span>)</span>
-<span id="cb1-2"><a href="NonlinearR.html#cb1-2" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="NonlinearR.html#cb1-3" tabindex="-1"></a><span class="do">## R libraries:</span></span>
-<span id="cb1-4"><a href="NonlinearR.html#cb1-4" tabindex="-1"></a><span class="co"># uncomment and change package name to download any required packages</span></span>
-<span id="cb1-5"><a href="NonlinearR.html#cb1-5" tabindex="-1"></a><span class="co"># install.packages(&quot;kableExtra&quot;) </span></span>
-<span id="cb1-6"><a href="NonlinearR.html#cb1-6" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
-<span id="cb1-7"><a href="NonlinearR.html#cb1-7" tabindex="-1"></a><span class="fu">library</span>(lme4)</span>
-<span id="cb1-8"><a href="NonlinearR.html#cb1-8" tabindex="-1"></a><span class="fu">library</span>(magrittr)</span>
-<span id="cb1-9"><a href="NonlinearR.html#cb1-9" tabindex="-1"></a><span class="fu">library</span>(truncnorm)</span>
-<span id="cb1-10"><a href="NonlinearR.html#cb1-10" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-11"><a href="NonlinearR.html#cb1-11" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
-<span id="cb1-12"><a href="NonlinearR.html#cb1-12" tabindex="-1"></a><span class="fu">library</span>(ggmap)</span>
-<span id="cb1-13"><a href="NonlinearR.html#cb1-13" tabindex="-1"></a><span class="co"># usethis::edit_r_environ()</span></span>
-<span id="cb1-14"><a href="NonlinearR.html#cb1-14" tabindex="-1"></a><span class="fu">register_google</span>(<span class="fu">Sys.getenv</span>(<span class="st">&quot;ggmapKey&quot;</span>)) <span class="co"># (key saved on hidden file for security)</span></span>
-<span id="cb1-15"><a href="NonlinearR.html#cb1-15" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="NonlinearR.html#cb1-16" tabindex="-1"></a><span class="co"># to run Bayesian models. Set appropriate nCores for your machine</span></span>
-<span id="cb1-17"><a href="NonlinearR.html#cb1-17" tabindex="-1"></a><span class="fu">library</span>(brms)</span>
-<span id="cb1-18"><a href="NonlinearR.html#cb1-18" tabindex="-1"></a>nCores <span class="ot">=</span> <span class="dv">6</span> <span class="co"># nCores -2 so your machine doesn&#39;t overheat</span></span>
-<span id="cb1-19"><a href="NonlinearR.html#cb1-19" tabindex="-1"></a><span class="fu">library</span>(ggmcmc) <span class="co"># ggs()</span></span>
-<span id="cb1-20"><a href="NonlinearR.html#cb1-20" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="NonlinearR.html#cb1-21" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="NonlinearR.html#cb1-22" tabindex="-1"></a><span class="do">## Package and example code to find colors</span></span>
-<span id="cb1-23"><a href="NonlinearR.html#cb1-23" tabindex="-1"></a><span class="co"># library(RColorBrewer)</span></span>
-<span id="cb1-24"><a href="NonlinearR.html#cb1-24" tabindex="-1"></a><span class="co"># display.brewer.pal(11, &quot;Spectral&quot;)</span></span>
-<span id="cb1-25"><a href="NonlinearR.html#cb1-25" tabindex="-1"></a><span class="co"># brewer.pal(11, &quot;Spectral&quot;)</span></span>
-<span id="cb1-26"><a href="NonlinearR.html#cb1-26" tabindex="-1"></a>mycolors <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;#9E0142&quot;</span>, <span class="st">&quot;#66C2A5&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="NonlinearR.html#cb2-1" tabindex="-1"></a><span class="co"># read in the data:</span></span>
-<span id="cb2-2"><a href="NonlinearR.html#cb2-2" tabindex="-1"></a>datRinit <span class="ot">=</span> <span class="fu">read.csv</span>(<span class="st">&quot;data/moths.csv&quot;</span>)</span>
-<span id="cb2-3"><a href="NonlinearR.html#cb2-3" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="NonlinearR.html#cb2-4" tabindex="-1"></a><span class="co"># check data values: </span></span>
-<span id="cb2-5"><a href="NonlinearR.html#cb2-5" tabindex="-1"></a><span class="fu">str</span>(datRinit)</span>
-<span id="cb2-6"><a href="NonlinearR.html#cb2-6" tabindex="-1"></a><span class="fu">summary</span>(datRinit)</span>
-<span id="cb2-7"><a href="NonlinearR.html#cb2-7" tabindex="-1"></a><span class="fu">lapply</span>(datRinit, <span class="cf">function</span>(x) {</span>
-<span id="cb2-8"><a href="NonlinearR.html#cb2-8" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.character</span>(x))</span>
-<span id="cb2-9"><a href="NonlinearR.html#cb2-9" tabindex="-1"></a>    <span class="fu">unique</span>(x)</span>
-<span id="cb2-10"><a href="NonlinearR.html#cb2-10" tabindex="-1"></a>})</span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="NonlinearR.html#cb3-1" tabindex="-1"></a><span class="co"># manipulate data:</span></span>
-<span id="cb3-2"><a href="NonlinearR.html#cb3-2" tabindex="-1"></a>datR <span class="ot">&lt;-</span> datRinit <span class="sc">%&gt;%</span></span>
-<span id="cb3-3"><a href="NonlinearR.html#cb3-3" tabindex="-1"></a>  <span class="co"># convert dates to dates (instead of character string):</span></span>
-<span id="cb3-4"><a href="NonlinearR.html#cb3-4" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">TransplantDate =</span> <span class="fu">ymd</span>(TransplantDate),</span>
-<span id="cb3-5"><a href="NonlinearR.html#cb3-5" tabindex="-1"></a>         <span class="at">DispInstallDate =</span> <span class="fu">ymd</span>(DispInstallDate),</span>
-<span id="cb3-6"><a href="NonlinearR.html#cb3-6" tabindex="-1"></a>         <span class="at">TrapInstallDate =</span> <span class="fu">ymd</span>(TrapInstallDate),</span>
-<span id="cb3-7"><a href="NonlinearR.html#cb3-7" tabindex="-1"></a>         <span class="at">SamplingDate =</span> <span class="fu">ymd</span>(SamplingDate)</span>
-<span id="cb3-8"><a href="NonlinearR.html#cb3-8" tabindex="-1"></a>         )  <span class="sc">%&gt;%</span></span>
-<span id="cb3-9"><a href="NonlinearR.html#cb3-9" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mothsperday =</span> nYSB <span class="sc">/</span> DaysOfCatch, <span class="co"># standardize the counts</span></span>
-<span id="cb3-10"><a href="NonlinearR.html#cb3-10" tabindex="-1"></a>         <span class="at">SamplingDateC =</span> <span class="fu">as.character</span>(SamplingDate))</span>
-<span id="cb3-11"><a href="NonlinearR.html#cb3-11" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="NonlinearR.html#cb3-12" tabindex="-1"></a><span class="do">## data manipulation that was not included in previous R chapter:</span></span>
-<span id="cb3-13"><a href="NonlinearR.html#cb3-13" tabindex="-1"></a>datR <span class="sc">%&lt;&gt;%</span></span>
-<span id="cb3-14"><a href="NonlinearR.html#cb3-14" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">numTrt =</span> <span class="fu">ifelse</span>(Treatment <span class="sc">==</span> <span class="st">&quot;Control&quot;</span>, <span class="dv">0</span>, <span class="dv">1</span>),</span>
-<span id="cb3-15"><a href="NonlinearR.html#cb3-15" tabindex="-1"></a>         <span class="at">DAI =</span> DATI)</span>
-<span id="cb3-16"><a href="NonlinearR.html#cb3-16" tabindex="-1"></a></span>
-<span id="cb3-17"><a href="NonlinearR.html#cb3-17" tabindex="-1"></a><span class="do">## average counts for each location, date</span></span>
-<span id="cb3-18"><a href="NonlinearR.html#cb3-18" tabindex="-1"></a>mean_cts <span class="ot">&lt;-</span> datR <span class="sc">%&gt;%</span></span>
-<span id="cb3-19"><a href="NonlinearR.html#cb3-19" tabindex="-1"></a>  <span class="fu">group_by</span>(Location, Treatment,</span>
-<span id="cb3-20"><a href="NonlinearR.html#cb3-20" tabindex="-1"></a>           AssessmentNumber,</span>
-<span id="cb3-21"><a href="NonlinearR.html#cb3-21" tabindex="-1"></a>           SamplingDate, DAI) <span class="sc">%&gt;%</span></span>
-<span id="cb3-22"><a href="NonlinearR.html#cb3-22" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_cts =</span> <span class="fu">mean</span>(nYSB, <span class="at">na.rm =</span> T),</span>
-<span id="cb3-23"><a href="NonlinearR.html#cb3-23" tabindex="-1"></a>            <span class="at">mean_mothsperday =</span> <span class="fu">mean</span>(mothsperday)) <span class="sc">%&gt;%</span></span>
-<span id="cb3-24"><a href="NonlinearR.html#cb3-24" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code></pre></div>
+<p>This chapter has similar setup code to Chapter <a href="GLMMsR.html#GLMMsR">3</a>. Check the <a href="https://github.com/bromsk/BayesInPython/blob/main/docs/04-NonlinearInR.md">script</a> to see the code.</p>
 </div>
 <div id="generalized-logistic-curve" class="section level2 hasAnchor" number="5.2">
 <h2><span class="header-section-number">5.2</span> Generalized Logistic Curve<a href="NonlinearR.html#generalized-logistic-curve" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -347,26 +224,8 @@ where,</p>
 <p><span class="math inline">\(B\)</span> is the growth rate (<span class="math inline">\(B&gt;0\)</span>; <span class="math inline">\(B&lt;0\)</span> is a decay rate),</p>
 <p><span class="math inline">\(v\)</span> affects where the inflection point occurs, and</p>
 <p><span class="math inline">\(M\)</span> relates to the starting time of when the curve begins.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="NonlinearR.html#cb4-1" tabindex="-1"></a>A <span class="ot">=</span> <span class="sc">-</span><span class="dv">3</span> <span class="co"># left asymptote</span></span>
-<span id="cb4-2"><a href="NonlinearR.html#cb4-2" tabindex="-1"></a>K <span class="ot">=</span> <span class="dv">0</span> <span class="co"># right asymptote</span></span>
-<span id="cb4-3"><a href="NonlinearR.html#cb4-3" tabindex="-1"></a>B <span class="ot">=</span> <span class="fl">0.06</span> <span class="co"># (decay rate if b &lt; 0; growth if b &gt; 0)</span></span>
-<span id="cb4-4"><a href="NonlinearR.html#cb4-4" tabindex="-1"></a>v <span class="ot">=</span> <span class="fl">0.2</span> <span class="co"># affects where inflection point is</span></span>
-<span id="cb4-5"><a href="NonlinearR.html#cb4-5" tabindex="-1"></a><span class="co"># Q = 9 # related to y at time 0 (how long until y starts to go to 0)</span></span>
-<span id="cb4-6"><a href="NonlinearR.html#cb4-6" tabindex="-1"></a>m <span class="ot">=</span> <span class="dv">50</span> <span class="co"># expected DAI when TR failure is midway</span></span>
-<span id="cb4-7"><a href="NonlinearR.html#cb4-7" tabindex="-1"></a>Q <span class="ot">=</span> <span class="fu">exp</span>(B<span class="sc">*</span>m)</span>
-<span id="cb4-8"><a href="NonlinearR.html#cb4-8" tabindex="-1"></a>C <span class="ot">=</span> <span class="dv">1</span></span>
-<span id="cb4-9"><a href="NonlinearR.html#cb4-9" tabindex="-1"></a></span>
-<span id="cb4-10"><a href="NonlinearR.html#cb4-10" tabindex="-1"></a>t <span class="ot">=</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">150</span></span>
-<span id="cb4-11"><a href="NonlinearR.html#cb4-11" tabindex="-1"></a>beta <span class="ot">=</span> A <span class="sc">+</span> ( (K <span class="sc">-</span> A)  <span class="sc">/</span> ( (C <span class="sc">+</span> Q <span class="sc">*</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">*</span> t <span class="sc">*</span> B)) <span class="sc">^</span> (<span class="dv">1</span> <span class="sc">/</span> v) ) )</span>
-<span id="cb4-12"><a href="NonlinearR.html#cb4-12" tabindex="-1"></a>TR <span class="ot">=</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fu">exp</span>(beta))</span>
-<span id="cb4-13"><a href="NonlinearR.html#cb4-13" tabindex="-1"></a><span class="fu">plot</span>(t, beta, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">xlab =</span> <span class="st">&quot;Days after installation (DAI)&quot;</span>,</span>
-<span id="cb4-14"><a href="NonlinearR.html#cb4-14" tabindex="-1"></a>     <span class="at">ylab =</span>  <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;Regression coefficient, &quot;</span>, beta[<span class="dv">1</span>])),</span>
-<span id="cb4-15"><a href="NonlinearR.html#cb4-15" tabindex="-1"></a>     <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;How &quot;</span>, beta[<span class="dv">1</span>], <span class="st">&quot; may change through a field season&quot;</span>)))</span></code></pre></div>
-<p><img src="04-NonlinearInR_files/figure-html/SimData-1.png" width="100%" /></p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="NonlinearR.html#cb5-1" tabindex="-1"></a><span class="fu">plot</span>(t, TR, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">xlab =</span> <span class="st">&quot;Days after installation (DAI)&quot;</span>,</span>
-<span id="cb5-2"><a href="NonlinearR.html#cb5-2" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">&quot;Trapping Reduction&quot;</span>,</span>
-<span id="cb5-3"><a href="NonlinearR.html#cb5-3" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;How trapping reduction may change through a season&quot;</span>)</span></code></pre></div>
-<p><img src="04-NonlinearInR_files/figure-html/SimData-2.png" width="100%" /></p>
+<p><img src="04-NonlinearInR_files/figure-html/SimData-1.png" width="100%" /><img src="04-NonlinearInR_files/figure-html/SimData-2.png" width="100%" /></p>
+<p>As a reminder, <span class="math inline">\(TR = 100 - 100 e^{(-\beta_1)}\)</span>.</p>
 <p>This <a href="https://bromsk.shinyapps.io/GeneralizedLogisticCurves/">shiny app</a> allows you to play around with how the parameter values affect the curve. It is helpful in understanding the model and setting priors for the model.</p>
 </div>
 <div id="bayesian-model-2" class="section level2 hasAnchor" number="5.3">
@@ -417,21 +276,8 @@ l_k \sim HalfCauchy(0, 1) \\
 </div>
 <div id="fitting-models-with-the-brms-package" class="section level2 hasAnchor" number="5.4">
 <h2><span class="header-section-number">5.4</span> Fitting models with the brms package<a href="NonlinearR.html#fitting-models-with-the-brms-package" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Before fitting the above model to our data, we continue to slowly build up our model and test it by fitting the model to simulated data. The simulated data has an obvious drop in product performance while the “real” data has a much more subtle drop.</p>
+<p>Before fitting the above model to our data, we continue to slowly build up our model and test it by fitting the model to simulated data.</p>
 <p>Setting priors in a nonlinear model is non-trivial! Make sure the ranges of your priors make sense.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="NonlinearR.html#cb6-1" tabindex="-1"></a><span class="co"># shared sim data components:</span></span>
-<span id="cb6-2"><a href="NonlinearR.html#cb6-2" tabindex="-1"></a>DAI <span class="ot">=</span> <span class="dv">11</span><span class="sc">:</span><span class="dv">114</span></span>
-<span id="cb6-3"><a href="NonlinearR.html#cb6-3" tabindex="-1"></a>DAIsampled <span class="ot">=</span> <span class="fu">seq</span>(<span class="dv">11</span>, <span class="dv">114</span>, <span class="at">by =</span> <span class="dv">7</span>)</span>
-<span id="cb6-4"><a href="NonlinearR.html#cb6-4" tabindex="-1"></a>Treatment <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;Control&quot;</span>, <span class="st">&quot;Trt&quot;</span>)</span>
-<span id="cb6-5"><a href="NonlinearR.html#cb6-5" tabindex="-1"></a>Location <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>, <span class="st">&quot;E&quot;</span>)</span>
-<span id="cb6-6"><a href="NonlinearR.html#cb6-6" tabindex="-1"></a>nLocs <span class="ot">=</span> <span class="fu">length</span>(Location)</span>
-<span id="cb6-7"><a href="NonlinearR.html#cb6-7" tabindex="-1"></a>Trap <span class="ot">=</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span></span>
-<span id="cb6-8"><a href="NonlinearR.html#cb6-8" tabindex="-1"></a></span>
-<span id="cb6-9"><a href="NonlinearR.html#cb6-9" tabindex="-1"></a>shape_param <span class="ot">=</span> <span class="dv">5</span></span>
-<span id="cb6-10"><a href="NonlinearR.html#cb6-10" tabindex="-1"></a></span>
-<span id="cb6-11"><a href="NonlinearR.html#cb6-11" tabindex="-1"></a>simdataBase <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(Location, Treatment, Trap, <span class="at">DAI =</span> DAIsampled) <span class="sc">%&gt;%</span></span>
-<span id="cb6-12"><a href="NonlinearR.html#cb6-12" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DaysOfCatch =</span> <span class="dv">1</span>,</span>
-<span id="cb6-13"><a href="NonlinearR.html#cb6-13" tabindex="-1"></a>         <span class="at">numTrt =</span> <span class="fu">ifelse</span>(Treatment <span class="sc">==</span> <span class="st">&quot;Control&quot;</span>, <span class="dv">0</span>, <span class="dv">1</span>))</span></code></pre></div>
 <div id="no-re-no-gp" class="section level3 hasAnchor" number="5.4.1">
 <h3><span class="header-section-number">5.4.1</span> No RE, no GP<a href="NonlinearR.html#no-re-no-gp" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The first nonlinear model that I fit has no random effects and no Gaussian Process:</p>
@@ -440,51 +286,9 @@ y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
 log(\lambda_{ikt} ) = \beta_0 + \beta_{1}(t) x_{Trt,i} + \mbox{ln} \left(DaysOfCatch_i\right) \\
 \beta_{1,t} = A \left(1 - \frac{1}{(1 + e^{-B(t-M)})}\right) \\
 \]</span></p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="NonlinearR.html#cb7-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">0528</span>)</span>
-<span id="cb7-2"><a href="NonlinearR.html#cb7-2" tabindex="-1"></a>b0 <span class="ot">=</span> <span class="dv">2</span></span>
-<span id="cb7-3"><a href="NonlinearR.html#cb7-3" tabindex="-1"></a>A <span class="ot">=</span> <span class="sc">-</span><span class="dv">3</span></span>
-<span id="cb7-4"><a href="NonlinearR.html#cb7-4" tabindex="-1"></a>B <span class="ot">=</span> <span class="fl">0.1</span></span>
-<span id="cb7-5"><a href="NonlinearR.html#cb7-5" tabindex="-1"></a>M <span class="ot">=</span> <span class="dv">50</span></span>
-<span id="cb7-6"><a href="NonlinearR.html#cb7-6" tabindex="-1"></a>b1 <span class="ot">=</span> A <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">*</span> B <span class="sc">*</span> (DAI <span class="sc">-</span> M) )))</span>
-<span id="cb7-7"><a href="NonlinearR.html#cb7-7" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="NonlinearR.html#cb7-8" tabindex="-1"></a>simdata1 <span class="ot">&lt;-</span> simdataBase <span class="sc">%&gt;%</span></span>
-<span id="cb7-9"><a href="NonlinearR.html#cb7-9" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">b1 =</span> A <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">*</span> B <span class="sc">*</span> (DAI <span class="sc">-</span> M) ))),</span>
-<span id="cb7-10"><a href="NonlinearR.html#cb7-10" tabindex="-1"></a>         <span class="at">TR =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fu">exp</span>(b1)),</span>
-<span id="cb7-11"><a href="NonlinearR.html#cb7-11" tabindex="-1"></a>         <span class="at">muTmp =</span> <span class="fu">exp</span>(b0 <span class="sc">+</span> b1<span class="sc">*</span>numTrt),</span>
-<span id="cb7-12"><a href="NonlinearR.html#cb7-12" tabindex="-1"></a>         <span class="at">nYSB =</span> <span class="fu">rnbinom</span>(<span class="at">n=</span><span class="fu">nrow</span>(simdataBase), <span class="at">mu =</span> muTmp, <span class="at">size =</span> shape_param))</span>
-<span id="cb7-13"><a href="NonlinearR.html#cb7-13" tabindex="-1"></a></span>
-<span id="cb7-14"><a href="NonlinearR.html#cb7-14" tabindex="-1"></a><span class="fu">ggplot</span>(simdata1, <span class="fu">aes</span>(DAI, nYSB, <span class="at">color =</span> Treatment)) <span class="sc">+</span></span>
-<span id="cb7-15"><a href="NonlinearR.html#cb7-15" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb7-16"><a href="NonlinearR.html#cb7-16" tabindex="-1"></a>  <span class="fu">geom_smooth</span>() <span class="sc">+</span> </span>
-<span id="cb7-17"><a href="NonlinearR.html#cb7-17" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Location) <span class="sc">+</span></span>
-<span id="cb7-18"><a href="NonlinearR.html#cb7-18" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Simulated moth counts for 5 locations&quot;</span>,</span>
-<span id="cb7-19"><a href="NonlinearR.html#cb7-19" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">&quot;Days after installation (DAI)&quot;</span>,</span>
-<span id="cb7-20"><a href="NonlinearR.html#cb7-20" tabindex="-1"></a>       <span class="at">ylab =</span> <span class="st">&quot;Number of moths per trap per day&quot;</span>)</span></code></pre></div>
+<p>In this model, each location has the same maximum trapping reduction (TR), and experiences the same loss in TR over the season, i.e., all locations share a common <span class="math inline">\(\beta(t)\)</span>. Each location has similar moth counts as well.</p>
 <p><img src="04-NonlinearInR_files/figure-html/simdata1-1.png" width="100%" /></p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="NonlinearR.html#cb8-1" tabindex="-1"></a>prior1 <span class="ot">&lt;-</span> <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>,<span class="dv">2</span>), <span class="at">nlpar =</span> <span class="st">&quot;b0&quot;</span>) <span class="sc">+</span></span>
-<span id="cb8-2"><a href="NonlinearR.html#cb8-2" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">nlpar =</span> <span class="st">&quot;A&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb8-3"><a href="NonlinearR.html#cb8-3" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">nlpar =</span> <span class="st">&quot;B&quot;</span>) <span class="sc">+</span></span>
-<span id="cb8-4"><a href="NonlinearR.html#cb8-4" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">uniform</span>(<span class="dv">0</span>, <span class="dv">120</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">ub =</span> <span class="dv">120</span>, <span class="at">nlpar =</span> <span class="st">&quot;M&quot;</span>) <span class="sc">+</span></span>
-<span id="cb8-5"><a href="NonlinearR.html#cb8-5" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">cauchy</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">class =</span> <span class="st">&quot;shape&quot;</span>)</span>
-<span id="cb8-6"><a href="NonlinearR.html#cb8-6" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="NonlinearR.html#cb8-7" tabindex="-1"></a>fit1 <span class="ot">&lt;-</span> <span class="fu">brm</span>(<span class="fu">bf</span>(nYSB <span class="sc">~</span> b0 <span class="sc">-</span> (A <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">*</span> B <span class="sc">*</span> (DAI <span class="sc">-</span> M) )))) <span class="sc">*</span> numTrt <span class="sc">+</span></span>
-<span id="cb8-8"><a href="NonlinearR.html#cb8-8" tabindex="-1"></a>                <span class="fu">log</span>(DaysOfCatch), <span class="co"># offset() is implicit in nonlinear formula</span></span>
-<span id="cb8-9"><a href="NonlinearR.html#cb8-9" tabindex="-1"></a>              b0 <span class="sc">+</span> A <span class="sc">+</span> B <span class="sc">+</span> M <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb8-10"><a href="NonlinearR.html#cb8-10" tabindex="-1"></a>              <span class="at">nl =</span> <span class="cn">TRUE</span>), </span>
-<span id="cb8-11"><a href="NonlinearR.html#cb8-11" tabindex="-1"></a>              <span class="at">control =</span> <span class="fu">list</span>(<span class="at">adapt_delta =</span> <span class="fl">0.9</span>),</span>
-<span id="cb8-12"><a href="NonlinearR.html#cb8-12" tabindex="-1"></a>              <span class="at">data =</span> simdata1, </span>
-<span id="cb8-13"><a href="NonlinearR.html#cb8-13" tabindex="-1"></a>              <span class="at">family =</span> negbinomial,</span>
-<span id="cb8-14"><a href="NonlinearR.html#cb8-14" tabindex="-1"></a>              <span class="at">prior =</span> prior1,</span>
-<span id="cb8-15"><a href="NonlinearR.html#cb8-15" tabindex="-1"></a>              <span class="at">warmup =</span> <span class="dv">1000</span>, <span class="at">iter =</span> <span class="dv">2000</span>, </span>
-<span id="cb8-16"><a href="NonlinearR.html#cb8-16" tabindex="-1"></a>              <span class="at">seed =</span> <span class="dv">5000</span>,</span>
-<span id="cb8-17"><a href="NonlinearR.html#cb8-17" tabindex="-1"></a>              <span class="at">chains =</span> nCores, <span class="at">cores =</span> nCores) </span>
-<span id="cb8-18"><a href="NonlinearR.html#cb8-18" tabindex="-1"></a><span class="fu">saveRDS</span>(fit1, <span class="st">&quot;output/fit1.RDS&quot;</span>)</span></code></pre></div>
 <p>The model estimates are very close to the true parameter values. We do not expect the parameters to match exactly due to the simulated noise in the data, but with many different simulated data sets, we expected the average of the estimated values to converge to the true values.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="NonlinearR.html#cb9-1" tabindex="-1"></a>fit1 <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;output/fit1.RDS&quot;</span>)</span>
-<span id="cb9-2"><a href="NonlinearR.html#cb9-2" tabindex="-1"></a><span class="co"># plot(fit1)</span></span>
-<span id="cb9-3"><a href="NonlinearR.html#cb9-3" tabindex="-1"></a><span class="co"># prior_summary(fit1)</span></span>
-<span id="cb9-4"><a href="NonlinearR.html#cb9-4" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="NonlinearR.html#cb9-5" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">round</span>(<span class="fu">summary</span>(fit1)<span class="sc">$</span>fixed, <span class="dv">2</span>))</span></code></pre></div>
 <table style="width:100%;">
 <caption><span id="tab:summary1">Table 5.1: </span>Model estimates of the fixed effects parameters.</caption>
 <colgroup>
@@ -552,7 +356,6 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1}(t) x_{Trt,i} + \mbox{ln} \left(DaysOfC
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="NonlinearR.html#cb10-1" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">round</span>(<span class="fu">summary</span>(fit1)<span class="sc">$</span>spec_pars, <span class="dv">2</span>))</span></code></pre></div>
 <table>
 <caption><span id="tab:summary1">Table 5.1: </span>Model estimates of the fixed effects parameters.</caption>
 <colgroup>
@@ -590,8 +393,6 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1}(t) x_{Trt,i} + \mbox{ln} \left(DaysOfC
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="NonlinearR.html#cb11-1" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">data.frame</span>(<span class="at">Parameter =</span> <span class="fu">c</span>(<span class="st">&quot;b0&quot;</span>, <span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;M&quot;</span>, <span class="st">&quot;shape&quot;</span>),</span>
-<span id="cb11-2"><a href="NonlinearR.html#cb11-2" tabindex="-1"></a>           <span class="at">Values =</span> <span class="fu">c</span>(b0, <span class="sc">-</span><span class="dv">1</span><span class="sc">*</span>A, B, M, shape_param)), <span class="at">caption =</span> <span class="st">&quot;True parameter values.&quot;</span>)</span></code></pre></div>
 <table>
 <caption><span id="tab:summary1">Table 5.1: </span>True parameter values.</caption>
 <thead>
@@ -627,68 +428,14 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1}(t) x_{Trt,i} + \mbox{ln} \left(DaysOfC
 </div>
 <div id="intercept-re-no-gp" class="section level3 hasAnchor" number="5.4.2">
 <h3><span class="header-section-number">5.4.2</span> Intercept RE, no GP<a href="NonlinearR.html#intercept-re-no-gp" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>This simulation study now includes the intercept RE, allowing for different background moth pressures at each location:</p>
+<p>This simulation study now includes the intercept RE, allowing for different background moth pressures at each location, but all location still share a common <span class="math inline">\(\beta(t)\)</span>.</p>
 <p><span class="math display">\[
 y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
 log(\lambda_{ikt} ) = \beta_0 + \beta_{1}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + \mbox{ln} \left(DaysOfCatch_i\right) \\
 \beta_{1,t} = A \left(1 - \frac{1}{(1 + e^{-B(t-M)})}\right) \\
 \]</span></p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="NonlinearR.html#cb12-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">0528</span>)</span>
-<span id="cb12-2"><a href="NonlinearR.html#cb12-2" tabindex="-1"></a>b0mean <span class="ot">=</span> <span class="dv">2</span></span>
-<span id="cb12-3"><a href="NonlinearR.html#cb12-3" tabindex="-1"></a>b0sd <span class="ot">=</span> <span class="fl">0.8</span></span>
-<span id="cb12-4"><a href="NonlinearR.html#cb12-4" tabindex="-1"></a>b0 <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="at">n =</span> nLocs, b0mean, <span class="at">sd =</span> b0sd) <span class="co"># now have 5 intercepts for 5 loc&#39;s</span></span>
-<span id="cb12-5"><a href="NonlinearR.html#cb12-5" tabindex="-1"></a>A <span class="ot">=</span> <span class="sc">-</span><span class="dv">3</span></span>
-<span id="cb12-6"><a href="NonlinearR.html#cb12-6" tabindex="-1"></a>B <span class="ot">=</span> <span class="fl">0.1</span></span>
-<span id="cb12-7"><a href="NonlinearR.html#cb12-7" tabindex="-1"></a>M <span class="ot">=</span> <span class="dv">50</span></span>
-<span id="cb12-8"><a href="NonlinearR.html#cb12-8" tabindex="-1"></a>b1 <span class="ot">=</span> A <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">*</span> B <span class="sc">*</span> (DAI <span class="sc">-</span> M) )))</span>
-<span id="cb12-9"><a href="NonlinearR.html#cb12-9" tabindex="-1"></a></span>
-<span id="cb12-10"><a href="NonlinearR.html#cb12-10" tabindex="-1"></a>simdata2 <span class="ot">=</span> simdataBase <span class="sc">%&gt;%</span></span>
-<span id="cb12-11"><a href="NonlinearR.html#cb12-11" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">data.frame</span>(b0, Location))</span>
-<span id="cb12-12"><a href="NonlinearR.html#cb12-12" tabindex="-1"></a>simdata2 <span class="sc">%&lt;&gt;%</span></span>
-<span id="cb12-13"><a href="NonlinearR.html#cb12-13" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">b1 =</span> A <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">*</span> B <span class="sc">*</span> (DAI <span class="sc">-</span> M) ))),</span>
-<span id="cb12-14"><a href="NonlinearR.html#cb12-14" tabindex="-1"></a>         <span class="at">TR =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fu">exp</span>(b1)),</span>
-<span id="cb12-15"><a href="NonlinearR.html#cb12-15" tabindex="-1"></a>         <span class="at">muTmp =</span> <span class="fu">exp</span>(b0 <span class="sc">+</span> b1<span class="sc">*</span>numTrt),</span>
-<span id="cb12-16"><a href="NonlinearR.html#cb12-16" tabindex="-1"></a>         <span class="at">nYSB =</span> <span class="fu">rnbinom</span>(<span class="at">n=</span><span class="fu">nrow</span>(simdataBase), <span class="at">mu =</span> muTmp, <span class="at">size =</span> <span class="dv">5</span>))</span>
-<span id="cb12-17"><a href="NonlinearR.html#cb12-17" tabindex="-1"></a><span class="fu">ggplot</span>(simdata2, <span class="fu">aes</span>(DAI, nYSB, <span class="at">color =</span> Treatment)) <span class="sc">+</span></span>
-<span id="cb12-18"><a href="NonlinearR.html#cb12-18" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb12-19"><a href="NonlinearR.html#cb12-19" tabindex="-1"></a>  <span class="fu">geom_smooth</span>() <span class="sc">+</span> </span>
-<span id="cb12-20"><a href="NonlinearR.html#cb12-20" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Location)  <span class="sc">+</span></span>
-<span id="cb12-21"><a href="NonlinearR.html#cb12-21" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Simulated moth counts for 5 locations&quot;</span>,</span>
-<span id="cb12-22"><a href="NonlinearR.html#cb12-22" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">&quot;Days after installation (DAI)&quot;</span>,</span>
-<span id="cb12-23"><a href="NonlinearR.html#cb12-23" tabindex="-1"></a>       <span class="at">ylab =</span> <span class="st">&quot;Number of moths per trap per day&quot;</span>)</span></code></pre></div>
 <p><img src="04-NonlinearInR_files/figure-html/simdata2-1.png" width="100%" /></p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="NonlinearR.html#cb13-1" tabindex="-1"></a>prior2 <span class="ot">&lt;-</span> <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>,<span class="dv">2</span>), <span class="at">nlpar =</span> <span class="st">&quot;b0&quot;</span>) <span class="sc">+</span></span>
-<span id="cb13-2"><a href="NonlinearR.html#cb13-2" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">nlpar =</span> <span class="st">&quot;A&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb13-3"><a href="NonlinearR.html#cb13-3" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">nlpar =</span> <span class="st">&quot;B&quot;</span>) <span class="sc">+</span></span>
-<span id="cb13-4"><a href="NonlinearR.html#cb13-4" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">uniform</span>(<span class="dv">0</span>, <span class="dv">120</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">ub =</span> <span class="dv">120</span>, <span class="at">nlpar =</span> <span class="st">&quot;M&quot;</span>)</span>
-<span id="cb13-5"><a href="NonlinearR.html#cb13-5" tabindex="-1"></a></span>
-<span id="cb13-6"><a href="NonlinearR.html#cb13-6" tabindex="-1"></a>fit2 <span class="ot">&lt;-</span> <span class="fu">brm</span>(<span class="fu">bf</span>(nYSB <span class="sc">~</span> b0 <span class="sc">-</span> (A <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">*</span> B <span class="sc">*</span> (DAI <span class="sc">-</span> M) )))) <span class="sc">*</span> numTrt <span class="sc">+</span>                 <span class="fu">log</span>(DaysOfCatch), <span class="co"># offset() is implicit in nonlinear formula</span></span>
-<span id="cb13-7"><a href="NonlinearR.html#cb13-7" tabindex="-1"></a>              b0 <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>Location),</span>
-<span id="cb13-8"><a href="NonlinearR.html#cb13-8" tabindex="-1"></a>              A <span class="sc">+</span> B <span class="sc">+</span> M <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb13-9"><a href="NonlinearR.html#cb13-9" tabindex="-1"></a>              <span class="at">nl =</span> <span class="cn">TRUE</span>), </span>
-<span id="cb13-10"><a href="NonlinearR.html#cb13-10" tabindex="-1"></a>              <span class="at">control =</span> <span class="fu">list</span>(<span class="at">adapt_delta =</span> <span class="fl">0.9</span>),</span>
-<span id="cb13-11"><a href="NonlinearR.html#cb13-11" tabindex="-1"></a>              <span class="at">data =</span> simdata2, </span>
-<span id="cb13-12"><a href="NonlinearR.html#cb13-12" tabindex="-1"></a>              <span class="at">family =</span> negbinomial,</span>
-<span id="cb13-13"><a href="NonlinearR.html#cb13-13" tabindex="-1"></a>              <span class="at">prior =</span> prior2,</span>
-<span id="cb13-14"><a href="NonlinearR.html#cb13-14" tabindex="-1"></a>              <span class="at">warmup =</span> <span class="dv">1000</span>, <span class="at">iter =</span> <span class="dv">2000</span>, </span>
-<span id="cb13-15"><a href="NonlinearR.html#cb13-15" tabindex="-1"></a>              <span class="at">seed =</span> <span class="dv">5000</span>,</span>
-<span id="cb13-16"><a href="NonlinearR.html#cb13-16" tabindex="-1"></a>              <span class="at">chains =</span> nCores, <span class="at">cores =</span> nCores) </span>
-<span id="cb13-17"><a href="NonlinearR.html#cb13-17" tabindex="-1"></a><span class="fu">saveRDS</span>(fit2, <span class="st">&quot;output/fit2.RDS&quot;</span>)</span></code></pre></div>
 <p>Again, the model estimates are close to the true parameter values.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="NonlinearR.html#cb14-1" tabindex="-1"></a>fit2 <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;output/fit2.RDS&quot;</span>)</span>
-<span id="cb14-2"><a href="NonlinearR.html#cb14-2" tabindex="-1"></a><span class="co"># some plots to help assess model fit:</span></span>
-<span id="cb14-3"><a href="NonlinearR.html#cb14-3" tabindex="-1"></a><span class="co"># plot(fit2)</span></span>
-<span id="cb14-4"><a href="NonlinearR.html#cb14-4" tabindex="-1"></a><span class="co"># conditional_effects(fit2, &quot;DAI:numTrt&quot;)</span></span>
-<span id="cb14-5"><a href="NonlinearR.html#cb14-5" tabindex="-1"></a><span class="co"># # # </span></span>
-<span id="cb14-6"><a href="NonlinearR.html#cb14-6" tabindex="-1"></a><span class="co"># conditions &lt;- data.frame(Location = unique(simdata2$Location))</span></span>
-<span id="cb14-7"><a href="NonlinearR.html#cb14-7" tabindex="-1"></a><span class="co"># rownames(conditions) &lt;- unique(simdata2$Location)</span></span>
-<span id="cb14-8"><a href="NonlinearR.html#cb14-8" tabindex="-1"></a><span class="co"># me_loss &lt;- conditional_effects(</span></span>
-<span id="cb14-9"><a href="NonlinearR.html#cb14-9" tabindex="-1"></a><span class="co">#   fit2, conditions = conditions,</span></span>
-<span id="cb14-10"><a href="NonlinearR.html#cb14-10" tabindex="-1"></a><span class="co">#   re_formula = NULL, method = &quot;predict&quot;</span></span>
-<span id="cb14-11"><a href="NonlinearR.html#cb14-11" tabindex="-1"></a><span class="co"># )</span></span>
-<span id="cb14-12"><a href="NonlinearR.html#cb14-12" tabindex="-1"></a><span class="co"># plot(me_loss, ncol = 5, points = TRUE)</span></span>
-<span id="cb14-13"><a href="NonlinearR.html#cb14-13" tabindex="-1"></a></span>
-<span id="cb14-14"><a href="NonlinearR.html#cb14-14" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">round</span>(<span class="fu">summary</span>(fit2)<span class="sc">$</span>fixed, <span class="dv">2</span>))</span></code></pre></div>
 <table style="width:100%;">
 <colgroup>
 <col width="17%" />
@@ -755,7 +502,6 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + \m
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="NonlinearR.html#cb15-1" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">round</span>(<span class="fu">summary</span>(fit2)<span class="sc">$</span>random<span class="sc">$</span>Location, <span class="dv">2</span>))</span></code></pre></div>
 <table>
 <colgroup>
 <col width="22%" />
@@ -792,8 +538,8 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + \m
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="NonlinearR.html#cb16-1" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">round</span>(<span class="fu">summary</span>(fit2)<span class="sc">$</span>spec_pars, <span class="dv">2</span>))</span></code></pre></div>
 <table>
+<caption><span id="tab:summary2">Table 5.2: </span>True parameter values.</caption>
 <colgroup>
 <col width="9%" />
 <col width="13%" />
@@ -829,10 +575,7 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + \m
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="NonlinearR.html#cb17-1" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">data.frame</span>(<span class="at">Parameter =</span> <span class="fu">c</span>(<span class="st">&quot;b0 mean&quot;</span>, <span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;M&quot;</span>, <span class="st">&quot;b0 SD&quot;</span>, <span class="st">&quot;shape&quot;</span>),</span>
-<span id="cb17-2"><a href="NonlinearR.html#cb17-2" tabindex="-1"></a>           <span class="at">Values =</span> <span class="fu">c</span>(b0mean,<span class="sc">-</span><span class="dv">1</span><span class="sc">*</span>A, B, M,  b0sd, shape_param)), <span class="at">caption =</span> <span class="st">&quot;True parameter values.&quot;</span>)</span></code></pre></div>
 <table>
-<caption><span id="tab:summary2">Table 5.2: </span>True parameter values.</caption>
 <thead>
 <tr class="header">
 <th align="left">Parameter</th>
@@ -870,60 +613,13 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + \m
 </div>
 <div id="intercept-re-a-re-no-gp" class="section level3 hasAnchor" number="5.4.3">
 <h3><span class="header-section-number">5.4.3</span> Intercept RE, A RE, no GP<a href="NonlinearR.html#intercept-re-a-re-no-gp" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>This simulation study now adds the random effects to the left asymptote of the logistic curve, the <span class="math inline">\(A\)</span> parameter, allowing for different max trapping reduction (min <span class="math inline">\(\beta_1\)</span> values) at each location:</p>
+<p>This simulation now adds random effects to the left asymptote of the logistic curve, the <span class="math inline">\(A\)</span> parameter, allowing for different max trapping reduction (min <span class="math inline">\(\beta_1\)</span> values) at each location. <em>For this model, we will now have different trapping reduction (TR) curves for each location.</em></p>
 <p><span class="math display">\[
 y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
 log(\lambda_{ikt} ) = \beta_0 + \beta_{1,k}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + \mbox{ln} \left(DaysOfCatch_i\right) \\
 \beta_{1,k}(t) = A_k \left(1 - \frac{1}{(1 + e^{-B(t-M)})}\right) \\
 \]</span></p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="NonlinearR.html#cb18-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">0528</span>)</span>
-<span id="cb18-2"><a href="NonlinearR.html#cb18-2" tabindex="-1"></a>b0mean <span class="ot">=</span> <span class="dv">2</span></span>
-<span id="cb18-3"><a href="NonlinearR.html#cb18-3" tabindex="-1"></a>b0sd <span class="ot">=</span> <span class="fl">0.8</span></span>
-<span id="cb18-4"><a href="NonlinearR.html#cb18-4" tabindex="-1"></a>b0 <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="at">n =</span> nLocs, b0mean, <span class="at">sd =</span> b0sd) </span>
-<span id="cb18-5"><a href="NonlinearR.html#cb18-5" tabindex="-1"></a>Amean <span class="ot">=</span> <span class="sc">-</span><span class="dv">3</span></span>
-<span id="cb18-6"><a href="NonlinearR.html#cb18-6" tabindex="-1"></a>Asd <span class="ot">=</span> <span class="fl">0.5</span></span>
-<span id="cb18-7"><a href="NonlinearR.html#cb18-7" tabindex="-1"></a>A <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="at">n =</span> nLocs, Amean, <span class="at">sd =</span> Asd)</span>
-<span id="cb18-8"><a href="NonlinearR.html#cb18-8" tabindex="-1"></a>B <span class="ot">=</span> <span class="fl">0.1</span></span>
-<span id="cb18-9"><a href="NonlinearR.html#cb18-9" tabindex="-1"></a>M <span class="ot">=</span> <span class="dv">50</span></span>
-<span id="cb18-10"><a href="NonlinearR.html#cb18-10" tabindex="-1"></a></span>
-<span id="cb18-11"><a href="NonlinearR.html#cb18-11" tabindex="-1"></a>simdata3 <span class="ot">&lt;-</span> simdataBase <span class="sc">%&gt;%</span></span>
-<span id="cb18-12"><a href="NonlinearR.html#cb18-12" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">data.frame</span>(b0, Location))  <span class="sc">%&gt;%</span></span>
-<span id="cb18-13"><a href="NonlinearR.html#cb18-13" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">data.frame</span>(A, Location))</span>
-<span id="cb18-14"><a href="NonlinearR.html#cb18-14" tabindex="-1"></a></span>
-<span id="cb18-15"><a href="NonlinearR.html#cb18-15" tabindex="-1"></a>simdata3 <span class="sc">%&lt;&gt;%</span></span>
-<span id="cb18-16"><a href="NonlinearR.html#cb18-16" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">b1 =</span> A <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">*</span> B <span class="sc">*</span> (DAI <span class="sc">-</span> M) ))),</span>
-<span id="cb18-17"><a href="NonlinearR.html#cb18-17" tabindex="-1"></a>         <span class="at">TR =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fu">exp</span>(b1)),</span>
-<span id="cb18-18"><a href="NonlinearR.html#cb18-18" tabindex="-1"></a>         <span class="at">muTmp =</span> <span class="fu">exp</span>(b0 <span class="sc">+</span> b1<span class="sc">*</span>numTrt),</span>
-<span id="cb18-19"><a href="NonlinearR.html#cb18-19" tabindex="-1"></a>         <span class="at">nYSB =</span> <span class="fu">rnbinom</span>(<span class="at">n=</span><span class="fu">nrow</span>(simdata3), <span class="at">mu =</span> muTmp, <span class="at">size =</span> <span class="dv">5</span>))</span>
-<span id="cb18-20"><a href="NonlinearR.html#cb18-20" tabindex="-1"></a></span>
-<span id="cb18-21"><a href="NonlinearR.html#cb18-21" tabindex="-1"></a><span class="fu">ggplot</span>(simdata3, <span class="fu">aes</span>(DAI, nYSB, <span class="at">color =</span> Treatment)) <span class="sc">+</span></span>
-<span id="cb18-22"><a href="NonlinearR.html#cb18-22" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb18-23"><a href="NonlinearR.html#cb18-23" tabindex="-1"></a>  <span class="fu">geom_smooth</span>() <span class="sc">+</span> </span>
-<span id="cb18-24"><a href="NonlinearR.html#cb18-24" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Location) <span class="sc">+</span></span>
-<span id="cb18-25"><a href="NonlinearR.html#cb18-25" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Simulated moth counts for 5 locations&quot;</span>,</span>
-<span id="cb18-26"><a href="NonlinearR.html#cb18-26" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">&quot;Days after installation (DAI)&quot;</span>,</span>
-<span id="cb18-27"><a href="NonlinearR.html#cb18-27" tabindex="-1"></a>       <span class="at">ylab =</span> <span class="st">&quot;Number of moths per trap per day&quot;</span>)</span></code></pre></div>
 <p><img src="04-NonlinearInR_files/figure-html/simdata3-1.png" width="100%" /></p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="NonlinearR.html#cb19-1" tabindex="-1"></a>prior3 <span class="ot">&lt;-</span> <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>,<span class="dv">2</span>), <span class="at">nlpar =</span> <span class="st">&quot;b0&quot;</span>) <span class="sc">+</span></span>
-<span id="cb19-2"><a href="NonlinearR.html#cb19-2" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">nlpar =</span> <span class="st">&quot;A&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb19-3"><a href="NonlinearR.html#cb19-3" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">nlpar =</span> <span class="st">&quot;B&quot;</span>) <span class="sc">+</span></span>
-<span id="cb19-4"><a href="NonlinearR.html#cb19-4" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">uniform</span>(<span class="dv">0</span>, <span class="dv">120</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">ub =</span> <span class="dv">120</span>, <span class="at">nlpar =</span> <span class="st">&quot;M&quot;</span>) <span class="sc">+</span></span>
-<span id="cb19-5"><a href="NonlinearR.html#cb19-5" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">cauchy</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">class =</span> <span class="st">&quot;shape&quot;</span>)</span>
-<span id="cb19-6"><a href="NonlinearR.html#cb19-6" tabindex="-1"></a></span>
-<span id="cb19-7"><a href="NonlinearR.html#cb19-7" tabindex="-1"></a>fit3 <span class="ot">&lt;-</span> <span class="fu">brm</span>(<span class="fu">bf</span>(nYSB <span class="sc">~</span> b0 <span class="sc">-</span> (A <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">*</span> B <span class="sc">*</span> (DAI <span class="sc">-</span> M) )))) <span class="sc">*</span> numTrt <span class="sc">+</span></span>
-<span id="cb19-8"><a href="NonlinearR.html#cb19-8" tabindex="-1"></a>                <span class="fu">log</span>(DaysOfCatch), <span class="co"># offset() is implicit in nonlinear formula</span></span>
-<span id="cb19-9"><a href="NonlinearR.html#cb19-9" tabindex="-1"></a>              b0 <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>Location),</span>
-<span id="cb19-10"><a href="NonlinearR.html#cb19-10" tabindex="-1"></a>              A  <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>Location),</span>
-<span id="cb19-11"><a href="NonlinearR.html#cb19-11" tabindex="-1"></a>              B <span class="sc">+</span> M <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb19-12"><a href="NonlinearR.html#cb19-12" tabindex="-1"></a>              <span class="at">nl =</span> <span class="cn">TRUE</span>), </span>
-<span id="cb19-13"><a href="NonlinearR.html#cb19-13" tabindex="-1"></a>              <span class="at">control =</span> <span class="fu">list</span>(<span class="at">adapt_delta =</span> <span class="fl">0.9</span>),</span>
-<span id="cb19-14"><a href="NonlinearR.html#cb19-14" tabindex="-1"></a>              <span class="at">data =</span> simdata3, </span>
-<span id="cb19-15"><a href="NonlinearR.html#cb19-15" tabindex="-1"></a>              <span class="at">family =</span> negbinomial,</span>
-<span id="cb19-16"><a href="NonlinearR.html#cb19-16" tabindex="-1"></a>              <span class="at">prior =</span> prior3,</span>
-<span id="cb19-17"><a href="NonlinearR.html#cb19-17" tabindex="-1"></a>              <span class="at">warmup =</span> <span class="dv">1000</span>, <span class="at">iter =</span> <span class="dv">2000</span>, </span>
-<span id="cb19-18"><a href="NonlinearR.html#cb19-18" tabindex="-1"></a>              <span class="at">seed =</span> <span class="dv">5000</span>,</span>
-<span id="cb19-19"><a href="NonlinearR.html#cb19-19" tabindex="-1"></a>              <span class="at">chains =</span> nCores, <span class="at">cores =</span> nCores) </span>
-<span id="cb19-20"><a href="NonlinearR.html#cb19-20" tabindex="-1"></a><span class="fu">saveRDS</span>(fit3, <span class="st">&quot;output/fit3.RDS&quot;</span>)</span></code></pre></div>
 <table style="width:100%;">
 <colgroup>
 <col width="17%" />
@@ -1115,7 +811,7 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1,k}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + 
 </div>
 <div id="intercept-re-a-re-with-gp-same-for-all-loc" class="section level3 hasAnchor" number="5.4.4">
 <h3><span class="header-section-number">5.4.4</span> Intercept RE, A RE, WITH GP (same for all loc)<a href="NonlinearR.html#intercept-re-a-re-with-gp-same-for-all-loc" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Now we add the Gaussian Process to the model, explicitly allowing for the correlated change in background moth pressure over time. However, we start with using the same GP for all locations:</p>
+<p>Now we add the Gaussian Process to the model, explicitly allowing for the correlated change in background moth pressure over time. This allows for peaks and dramatic changes in a moth population over time, which mimics what is observed. We start with using the same GP for all locations.</p>
 <p><span class="math display">\[
 y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
 log(\lambda_{ikt} ) = \beta_0 + \beta_{1,k}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + GP_{k,t} + \mbox{ln} \left(DaysOfCatch_i\right) \\
@@ -1123,86 +819,8 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1,k}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + 
 \mathbf{GP} \sim MVN(0, \boldsymbol\Sigma) \\
 \sigma_{lm} = \tau \cdot e^{-\frac{|d_l - d_m|^2}{l^2}}
 \]</span></p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="NonlinearR.html#cb20-1" tabindex="-1"></a><span class="co"># simulate the GP:</span></span>
-<span id="cb20-2"><a href="NonlinearR.html#cb20-2" tabindex="-1"></a>x <span class="ot">=</span> DAIsampled <span class="co"># runif(100)</span></span>
-<span id="cb20-3"><a href="NonlinearR.html#cb20-3" tabindex="-1"></a>d <span class="ot">=</span> <span class="fu">abs</span>(<span class="fu">outer</span>(x, x, <span class="st">&quot;-&quot;</span>)) <span class="co"># compute distance matrix, d_{ij} = |x_i - x_j|</span></span>
-<span id="cb20-4"><a href="NonlinearR.html#cb20-4" tabindex="-1"></a>l <span class="ot">=</span> <span class="dv">30</span> <span class="co"># length scale- smaller l is more wiggle</span></span>
-<span id="cb20-5"><a href="NonlinearR.html#cb20-5" tabindex="-1"></a>tau <span class="ot">=</span> <span class="dv">3</span></span>
-<span id="cb20-6"><a href="NonlinearR.html#cb20-6" tabindex="-1"></a>Sigma_SE <span class="ot">=</span> tau <span class="sc">*</span> <span class="fu">exp</span>(<span class="sc">-</span>d<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>(<span class="dv">2</span><span class="sc">*</span>l<span class="sc">^</span><span class="dv">2</span>)) <span class="co"># squared exponential kernel</span></span>
-<span id="cb20-7"><a href="NonlinearR.html#cb20-7" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)</span>
-<span id="cb20-8"><a href="NonlinearR.html#cb20-8" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(Location)) {</span>
-<span id="cb20-9"><a href="NonlinearR.html#cb20-9" tabindex="-1"></a>  GP <span class="ot">=</span> <span class="fu">as.vector</span>(mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">1</span>,<span class="at">sigma=</span>Sigma_SE))</span>
-<span id="cb20-10"><a href="NonlinearR.html#cb20-10" tabindex="-1"></a>  <span class="co"># plot(DAIsampled, GP, type = &quot;l&quot;)</span></span>
-<span id="cb20-11"><a href="NonlinearR.html#cb20-11" tabindex="-1"></a>  <span class="cf">if</span> (i <span class="sc">==</span> <span class="dv">1</span>) {</span>
-<span id="cb20-12"><a href="NonlinearR.html#cb20-12" tabindex="-1"></a>   out <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">DAI =</span> DAIsampled,</span>
-<span id="cb20-13"><a href="NonlinearR.html#cb20-13" tabindex="-1"></a>             <span class="at">GP =</span> <span class="fu">as.vector</span>(GP),</span>
-<span id="cb20-14"><a href="NonlinearR.html#cb20-14" tabindex="-1"></a>             <span class="at">Location =</span> Location[i])</span>
-<span id="cb20-15"><a href="NonlinearR.html#cb20-15" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb20-16"><a href="NonlinearR.html#cb20-16" tabindex="-1"></a>    out <span class="sc">%&lt;&gt;%</span></span>
-<span id="cb20-17"><a href="NonlinearR.html#cb20-17" tabindex="-1"></a>      <span class="fu">bind_rows</span>(<span class="fu">data.frame</span>(<span class="at">DAI =</span> DAIsampled,</span>
-<span id="cb20-18"><a href="NonlinearR.html#cb20-18" tabindex="-1"></a>             <span class="at">GP =</span> <span class="fu">as.vector</span>(GP),</span>
-<span id="cb20-19"><a href="NonlinearR.html#cb20-19" tabindex="-1"></a>             <span class="at">Location =</span> Location[i]))</span>
-<span id="cb20-20"><a href="NonlinearR.html#cb20-20" tabindex="-1"></a>  }</span>
-<span id="cb20-21"><a href="NonlinearR.html#cb20-21" tabindex="-1"></a>}</span>
-<span id="cb20-22"><a href="NonlinearR.html#cb20-22" tabindex="-1"></a></span>
-<span id="cb20-23"><a href="NonlinearR.html#cb20-23" tabindex="-1"></a><span class="co"># str(dat)</span></span>
-<span id="cb20-24"><a href="NonlinearR.html#cb20-24" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">0530</span>)</span>
-<span id="cb20-25"><a href="NonlinearR.html#cb20-25" tabindex="-1"></a>b0mean <span class="ot">=</span> <span class="dv">1</span></span>
-<span id="cb20-26"><a href="NonlinearR.html#cb20-26" tabindex="-1"></a>b0sd <span class="ot">=</span> <span class="fl">1.5</span></span>
-<span id="cb20-27"><a href="NonlinearR.html#cb20-27" tabindex="-1"></a>Amean <span class="ot">=</span> <span class="sc">-</span><span class="dv">3</span></span>
-<span id="cb20-28"><a href="NonlinearR.html#cb20-28" tabindex="-1"></a>Asd <span class="ot">=</span> <span class="fl">0.5</span></span>
-<span id="cb20-29"><a href="NonlinearR.html#cb20-29" tabindex="-1"></a>b0 <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="at">n =</span> nLocs, b0mean, <span class="at">sd =</span> b0sd) </span>
-<span id="cb20-30"><a href="NonlinearR.html#cb20-30" tabindex="-1"></a>A <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="at">n =</span> nLocs, Amean, <span class="at">sd =</span> Asd)</span>
-<span id="cb20-31"><a href="NonlinearR.html#cb20-31" tabindex="-1"></a>B <span class="ot">=</span> <span class="fl">0.1</span></span>
-<span id="cb20-32"><a href="NonlinearR.html#cb20-32" tabindex="-1"></a>M <span class="ot">=</span> <span class="dv">50</span></span>
-<span id="cb20-33"><a href="NonlinearR.html#cb20-33" tabindex="-1"></a></span>
-<span id="cb20-34"><a href="NonlinearR.html#cb20-34" tabindex="-1"></a>simdata4 <span class="ot">&lt;-</span> simdataBase <span class="sc">%&gt;%</span></span>
-<span id="cb20-35"><a href="NonlinearR.html#cb20-35" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">data.frame</span>(b0, Location))  <span class="sc">%&gt;%</span></span>
-<span id="cb20-36"><a href="NonlinearR.html#cb20-36" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">data.frame</span>(A, Location)) <span class="sc">%&gt;%</span></span>
-<span id="cb20-37"><a href="NonlinearR.html#cb20-37" tabindex="-1"></a>  <span class="fu">left_join</span>(out)</span>
-<span id="cb20-38"><a href="NonlinearR.html#cb20-38" tabindex="-1"></a><span class="co"># head(simdata4)</span></span>
-<span id="cb20-39"><a href="NonlinearR.html#cb20-39" tabindex="-1"></a>simdata4 <span class="sc">%&lt;&gt;%</span></span>
-<span id="cb20-40"><a href="NonlinearR.html#cb20-40" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">b1 =</span> A <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">*</span> B <span class="sc">*</span> (DAI <span class="sc">-</span> M) ))),</span>
-<span id="cb20-41"><a href="NonlinearR.html#cb20-41" tabindex="-1"></a>         <span class="at">TR =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fu">exp</span>(b1)),</span>
-<span id="cb20-42"><a href="NonlinearR.html#cb20-42" tabindex="-1"></a>         <span class="at">muTmp =</span> <span class="fu">exp</span>(b0 <span class="sc">+</span> b1<span class="sc">*</span>numTrt <span class="sc">+</span> GP),</span>
-<span id="cb20-43"><a href="NonlinearR.html#cb20-43" tabindex="-1"></a>         <span class="at">nYSB =</span> <span class="fu">rnbinom</span>(<span class="at">n=</span><span class="fu">nrow</span>(simdata4), <span class="at">mu =</span> muTmp, <span class="at">size =</span> <span class="dv">30</span>))</span>
-<span id="cb20-44"><a href="NonlinearR.html#cb20-44" tabindex="-1"></a><span class="co"># print(sum(is.na(simdata4$nYSB)))</span></span>
-<span id="cb20-45"><a href="NonlinearR.html#cb20-45" tabindex="-1"></a>simdata4 <span class="sc">%&lt;&gt;%</span></span>
-<span id="cb20-46"><a href="NonlinearR.html#cb20-46" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nYSB =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(nYSB), <span class="dv">0</span>, nYSB))</span>
-<span id="cb20-47"><a href="NonlinearR.html#cb20-47" tabindex="-1"></a><span class="co"># hist(simdata4$nYSB)</span></span>
-<span id="cb20-48"><a href="NonlinearR.html#cb20-48" tabindex="-1"></a><span class="fu">ggplot</span>(simdata4, <span class="fu">aes</span>(DAI, nYSB, <span class="at">color =</span> Treatment)) <span class="sc">+</span></span>
-<span id="cb20-49"><a href="NonlinearR.html#cb20-49" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb20-50"><a href="NonlinearR.html#cb20-50" tabindex="-1"></a>  <span class="fu">geom_smooth</span>() <span class="sc">+</span> </span>
-<span id="cb20-51"><a href="NonlinearR.html#cb20-51" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Location, <span class="at">scales =</span> <span class="st">&quot;free&quot;</span>) <span class="sc">+</span></span>
-<span id="cb20-52"><a href="NonlinearR.html#cb20-52" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Simulated moth counts for 5 locations&quot;</span>,</span>
-<span id="cb20-53"><a href="NonlinearR.html#cb20-53" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">&quot;Days after installation (DAI)&quot;</span>,</span>
-<span id="cb20-54"><a href="NonlinearR.html#cb20-54" tabindex="-1"></a>       <span class="at">ylab =</span> <span class="st">&quot;Number of moths per trap per day&quot;</span>)</span></code></pre></div>
 <p><img src="04-NonlinearInR_files/figure-html/simdata4-1.png" width="100%" /></p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="NonlinearR.html#cb21-1" tabindex="-1"></a><span class="co"># https://bookdown.org/content/4857/adventures-in-covariance.html#continuous-categories-and-the-gaussian-process</span></span>
-<span id="cb21-2"><a href="NonlinearR.html#cb21-2" tabindex="-1"></a>prior4 <span class="ot">&lt;-</span> <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>,<span class="dv">2</span>), <span class="at">nlpar =</span> <span class="st">&quot;b0&quot;</span>) <span class="sc">+</span></span>
-<span id="cb21-3"><a href="NonlinearR.html#cb21-3" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">nlpar =</span> <span class="st">&quot;A&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb21-4"><a href="NonlinearR.html#cb21-4" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">nlpar =</span> <span class="st">&quot;B&quot;</span>) <span class="sc">+</span></span>
-<span id="cb21-5"><a href="NonlinearR.html#cb21-5" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">uniform</span>(<span class="dv">0</span>, <span class="dv">120</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">ub =</span> <span class="dv">120</span>, <span class="at">nlpar =</span> <span class="st">&quot;M&quot;</span>) <span class="sc">+</span></span>
-<span id="cb21-6"><a href="NonlinearR.html#cb21-6" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">cauchy</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">class =</span> <span class="st">&quot;shape&quot;</span>) <span class="sc">+</span></span>
-<span id="cb21-7"><a href="NonlinearR.html#cb21-7" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">cauchy</span>(<span class="dv">0</span>,<span class="dv">50</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">class =</span> <span class="st">&quot;lscale&quot;</span>, <span class="at">nlpar =</span> <span class="st">&quot;gpP&quot;</span>) <span class="sc">+</span></span>
-<span id="cb21-8"><a href="NonlinearR.html#cb21-8" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">cauchy</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">class =</span> <span class="st">&quot;sdgp&quot;</span>, <span class="at">nlpar =</span> <span class="st">&quot;gpP&quot;</span>)</span>
-<span id="cb21-9"><a href="NonlinearR.html#cb21-9" tabindex="-1"></a></span>
-<span id="cb21-10"><a href="NonlinearR.html#cb21-10" tabindex="-1"></a>fit4 <span class="ot">&lt;-</span> <span class="fu">brm</span>(<span class="fu">bf</span>(nYSB <span class="sc">~</span>  b0 <span class="sc">-</span> (A <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">*</span> B <span class="sc">*</span> (DAI <span class="sc">-</span> M) )))) <span class="sc">*</span> numTrt <span class="sc">+</span> </span>
-<span id="cb21-11"><a href="NonlinearR.html#cb21-11" tabindex="-1"></a>              gpP <span class="sc">+</span> </span>
-<span id="cb21-12"><a href="NonlinearR.html#cb21-12" tabindex="-1"></a>              <span class="fu">log</span>(DaysOfCatch), </span>
-<span id="cb21-13"><a href="NonlinearR.html#cb21-13" tabindex="-1"></a>              b0 <span class="sc">~</span> (<span class="dv">1</span><span class="sc">|</span>Location),</span>
-<span id="cb21-14"><a href="NonlinearR.html#cb21-14" tabindex="-1"></a>              gpP <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> <span class="fu">gp</span>(DAI), <span class="co"># GP absorbs the intercept</span></span>
-<span id="cb21-15"><a href="NonlinearR.html#cb21-15" tabindex="-1"></a>              A  <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>Location),</span>
-<span id="cb21-16"><a href="NonlinearR.html#cb21-16" tabindex="-1"></a>              B <span class="sc">+</span> M <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb21-17"><a href="NonlinearR.html#cb21-17" tabindex="-1"></a>              <span class="at">nl =</span> <span class="cn">TRUE</span>), </span>
-<span id="cb21-18"><a href="NonlinearR.html#cb21-18" tabindex="-1"></a>              <span class="at">control =</span> <span class="fu">list</span>(<span class="at">adapt_delta =</span> <span class="fl">0.9</span>),</span>
-<span id="cb21-19"><a href="NonlinearR.html#cb21-19" tabindex="-1"></a>              <span class="at">data =</span> simdata4, </span>
-<span id="cb21-20"><a href="NonlinearR.html#cb21-20" tabindex="-1"></a>              <span class="at">family =</span> negbinomial,</span>
-<span id="cb21-21"><a href="NonlinearR.html#cb21-21" tabindex="-1"></a>              <span class="at">prior =</span> prior4,</span>
-<span id="cb21-22"><a href="NonlinearR.html#cb21-22" tabindex="-1"></a>              <span class="at">warmup =</span> <span class="dv">1000</span>, <span class="at">iter =</span> <span class="dv">2000</span>, </span>
-<span id="cb21-23"><a href="NonlinearR.html#cb21-23" tabindex="-1"></a>              <span class="at">seed =</span> <span class="dv">5000</span>,</span>
-<span id="cb21-24"><a href="NonlinearR.html#cb21-24" tabindex="-1"></a>              <span class="at">chains =</span> nCores, <span class="at">cores =</span> nCores) </span>
-<span id="cb21-25"><a href="NonlinearR.html#cb21-25" tabindex="-1"></a><span class="fu">saveRDS</span>(fit4, <span class="st">&quot;output/fit4.RDS&quot;</span>)</span></code></pre></div>
+<p>The model still does a good job estimating the parameters.</p>
 <table>
 <colgroup>
 <col width="18%" />
@@ -1459,7 +1077,7 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1,k}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + 
 <div id="intercept-a-re-with-gp-diff-for-each-loc" class="section level3 hasAnchor" number="5.4.5">
 <h3><span class="header-section-number">5.4.5</span> Intercept, A RE, with GP (DIFF for each loc)<a href="NonlinearR.html#intercept-a-re-with-gp-diff-for-each-loc" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Starting here, I include 9 locations for each simulation as I found more locations were required for the model to estimate the parameters.</p>
-<p>This model has different GP’s or each location (as in Sections <a href="mathematical-models.html#glmm-gp">2.4</a> and <a href="GLMMsR.html#fit-glmm-gpR">3.6</a>):</p>
+<p>This model has different GP’s or each location (as in Sections <a href="mathematical-models.html#glmm-gp">2.4</a> and <a href="GLMMsR.html#fit-glmm-gpR">3.6</a>). Allowing for a differen GP for each location leads to more variety in the moth populations across the locations and more closely mimics what is observed in the field.</p>
 <p><span class="math display">\[
 y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
 log(\lambda_{ikt} ) = \beta_0 + \beta_{1,k}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + GP_{k,t} + \mbox{ln} \left(DaysOfCatch_i\right) \\
@@ -1467,104 +1085,12 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1,k}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + 
 \mathbf{GP_k} \sim MVN(0, \boldsymbol\Sigma_k) \\
 \sigma_{k,lm} = \tau_k \cdot e^{-\frac{|d_l - d_m|^2}{l_k^2}}
 \]</span></p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="NonlinearR.html#cb22-1" tabindex="-1"></a>Location <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>, <span class="st">&quot;E&quot;</span>, <span class="st">&quot;F&quot;</span>, <span class="st">&quot;G&quot;</span>, <span class="st">&quot;H&quot;</span>, <span class="st">&quot;I&quot;</span>)</span>
-<span id="cb22-2"><a href="NonlinearR.html#cb22-2" tabindex="-1"></a>Trap <span class="ot">=</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span></span>
-<span id="cb22-3"><a href="NonlinearR.html#cb22-3" tabindex="-1"></a>nLocs <span class="ot">=</span> <span class="fu">length</span>(Location)</span>
-<span id="cb22-4"><a href="NonlinearR.html#cb22-4" tabindex="-1"></a></span>
-<span id="cb22-5"><a href="NonlinearR.html#cb22-5" tabindex="-1"></a><span class="co"># simulate the GP:</span></span>
-<span id="cb22-6"><a href="NonlinearR.html#cb22-6" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)</span>
-<span id="cb22-7"><a href="NonlinearR.html#cb22-7" tabindex="-1"></a>x <span class="ot">=</span> DAIsampled <span class="co"># runif(100)</span></span>
-<span id="cb22-8"><a href="NonlinearR.html#cb22-8" tabindex="-1"></a>d <span class="ot">=</span> <span class="fu">abs</span>(<span class="fu">outer</span>(x, x, <span class="st">&quot;-&quot;</span>)) <span class="co"># compute distance matrix, d_{ij} = |x_i - x_j|</span></span>
-<span id="cb22-9"><a href="NonlinearR.html#cb22-9" tabindex="-1"></a>l_mean <span class="ot">=</span> <span class="dv">30</span></span>
-<span id="cb22-10"><a href="NonlinearR.html#cb22-10" tabindex="-1"></a>l_sd <span class="ot">=</span> <span class="dv">10</span></span>
-<span id="cb22-11"><a href="NonlinearR.html#cb22-11" tabindex="-1"></a>tau_mean <span class="ot">=</span> <span class="dv">3</span></span>
-<span id="cb22-12"><a href="NonlinearR.html#cb22-12" tabindex="-1"></a>tau_sd <span class="ot">=</span> <span class="dv">1</span></span>
-<span id="cb22-13"><a href="NonlinearR.html#cb22-13" tabindex="-1"></a>l <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="at">n =</span> nLocs, <span class="at">mean =</span> l_mean, <span class="at">sd =</span> l_sd) <span class="co"># smaller l is more wiggle</span></span>
-<span id="cb22-14"><a href="NonlinearR.html#cb22-14" tabindex="-1"></a>tau <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="at">n =</span> nLocs, <span class="at">mean =</span> tau_mean, <span class="at">sd =</span> tau_sd)</span>
-<span id="cb22-15"><a href="NonlinearR.html#cb22-15" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nLocs) {</span>
-<span id="cb22-16"><a href="NonlinearR.html#cb22-16" tabindex="-1"></a>  Sigma_SE <span class="ot">=</span> tau[i] <span class="sc">*</span> <span class="fu">exp</span>(<span class="sc">-</span>d<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>(<span class="dv">2</span><span class="sc">*</span>l[i]<span class="sc">^</span><span class="dv">2</span>)) <span class="co"># squared exponential kernel</span></span>
-<span id="cb22-17"><a href="NonlinearR.html#cb22-17" tabindex="-1"></a>  GP <span class="ot">=</span> <span class="fu">as.vector</span>(mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">1</span>,<span class="at">sigma=</span>Sigma_SE))</span>
-<span id="cb22-18"><a href="NonlinearR.html#cb22-18" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">all</span>(GP<span class="sc">&lt;</span><span class="dv">0</span>)) GP <span class="ot">=</span> <span class="fu">abs</span>(GP)</span>
-<span id="cb22-19"><a href="NonlinearR.html#cb22-19" tabindex="-1"></a>  <span class="co"># GP = abs(GP)</span></span>
-<span id="cb22-20"><a href="NonlinearR.html#cb22-20" tabindex="-1"></a>  <span class="co"># plot(DAIsampled, GP, type = &quot;l&quot;)</span></span>
-<span id="cb22-21"><a href="NonlinearR.html#cb22-21" tabindex="-1"></a>  <span class="cf">if</span> (i <span class="sc">==</span> <span class="dv">1</span>) {</span>
-<span id="cb22-22"><a href="NonlinearR.html#cb22-22" tabindex="-1"></a>   out <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">DAI =</span> DAIsampled,</span>
-<span id="cb22-23"><a href="NonlinearR.html#cb22-23" tabindex="-1"></a>             <span class="at">GP =</span> <span class="fu">as.vector</span>(GP),</span>
-<span id="cb22-24"><a href="NonlinearR.html#cb22-24" tabindex="-1"></a>             <span class="at">Location =</span> Location[i])</span>
-<span id="cb22-25"><a href="NonlinearR.html#cb22-25" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb22-26"><a href="NonlinearR.html#cb22-26" tabindex="-1"></a>    out <span class="sc">%&lt;&gt;%</span></span>
-<span id="cb22-27"><a href="NonlinearR.html#cb22-27" tabindex="-1"></a>      <span class="fu">bind_rows</span>(<span class="fu">data.frame</span>(<span class="at">DAI =</span> DAIsampled,</span>
-<span id="cb22-28"><a href="NonlinearR.html#cb22-28" tabindex="-1"></a>             <span class="at">GP =</span> <span class="fu">as.vector</span>(GP),</span>
-<span id="cb22-29"><a href="NonlinearR.html#cb22-29" tabindex="-1"></a>             <span class="at">Location =</span> Location[i]))</span>
-<span id="cb22-30"><a href="NonlinearR.html#cb22-30" tabindex="-1"></a>  }</span>
-<span id="cb22-31"><a href="NonlinearR.html#cb22-31" tabindex="-1"></a>}</span>
-<span id="cb22-32"><a href="NonlinearR.html#cb22-32" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb22-33"><a href="NonlinearR.html#cb22-33" tabindex="-1"></a></span>
-<span id="cb22-34"><a href="NonlinearR.html#cb22-34" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">0530</span>)</span>
-<span id="cb22-35"><a href="NonlinearR.html#cb22-35" tabindex="-1"></a>b0mean <span class="ot">=</span> <span class="dv">1</span></span>
-<span id="cb22-36"><a href="NonlinearR.html#cb22-36" tabindex="-1"></a>b0sd <span class="ot">=</span> <span class="fl">1.5</span></span>
-<span id="cb22-37"><a href="NonlinearR.html#cb22-37" tabindex="-1"></a>Amean <span class="ot">=</span> <span class="sc">-</span><span class="dv">3</span></span>
-<span id="cb22-38"><a href="NonlinearR.html#cb22-38" tabindex="-1"></a>Asd <span class="ot">=</span> <span class="fl">0.5</span></span>
-<span id="cb22-39"><a href="NonlinearR.html#cb22-39" tabindex="-1"></a>b0 <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="at">n =</span> nLocs, b0mean, <span class="at">sd =</span> b0sd) <span class="co"># now have 5 intercepts for 5 loc&#39;s</span></span>
-<span id="cb22-40"><a href="NonlinearR.html#cb22-40" tabindex="-1"></a>A <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="at">n =</span> nLocs, Amean, <span class="at">sd =</span> Asd)</span>
-<span id="cb22-41"><a href="NonlinearR.html#cb22-41" tabindex="-1"></a>B <span class="ot">=</span> <span class="fl">0.1</span></span>
-<span id="cb22-42"><a href="NonlinearR.html#cb22-42" tabindex="-1"></a>M <span class="ot">=</span> <span class="dv">50</span></span>
-<span id="cb22-43"><a href="NonlinearR.html#cb22-43" tabindex="-1"></a></span>
-<span id="cb22-44"><a href="NonlinearR.html#cb22-44" tabindex="-1"></a>simdata5 <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(Location, Treatment, Trap, <span class="at">DAI=</span> DAIsampled) <span class="sc">%&gt;%</span></span>
-<span id="cb22-45"><a href="NonlinearR.html#cb22-45" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DaysOfCatch =</span> <span class="dv">1</span>,</span>
-<span id="cb22-46"><a href="NonlinearR.html#cb22-46" tabindex="-1"></a>         <span class="at">numTrt =</span> <span class="fu">ifelse</span>(Treatment <span class="sc">==</span> <span class="st">&quot;Control&quot;</span>, <span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb22-47"><a href="NonlinearR.html#cb22-47" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">data.frame</span>(b0, Location))  <span class="sc">%&gt;%</span></span>
-<span id="cb22-48"><a href="NonlinearR.html#cb22-48" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">data.frame</span>(A, Location)) <span class="sc">%&gt;%</span></span>
-<span id="cb22-49"><a href="NonlinearR.html#cb22-49" tabindex="-1"></a>  <span class="fu">left_join</span>(out)</span>
-<span id="cb22-50"><a href="NonlinearR.html#cb22-50" tabindex="-1"></a><span class="co"># head(simdata5)</span></span>
-<span id="cb22-51"><a href="NonlinearR.html#cb22-51" tabindex="-1"></a>shape_param <span class="ot">=</span> <span class="dv">30</span> <span class="co"># DIFFERENT!</span></span>
-<span id="cb22-52"><a href="NonlinearR.html#cb22-52" tabindex="-1"></a>simdata5 <span class="sc">%&lt;&gt;%</span></span>
-<span id="cb22-53"><a href="NonlinearR.html#cb22-53" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">b1 =</span> A <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">*</span> B <span class="sc">*</span> (DAI <span class="sc">-</span> M) ))),</span>
-<span id="cb22-54"><a href="NonlinearR.html#cb22-54" tabindex="-1"></a>         <span class="at">TR =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fu">exp</span>(b1)),</span>
-<span id="cb22-55"><a href="NonlinearR.html#cb22-55" tabindex="-1"></a>         <span class="at">muTmp =</span> <span class="fu">exp</span>(b0 <span class="sc">+</span> b1<span class="sc">*</span>numTrt <span class="sc">+</span> GP),</span>
-<span id="cb22-56"><a href="NonlinearR.html#cb22-56" tabindex="-1"></a>         <span class="at">nYSB =</span> <span class="fu">rnbinom</span>(<span class="at">n=</span><span class="fu">nrow</span>(simdata5), <span class="at">mu =</span> muTmp, <span class="at">size =</span> shape_param))</span>
-<span id="cb22-57"><a href="NonlinearR.html#cb22-57" tabindex="-1"></a><span class="co"># print(sum(is.na(simdata5$nYSB)))</span></span>
-<span id="cb22-58"><a href="NonlinearR.html#cb22-58" tabindex="-1"></a>simdata5 <span class="sc">%&lt;&gt;%</span></span>
-<span id="cb22-59"><a href="NonlinearR.html#cb22-59" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nYSB =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(nYSB), <span class="dv">0</span>, nYSB))</span>
-<span id="cb22-60"><a href="NonlinearR.html#cb22-60" tabindex="-1"></a><span class="co"># hist(simdata4$nYSB)</span></span>
-<span id="cb22-61"><a href="NonlinearR.html#cb22-61" tabindex="-1"></a><span class="fu">ggplot</span>(simdata5, <span class="fu">aes</span>(DAI, nYSB, <span class="at">color =</span> Treatment)) <span class="sc">+</span></span>
-<span id="cb22-62"><a href="NonlinearR.html#cb22-62" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb22-63"><a href="NonlinearR.html#cb22-63" tabindex="-1"></a>  <span class="fu">geom_smooth</span>() <span class="sc">+</span> </span>
-<span id="cb22-64"><a href="NonlinearR.html#cb22-64" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Location, <span class="at">scales =</span> <span class="st">&quot;free&quot;</span>) <span class="sc">+</span></span>
-<span id="cb22-65"><a href="NonlinearR.html#cb22-65" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Simulated moth counts for 9 locations&quot;</span>,</span>
-<span id="cb22-66"><a href="NonlinearR.html#cb22-66" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">&quot;Days after installation (DAI)&quot;</span>,</span>
-<span id="cb22-67"><a href="NonlinearR.html#cb22-67" tabindex="-1"></a>       <span class="at">ylab =</span> <span class="st">&quot;Number of moths per trap per day&quot;</span>)</span></code></pre></div>
 <p><img src="04-NonlinearInR_files/figure-html/simdata5-1.png" width="100%" /></p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="NonlinearR.html#cb23-1" tabindex="-1"></a><span class="co"># https://bookdown.org/content/4857/adventures-in-covariance.html#continuous-categories-and-the-gaussian-process</span></span>
-<span id="cb23-2"><a href="NonlinearR.html#cb23-2" tabindex="-1"></a>prior5 <span class="ot">&lt;-</span> <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>,<span class="dv">2</span>), <span class="at">nlpar =</span> <span class="st">&quot;b0&quot;</span>) <span class="sc">+</span></span>
-<span id="cb23-3"><a href="NonlinearR.html#cb23-3" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">nlpar =</span> <span class="st">&quot;A&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb23-4"><a href="NonlinearR.html#cb23-4" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">nlpar =</span> <span class="st">&quot;B&quot;</span>) <span class="sc">+</span></span>
-<span id="cb23-5"><a href="NonlinearR.html#cb23-5" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">uniform</span>(<span class="dv">0</span>, <span class="dv">120</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">ub =</span> <span class="dv">120</span>, <span class="at">nlpar =</span> <span class="st">&quot;M&quot;</span>) <span class="sc">+</span></span>
-<span id="cb23-6"><a href="NonlinearR.html#cb23-6" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">cauchy</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">class =</span> <span class="st">&quot;shape&quot;</span>) <span class="sc">+</span></span>
-<span id="cb23-7"><a href="NonlinearR.html#cb23-7" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">cauchy</span>(<span class="dv">0</span>,<span class="dv">50</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">class =</span> <span class="st">&quot;lscale&quot;</span>, <span class="at">nlpar =</span> <span class="st">&quot;gpP&quot;</span>) <span class="sc">+</span></span>
-<span id="cb23-8"><a href="NonlinearR.html#cb23-8" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">cauchy</span>(<span class="dv">0</span>,<span class="dv">10</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">class =</span> <span class="st">&quot;sdgp&quot;</span>, <span class="at">nlpar =</span> <span class="st">&quot;gpP&quot;</span>)</span>
-<span id="cb23-9"><a href="NonlinearR.html#cb23-9" tabindex="-1"></a></span>
-<span id="cb23-10"><a href="NonlinearR.html#cb23-10" tabindex="-1"></a>fit5 <span class="ot">&lt;-</span> <span class="fu">brm</span>(<span class="fu">bf</span>(nYSB <span class="sc">~</span>  b0 <span class="sc">-</span> (A <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">*</span> B <span class="sc">*</span> (DAI <span class="sc">-</span> M) )))) <span class="sc">*</span> numTrt <span class="sc">+</span></span>
-<span id="cb23-11"><a href="NonlinearR.html#cb23-11" tabindex="-1"></a>              gpP <span class="sc">+</span> </span>
-<span id="cb23-12"><a href="NonlinearR.html#cb23-12" tabindex="-1"></a>              <span class="fu">log</span>(DaysOfCatch), </span>
-<span id="cb23-13"><a href="NonlinearR.html#cb23-13" tabindex="-1"></a>              b0 <span class="sc">~</span> (<span class="dv">1</span><span class="sc">|</span>Location),</span>
-<span id="cb23-14"><a href="NonlinearR.html#cb23-14" tabindex="-1"></a>              gpP <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> <span class="fu">gp</span>(DAI, <span class="at">by =</span> Location), <span class="co"># GP absorbs the intercept</span></span>
-<span id="cb23-15"><a href="NonlinearR.html#cb23-15" tabindex="-1"></a>              A  <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>Location),</span>
-<span id="cb23-16"><a href="NonlinearR.html#cb23-16" tabindex="-1"></a>              B <span class="sc">+</span> M <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb23-17"><a href="NonlinearR.html#cb23-17" tabindex="-1"></a>              <span class="at">nl =</span> <span class="cn">TRUE</span>), </span>
-<span id="cb23-18"><a href="NonlinearR.html#cb23-18" tabindex="-1"></a>              <span class="at">control =</span> <span class="fu">list</span>(<span class="at">adapt_delta =</span> <span class="fl">0.9</span>),</span>
-<span id="cb23-19"><a href="NonlinearR.html#cb23-19" tabindex="-1"></a>              <span class="at">data =</span> simdata5, </span>
-<span id="cb23-20"><a href="NonlinearR.html#cb23-20" tabindex="-1"></a>              <span class="at">prior =</span> prior5,</span>
-<span id="cb23-21"><a href="NonlinearR.html#cb23-21" tabindex="-1"></a>              <span class="at">family =</span> negbinomial,</span>
-<span id="cb23-22"><a href="NonlinearR.html#cb23-22" tabindex="-1"></a>              <span class="at">warmup =</span> <span class="dv">1000</span>, <span class="at">iter =</span> <span class="dv">2000</span>, </span>
-<span id="cb23-23"><a href="NonlinearR.html#cb23-23" tabindex="-1"></a>              <span class="at">seed =</span> <span class="dv">5000</span>,</span>
-<span id="cb23-24"><a href="NonlinearR.html#cb23-24" tabindex="-1"></a>              <span class="at">chains =</span> nCores, <span class="at">cores =</span> nCores) </span>
-<span id="cb23-25"><a href="NonlinearR.html#cb23-25" tabindex="-1"></a><span class="fu">saveRDS</span>(fit5, <span class="st">&quot;output/fit5.RDS&quot;</span>)</span></code></pre></div>
 <p><img src="04-NonlinearInR_files/figure-html/output5-1.png" width="100%" /></p>
 </div>
 <div id="intercept-a-b-m-re-with-gp-diff-for-each-loc" class="section level3 hasAnchor" number="5.4.6">
 <h3><span class="header-section-number">5.4.6</span> Intercept, A, B, M RE, with GP (DIFF for each loc)<a href="NonlinearR.html#intercept-a-b-m-re-with-gp-diff-for-each-loc" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>In this most complex model, I make <span class="math inline">\(B\)</span> and <span class="math inline">\(M\)</span> random effects in the logistic curve, in addition to the <span class="math inline">\(A\)</span> parameter:</p>
+<p>In this most complex model, I make <span class="math inline">\(B\)</span> and <span class="math inline">\(M\)</span> random effects in the logistic curve, in addition to the <span class="math inline">\(A\)</span> parameter. This allows for the TR curve to vary in multiple ways among the locations.</p>
 <p><span class="math display">\[
 y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
 log(\lambda_{ikt} ) = \beta_0 + \beta_{1,k}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + GP_{k,t} + \mbox{ln} \left(DaysOfCatch_i\right) \\
@@ -1572,141 +1098,16 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1,k}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + 
 \mathbf{GP_k} \sim MVN(0, \boldsymbol\Sigma_k) \\
 \sigma_{k,lm} = \tau_k \cdot e^{-\frac{|d_l - d_m|^2}{l_k^2}}
 \]</span></p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="NonlinearR.html#cb24-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">600</span>)</span>
-<span id="cb24-2"><a href="NonlinearR.html#cb24-2" tabindex="-1"></a>Location <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>, <span class="st">&quot;E&quot;</span>, <span class="st">&quot;F&quot;</span>, <span class="st">&quot;G&quot;</span>, <span class="st">&quot;H&quot;</span>, <span class="st">&quot;I&quot;</span>)</span>
-<span id="cb24-3"><a href="NonlinearR.html#cb24-3" tabindex="-1"></a>nLocs <span class="ot">=</span> <span class="fu">length</span>(Location)</span>
-<span id="cb24-4"><a href="NonlinearR.html#cb24-4" tabindex="-1"></a></span>
-<span id="cb24-5"><a href="NonlinearR.html#cb24-5" tabindex="-1"></a><span class="co"># simulate the GP:</span></span>
-<span id="cb24-6"><a href="NonlinearR.html#cb24-6" tabindex="-1"></a>x <span class="ot">=</span> DAIsampled <span class="co"># runif(100)</span></span>
-<span id="cb24-7"><a href="NonlinearR.html#cb24-7" tabindex="-1"></a>d <span class="ot">=</span> <span class="fu">abs</span>(<span class="fu">outer</span>(x, x, <span class="st">&quot;-&quot;</span>)) <span class="co"># compute distance matrix, d_{ij} = |x_i - x_j|</span></span>
-<span id="cb24-8"><a href="NonlinearR.html#cb24-8" tabindex="-1"></a>l_mean <span class="ot">=</span> <span class="dv">30</span></span>
-<span id="cb24-9"><a href="NonlinearR.html#cb24-9" tabindex="-1"></a>l_sd <span class="ot">=</span> <span class="dv">10</span></span>
-<span id="cb24-10"><a href="NonlinearR.html#cb24-10" tabindex="-1"></a>tau_mean <span class="ot">=</span> <span class="dv">1</span></span>
-<span id="cb24-11"><a href="NonlinearR.html#cb24-11" tabindex="-1"></a>tau_sd <span class="ot">=</span> <span class="fl">0.5</span></span>
-<span id="cb24-12"><a href="NonlinearR.html#cb24-12" tabindex="-1"></a>l <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="at">n =</span> nLocs, <span class="at">mean =</span> l_mean, <span class="at">sd =</span> l_sd) <span class="co"># smaller l is more wiggle</span></span>
-<span id="cb24-13"><a href="NonlinearR.html#cb24-13" tabindex="-1"></a>tau <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="at">n =</span> nLocs, <span class="at">mean =</span> tau_mean, <span class="at">sd =</span> tau_sd)</span>
-<span id="cb24-14"><a href="NonlinearR.html#cb24-14" tabindex="-1"></a><span class="co"># set.seed(100)</span></span>
-<span id="cb24-15"><a href="NonlinearR.html#cb24-15" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nLocs) {</span>
-<span id="cb24-16"><a href="NonlinearR.html#cb24-16" tabindex="-1"></a>  Sigma_SE <span class="ot">=</span> tau[i]<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> <span class="fu">exp</span>(<span class="sc">-</span>d<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>(<span class="dv">2</span><span class="sc">*</span>l[i]<span class="sc">^</span><span class="dv">2</span>)) <span class="co"># squared exponential kernel</span></span>
-<span id="cb24-17"><a href="NonlinearR.html#cb24-17" tabindex="-1"></a>  GP <span class="ot">=</span> <span class="fu">as.vector</span>(mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">1</span>,<span class="at">sigma=</span>Sigma_SE))</span>
-<span id="cb24-18"><a href="NonlinearR.html#cb24-18" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">all</span>(GP<span class="sc">&lt;</span><span class="dv">0</span>)) GP <span class="ot">=</span> <span class="fu">abs</span>(GP)</span>
-<span id="cb24-19"><a href="NonlinearR.html#cb24-19" tabindex="-1"></a>  <span class="co"># GP = abs(GP)</span></span>
-<span id="cb24-20"><a href="NonlinearR.html#cb24-20" tabindex="-1"></a>  <span class="co"># plot(DAIsampled, GP, type = &quot;l&quot;)</span></span>
-<span id="cb24-21"><a href="NonlinearR.html#cb24-21" tabindex="-1"></a>  <span class="cf">if</span> (i <span class="sc">==</span> <span class="dv">1</span>) {</span>
-<span id="cb24-22"><a href="NonlinearR.html#cb24-22" tabindex="-1"></a>   out <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">DAI =</span> DAIsampled,</span>
-<span id="cb24-23"><a href="NonlinearR.html#cb24-23" tabindex="-1"></a>             <span class="at">GP =</span> <span class="fu">as.vector</span>(GP),</span>
-<span id="cb24-24"><a href="NonlinearR.html#cb24-24" tabindex="-1"></a>             <span class="at">Location =</span> Location[i])</span>
-<span id="cb24-25"><a href="NonlinearR.html#cb24-25" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb24-26"><a href="NonlinearR.html#cb24-26" tabindex="-1"></a>    out <span class="sc">%&lt;&gt;%</span></span>
-<span id="cb24-27"><a href="NonlinearR.html#cb24-27" tabindex="-1"></a>      <span class="fu">bind_rows</span>(<span class="fu">data.frame</span>(<span class="at">DAI =</span> DAIsampled,</span>
-<span id="cb24-28"><a href="NonlinearR.html#cb24-28" tabindex="-1"></a>             <span class="at">GP =</span> <span class="fu">as.vector</span>(GP),</span>
-<span id="cb24-29"><a href="NonlinearR.html#cb24-29" tabindex="-1"></a>             <span class="at">Location =</span> Location[i]))</span>
-<span id="cb24-30"><a href="NonlinearR.html#cb24-30" tabindex="-1"></a>  }</span>
-<span id="cb24-31"><a href="NonlinearR.html#cb24-31" tabindex="-1"></a>}</span>
-<span id="cb24-32"><a href="NonlinearR.html#cb24-32" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb24-33"><a href="NonlinearR.html#cb24-33" tabindex="-1"></a></span>
-<span id="cb24-34"><a href="NonlinearR.html#cb24-34" tabindex="-1"></a><span class="co"># set.seed(0530)</span></span>
-<span id="cb24-35"><a href="NonlinearR.html#cb24-35" tabindex="-1"></a>b0mean <span class="ot">=</span> <span class="dv">1</span></span>
-<span id="cb24-36"><a href="NonlinearR.html#cb24-36" tabindex="-1"></a>b0sd <span class="ot">=</span> <span class="fl">0.5</span></span>
-<span id="cb24-37"><a href="NonlinearR.html#cb24-37" tabindex="-1"></a>Amean <span class="ot">=</span> <span class="sc">-</span><span class="dv">3</span></span>
-<span id="cb24-38"><a href="NonlinearR.html#cb24-38" tabindex="-1"></a>Asd <span class="ot">=</span> <span class="fl">0.5</span></span>
-<span id="cb24-39"><a href="NonlinearR.html#cb24-39" tabindex="-1"></a>b0 <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="at">n =</span> b0mean, <span class="dv">1</span>, <span class="at">sd =</span> b0sd) <span class="co"># now have 5 intercepts for 5 loc&#39;s</span></span>
-<span id="cb24-40"><a href="NonlinearR.html#cb24-40" tabindex="-1"></a>A <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="at">n =</span> nLocs, Amean, <span class="at">sd =</span> Asd)</span>
-<span id="cb24-41"><a href="NonlinearR.html#cb24-41" tabindex="-1"></a></span>
-<span id="cb24-42"><a href="NonlinearR.html#cb24-42" tabindex="-1"></a>Bmean <span class="ot">=</span> <span class="fl">0.1</span></span>
-<span id="cb24-43"><a href="NonlinearR.html#cb24-43" tabindex="-1"></a>Bsd <span class="ot">=</span> <span class="fl">0.02</span></span>
-<span id="cb24-44"><a href="NonlinearR.html#cb24-44" tabindex="-1"></a>Mmean <span class="ot">=</span> <span class="dv">50</span></span>
-<span id="cb24-45"><a href="NonlinearR.html#cb24-45" tabindex="-1"></a>Msd <span class="ot">=</span> <span class="dv">10</span></span>
-<span id="cb24-46"><a href="NonlinearR.html#cb24-46" tabindex="-1"></a>B <span class="ot">=</span> <span class="fu">rtruncnorm</span>(<span class="at">n =</span> nLocs,<span class="at">a =</span> <span class="dv">0</span>, <span class="at">mean =</span> Bmean, <span class="at">sd =</span>Bsd)</span>
-<span id="cb24-47"><a href="NonlinearR.html#cb24-47" tabindex="-1"></a>M <span class="ot">=</span> <span class="fu">rtruncnorm</span>(<span class="at">n =</span> nLocs, <span class="at">a =</span> <span class="dv">0</span>, <span class="at">mean =</span> Mmean, <span class="at">sd =</span> Msd)</span>
-<span id="cb24-48"><a href="NonlinearR.html#cb24-48" tabindex="-1"></a></span>
-<span id="cb24-49"><a href="NonlinearR.html#cb24-49" tabindex="-1"></a>simdata6 <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(Location, Treatment, Trap, <span class="at">DAI =</span> DAIsampled) <span class="sc">%&gt;%</span></span>
-<span id="cb24-50"><a href="NonlinearR.html#cb24-50" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DaysOfCatch =</span> <span class="dv">1</span>,</span>
-<span id="cb24-51"><a href="NonlinearR.html#cb24-51" tabindex="-1"></a>         <span class="at">numTrt =</span> <span class="fu">ifelse</span>(Treatment <span class="sc">==</span> <span class="st">&quot;Control&quot;</span>, <span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb24-52"><a href="NonlinearR.html#cb24-52" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">data.frame</span>(b0, Location))  <span class="sc">%&gt;%</span></span>
-<span id="cb24-53"><a href="NonlinearR.html#cb24-53" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">data.frame</span>(A, Location)) <span class="sc">%&gt;%</span></span>
-<span id="cb24-54"><a href="NonlinearR.html#cb24-54" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">data.frame</span>(B, Location)) <span class="sc">%&gt;%</span></span>
-<span id="cb24-55"><a href="NonlinearR.html#cb24-55" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">data.frame</span>(M, Location)) <span class="sc">%&gt;%</span></span>
-<span id="cb24-56"><a href="NonlinearR.html#cb24-56" tabindex="-1"></a>  <span class="fu">left_join</span>(out)</span>
-<span id="cb24-57"><a href="NonlinearR.html#cb24-57" tabindex="-1"></a><span class="co"># head(simdata4)</span></span>
-<span id="cb24-58"><a href="NonlinearR.html#cb24-58" tabindex="-1"></a>shape_param <span class="ot">=</span> <span class="dv">30</span></span>
-<span id="cb24-59"><a href="NonlinearR.html#cb24-59" tabindex="-1"></a>simdata6 <span class="sc">%&lt;&gt;%</span></span>
-<span id="cb24-60"><a href="NonlinearR.html#cb24-60" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">b1 =</span> A <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> (<span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">*</span> B <span class="sc">*</span> (DAI <span class="sc">-</span> M) )))),</span>
-<span id="cb24-61"><a href="NonlinearR.html#cb24-61" tabindex="-1"></a>         <span class="at">TR =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fu">exp</span>(b1)),</span>
-<span id="cb24-62"><a href="NonlinearR.html#cb24-62" tabindex="-1"></a>         <span class="at">muTmp =</span> <span class="fu">exp</span>(b0 <span class="sc">+</span> b1<span class="sc">*</span>numTrt <span class="sc">+</span> GP),</span>
-<span id="cb24-63"><a href="NonlinearR.html#cb24-63" tabindex="-1"></a>         <span class="at">nYSB =</span> <span class="fu">rnbinom</span>(<span class="at">n=</span><span class="fu">nrow</span>(simdata6), <span class="at">mu =</span> muTmp, <span class="at">size =</span> shape_param))</span>
-<span id="cb24-64"><a href="NonlinearR.html#cb24-64" tabindex="-1"></a><span class="co"># print(sum(is.na(simdata6$nYSB)))</span></span>
-<span id="cb24-65"><a href="NonlinearR.html#cb24-65" tabindex="-1"></a>simdata6 <span class="sc">%&lt;&gt;%</span></span>
-<span id="cb24-66"><a href="NonlinearR.html#cb24-66" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nYSB =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(nYSB), <span class="dv">0</span>, nYSB))</span>
-<span id="cb24-67"><a href="NonlinearR.html#cb24-67" tabindex="-1"></a><span class="co"># hist(simdata4$nYSB)</span></span>
-<span id="cb24-68"><a href="NonlinearR.html#cb24-68" tabindex="-1"></a><span class="fu">ggplot</span>(simdata6, <span class="fu">aes</span>(DAI, nYSB, <span class="at">color =</span> Treatment)) <span class="sc">+</span></span>
-<span id="cb24-69"><a href="NonlinearR.html#cb24-69" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb24-70"><a href="NonlinearR.html#cb24-70" tabindex="-1"></a>  <span class="fu">geom_smooth</span>() <span class="sc">+</span> </span>
-<span id="cb24-71"><a href="NonlinearR.html#cb24-71" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Location, <span class="at">scales =</span> <span class="st">&quot;free&quot;</span>) <span class="sc">+</span></span>
-<span id="cb24-72"><a href="NonlinearR.html#cb24-72" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Simulated moth counts for 9 locations&quot;</span>,</span>
-<span id="cb24-73"><a href="NonlinearR.html#cb24-73" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">&quot;Days after installation (DAI)&quot;</span>,</span>
-<span id="cb24-74"><a href="NonlinearR.html#cb24-74" tabindex="-1"></a>       <span class="at">ylab =</span> <span class="st">&quot;Number of moths per trap per day&quot;</span>)</span></code></pre></div>
 <p><img src="04-NonlinearInR_files/figure-html/simdata6-1.png" width="100%" /></p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="NonlinearR.html#cb25-1" tabindex="-1"></a><span class="co"># https://bookdown.org/content/4857/adventures-in-covariance.html#continuous-categories-and-the-gaussian-process</span></span>
-<span id="cb25-2"><a href="NonlinearR.html#cb25-2" tabindex="-1"></a>prior6 <span class="ot">&lt;-</span> <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>,<span class="dv">2</span>), <span class="at">nlpar =</span> <span class="st">&quot;b0&quot;</span>) <span class="sc">+</span></span>
-<span id="cb25-3"><a href="NonlinearR.html#cb25-3" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">nlpar =</span> <span class="st">&quot;A&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb25-4"><a href="NonlinearR.html#cb25-4" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">nlpar =</span> <span class="st">&quot;B&quot;</span>) <span class="sc">+</span></span>
-<span id="cb25-5"><a href="NonlinearR.html#cb25-5" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">uniform</span>(<span class="dv">0</span>, <span class="dv">120</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">ub =</span> <span class="dv">120</span>, <span class="at">nlpar =</span> <span class="st">&quot;M&quot;</span>) <span class="sc">+</span></span>
-<span id="cb25-6"><a href="NonlinearR.html#cb25-6" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">cauchy</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">class =</span> <span class="st">&quot;shape&quot;</span>) <span class="sc">+</span></span>
-<span id="cb25-7"><a href="NonlinearR.html#cb25-7" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">cauchy</span>(<span class="dv">0</span>,<span class="dv">50</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">class =</span> <span class="st">&quot;lscale&quot;</span>, <span class="at">nlpar =</span> <span class="st">&quot;gpP&quot;</span>) <span class="sc">+</span></span>
-<span id="cb25-8"><a href="NonlinearR.html#cb25-8" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">cauchy</span>(<span class="dv">0</span>,<span class="dv">10</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">class =</span> <span class="st">&quot;sdgp&quot;</span>, <span class="at">nlpar =</span> <span class="st">&quot;gpP&quot;</span>)</span>
-<span id="cb25-9"><a href="NonlinearR.html#cb25-9" tabindex="-1"></a></span>
-<span id="cb25-10"><a href="NonlinearR.html#cb25-10" tabindex="-1"></a>fit6 <span class="ot">&lt;-</span> <span class="fu">brm</span>(<span class="fu">bf</span>(nYSB <span class="sc">~</span>  b0 <span class="sc">-</span> (A <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> (<span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">*</span> B <span class="sc">*</span> (DAI <span class="sc">-</span> M) ))))) <span class="sc">*</span> numTrt <span class="sc">+</span></span>
-<span id="cb25-11"><a href="NonlinearR.html#cb25-11" tabindex="-1"></a>              gpP <span class="sc">+</span> </span>
-<span id="cb25-12"><a href="NonlinearR.html#cb25-12" tabindex="-1"></a>              <span class="fu">log</span>(DaysOfCatch), </span>
-<span id="cb25-13"><a href="NonlinearR.html#cb25-13" tabindex="-1"></a>              b0 <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>Location),</span>
-<span id="cb25-14"><a href="NonlinearR.html#cb25-14" tabindex="-1"></a>              gpP <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> <span class="fu">gp</span>(DAI, <span class="at">by =</span> Location), <span class="co"># GP absorbs the intercept</span></span>
-<span id="cb25-15"><a href="NonlinearR.html#cb25-15" tabindex="-1"></a>              A  <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>Location),</span>
-<span id="cb25-16"><a href="NonlinearR.html#cb25-16" tabindex="-1"></a>              B  <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>Location),</span>
-<span id="cb25-17"><a href="NonlinearR.html#cb25-17" tabindex="-1"></a>              M  <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>Location),</span>
-<span id="cb25-18"><a href="NonlinearR.html#cb25-18" tabindex="-1"></a>              <span class="at">nl =</span> <span class="cn">TRUE</span>), </span>
-<span id="cb25-19"><a href="NonlinearR.html#cb25-19" tabindex="-1"></a>              <span class="at">control =</span> <span class="fu">list</span>(<span class="at">adapt_delta =</span> <span class="fl">0.9</span>),</span>
-<span id="cb25-20"><a href="NonlinearR.html#cb25-20" tabindex="-1"></a>              <span class="at">data =</span> simdata6, </span>
-<span id="cb25-21"><a href="NonlinearR.html#cb25-21" tabindex="-1"></a>              <span class="at">family =</span> negbinomial,</span>
-<span id="cb25-22"><a href="NonlinearR.html#cb25-22" tabindex="-1"></a>              <span class="at">prior =</span> prior6,</span>
-<span id="cb25-23"><a href="NonlinearR.html#cb25-23" tabindex="-1"></a>              <span class="at">warmup =</span> <span class="dv">1000</span>, <span class="at">iter =</span> <span class="dv">2000</span>, </span>
-<span id="cb25-24"><a href="NonlinearR.html#cb25-24" tabindex="-1"></a>              <span class="at">seed =</span> <span class="dv">5000</span>,</span>
-<span id="cb25-25"><a href="NonlinearR.html#cb25-25" tabindex="-1"></a>              <span class="at">chains =</span> nCores, <span class="at">cores =</span> nCores) </span>
-<span id="cb25-26"><a href="NonlinearR.html#cb25-26" tabindex="-1"></a><span class="fu">saveRDS</span>(fit6, <span class="st">&quot;output/fit6.RDS&quot;</span>)</span></code></pre></div>
 <p><img src="04-NonlinearInR_files/figure-html/output6-1.png" width="100%" /></p>
+<p>This model did not fit the data well. Priors may need to be tweaked, or more locations may be required to estimate all of the parameters well.</p>
 </div>
 </div>
 <div id="case-study" class="section level2 hasAnchor" number="5.5">
 <h2><span class="header-section-number">5.5</span> Case study<a href="NonlinearR.html#case-study" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Too many divergent warnings with model with intercept, A, B, M RE, with GP (DIFF for each loc). (M was multimodal)</p>
-<p>Use constant B, M instead.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="NonlinearR.html#cb26-1" tabindex="-1"></a><span class="co"># https://bookdown.org/content/4857/adventures-in-covariance.html#continuous-categories-and-the-gaussian-process</span></span>
-<span id="cb26-2"><a href="NonlinearR.html#cb26-2" tabindex="-1"></a>prior6 <span class="ot">&lt;-</span> <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>,<span class="dv">2</span>), <span class="at">nlpar =</span> <span class="st">&quot;b0&quot;</span>) <span class="sc">+</span></span>
-<span id="cb26-3"><a href="NonlinearR.html#cb26-3" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">nlpar =</span> <span class="st">&quot;A&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb26-4"><a href="NonlinearR.html#cb26-4" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">nlpar =</span> <span class="st">&quot;B&quot;</span>) <span class="sc">+</span></span>
-<span id="cb26-5"><a href="NonlinearR.html#cb26-5" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">uniform</span>(<span class="dv">0</span>, <span class="dv">120</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">ub =</span> <span class="dv">120</span>, <span class="at">nlpar =</span> <span class="st">&quot;M&quot;</span>) <span class="sc">+</span></span>
-<span id="cb26-6"><a href="NonlinearR.html#cb26-6" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">cauchy</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">class =</span> <span class="st">&quot;shape&quot;</span>) <span class="sc">+</span></span>
-<span id="cb26-7"><a href="NonlinearR.html#cb26-7" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">cauchy</span>(<span class="dv">0</span>,<span class="dv">50</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">class =</span> <span class="st">&quot;lscale&quot;</span>, <span class="at">nlpar =</span> <span class="st">&quot;gpP&quot;</span>) <span class="sc">+</span></span>
-<span id="cb26-8"><a href="NonlinearR.html#cb26-8" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">cauchy</span>(<span class="dv">0</span>,<span class="dv">10</span>), <span class="at">lb =</span> <span class="dv">0</span>, <span class="at">class =</span> <span class="st">&quot;sdgp&quot;</span>, <span class="at">nlpar =</span> <span class="st">&quot;gpP&quot;</span>)</span>
-<span id="cb26-9"><a href="NonlinearR.html#cb26-9" tabindex="-1"></a></span>
-<span id="cb26-10"><a href="NonlinearR.html#cb26-10" tabindex="-1"></a></span>
-<span id="cb26-11"><a href="NonlinearR.html#cb26-11" tabindex="-1"></a>fitR <span class="ot">&lt;-</span> <span class="fu">brm</span>(<span class="fu">bf</span>(nYSB <span class="sc">~</span>  b0 <span class="sc">-</span> </span>
-<span id="cb26-12"><a href="NonlinearR.html#cb26-12" tabindex="-1"></a>                 (A <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">*</span> B <span class="sc">*</span> (DAI <span class="sc">-</span> M) )))) <span class="sc">*</span> numTrt <span class="sc">+</span></span>
-<span id="cb26-13"><a href="NonlinearR.html#cb26-13" tabindex="-1"></a>              gpP <span class="sc">+</span> </span>
-<span id="cb26-14"><a href="NonlinearR.html#cb26-14" tabindex="-1"></a>              <span class="fu">log</span>(DaysOfCatch), </span>
-<span id="cb26-15"><a href="NonlinearR.html#cb26-15" tabindex="-1"></a>              b0 <span class="sc">~</span> (<span class="dv">1</span><span class="sc">|</span>Location),</span>
-<span id="cb26-16"><a href="NonlinearR.html#cb26-16" tabindex="-1"></a>              gpP <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> <span class="fu">gp</span>(DAI, <span class="at">by =</span> Location), <span class="co"># GP absorbs the intercept</span></span>
-<span id="cb26-17"><a href="NonlinearR.html#cb26-17" tabindex="-1"></a>              A  <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>Location),</span>
-<span id="cb26-18"><a href="NonlinearR.html#cb26-18" tabindex="-1"></a>              B <span class="sc">+</span> M <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb26-19"><a href="NonlinearR.html#cb26-19" tabindex="-1"></a>              <span class="at">nl =</span> <span class="cn">TRUE</span>), </span>
-<span id="cb26-20"><a href="NonlinearR.html#cb26-20" tabindex="-1"></a>              <span class="at">control =</span> <span class="fu">list</span>(<span class="at">adapt_delta =</span> <span class="fl">0.9</span>),</span>
-<span id="cb26-21"><a href="NonlinearR.html#cb26-21" tabindex="-1"></a>              <span class="at">data =</span> datR, </span>
-<span id="cb26-22"><a href="NonlinearR.html#cb26-22" tabindex="-1"></a>              <span class="at">family =</span> negbinomial,</span>
-<span id="cb26-23"><a href="NonlinearR.html#cb26-23" tabindex="-1"></a>              <span class="at">prior =</span> prior6,</span>
-<span id="cb26-24"><a href="NonlinearR.html#cb26-24" tabindex="-1"></a>              <span class="at">warmup =</span> <span class="dv">1000</span>, <span class="at">iter =</span> <span class="dv">2000</span>, </span>
-<span id="cb26-25"><a href="NonlinearR.html#cb26-25" tabindex="-1"></a>              <span class="at">seed =</span> <span class="dv">5000</span>,</span>
-<span id="cb26-26"><a href="NonlinearR.html#cb26-26" tabindex="-1"></a>              <span class="at">chains =</span> nCores, <span class="at">cores =</span> nCores) </span>
-<span id="cb26-27"><a href="NonlinearR.html#cb26-27" tabindex="-1"></a><span class="fu">saveRDS</span>(fitR, <span class="st">&quot;output/fitR.RDS&quot;</span>)</span></code></pre></div>
+<p>Too many divergent warnings with the most complex model, i.e., the model with intercept, A, B, M RE, with GP (DIFF for each loc). (M was multi-modal in that model fit.)</p>
+<p>Use constant B, M model instead.</p>
+<p>The model fits the data well, is interpretable, and converges well.</p>
 <p><img src="04-NonlinearInR_files/figure-html/outputR-1.png" width="100%" />
 <img src="04-NonlinearInR_files/figure-html/predsR-1.png" width="100%" /></p>
 

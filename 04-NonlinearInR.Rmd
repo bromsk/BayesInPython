@@ -6,15 +6,17 @@ editor_options:
 
 # Nonlinear Bayesian Models in R {#NonlinearR}
 
-As mentioned in Section \@ref(CaseStudy), the treatment group for these data is a pheromone dispenser. Eventually, given enough time, the dispenser has to run out of pheromone and the moth counts in the treatment and control groups are expected to have the same expected counts for a given location. Mathematically, $\beta_1 \to 0$ as $t \to \infty$. The timeline for this to happen may or may not happen during the field season, but we want to be sure to include this potential dynamic in the model to statistically test whether the loss of performance is observed or not.
+As mentioned in Section \@ref(CaseStudy), the treatment group for these data is a pheromone dispenser. Eventually, given enough time, the dispenser has to run out of pheromone and the moth counts in the treatment and control groups are expected to have the same expected counts for a given location. In other words, Trapping reduction goes from a max value to 0 over time. Mathematically, $\beta_1 \to 0$ as $t \to \infty$. The timeline for this to happen may or may not happen during the field season, but we want to be sure to include this potential dynamic in the model to statistically test whether the loss of performance is observed or not.
 
 To include this potential change over time, a nonlinear relationship between moth counts and treatment effect is needed in our model. In particular, $\beta_1$ should have an asymmetric sigmoidal curve. Here, I use a generalized logistic curve to get an appropriate shape.
 
+**Code is not included here for easier readability. Please follow along using [this](https://github.com/bromsk/BayesInPython/blob/main/docs/04-NonlinearInR.md) R script to run the code yourself.**
+
 ## Setup 
 
-This chapter begins with almost the same setup code as Chapter \@ref(GLMMsR), copied here for easier reference. A few of the functions used in Chapter \@ref(GLMMsR) are excluded from this script because they are not needed and an extra data manipulation is completed-- a numeric version of the "Treatment" cateogrical variable is created for these models.
+This chapter has similar setup code to Chapter \@ref(GLMMsR). Check the [script](https://github.com/bromsk/BayesInPython/blob/main/docs/04-NonlinearInR.md) to see the code.  
 
-```{r libs_and_setup, include = T, cache = F, message=F, warning=FALSE, results = "hide"}
+```{r libs_and_setup, include = F, cache = F, message=F, warning=FALSE, results = "hide"}
 knitr::opts_chunk$set(cache = T, message =F, warning = F,  out.width = '100%')
 
 ## R libraries:
@@ -65,7 +67,7 @@ getTR <- function (mod, coefs = -1) {
 
 
 ```
-```{r readdatR, results = "hide"}
+```{r readdatR, include = F, results = "hide"}
 # read in the data:
 datRinit = read.csv("data/moths.csv")
 
@@ -77,7 +79,7 @@ lapply(datRinit, function(x) {
     unique(x)
 })
 ```
-```{r data_manip, results = "hide"}
+```{r data_manip, include = F, results = "hide"}
 # manipulate data:
 datR <- datRinit %>%
   # convert dates to dates (instead of character string):
@@ -127,7 +129,7 @@ $v$ affects where the inflection point occurs, and
 
 $M$ relates to the starting time of when the curve begins.
 
-```{r SimData}
+```{r SimData, echo = F}
 
 A = -3 # left asymptote
 K = 0 # right asymptote
@@ -146,9 +148,13 @@ plot(t, beta, type = "l", xlab = "Days after installation (DAI)",
      main = expression(paste("How ", beta[1], " may change through a field season")))
 
 plot(t, TR, type = "l", xlab = "Days after installation (DAI)",
-     ylab = "Trapping Reduction",
-     main = "How trapping reduction may change through a season")
+     ylab = "Trapping Reduction (TR)",
+     main = "How trapping reduction may change through a season",
+     ylim = c(0,100)) 
+  
 ```
+
+As a reminder, $TR = 100 - 100 e^{(-\beta_1)}$.
 
 This [shiny app](https://bromsk.shinyapps.io/GeneralizedLogisticCurves/) allows you to play around with how the parameter values affect the curve. It is helpful in understanding the model and setting priors for the model.
 
@@ -228,11 +234,11 @@ For now, we assume that each location shares all of the same nonlinear, logistic
 
 ## Fitting models with the brms package
 
-Before fitting the above model to our data, we continue to slowly build up our model and test it by fitting the model to simulated data. The simulated data has an obvious drop in product performance while the "real" data has a much more subtle drop.
+Before fitting the above model to our data, we continue to slowly build up our model and test it by fitting the model to simulated data.
 
 Setting priors in a nonlinear model is non-trivial! Make sure the ranges of your priors make sense.
 
-```{r simdataBase}
+```{r simdataBase, include = F}
 # shared sim data components:
 DAI = 11:114
 DAIsampled = seq(11, 114, by = 7)
@@ -259,7 +265,9 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1}(t) x_{Trt,i} + \mbox{ln} \left(DaysOfC
 \beta_{1,t} = A \left(1 - \frac{1}{(1 + e^{-B(t-M)})}\right) \\
 $$
 
-```{r simdata1}
+In this model, each location has the same maximum trapping reduction (TR), and experiences the same loss in TR over the season, i.e., all locations share a common $\beta(t)$. Each location has similar moth counts as well.
+
+```{r simdata1, echo=F}
 set.seed(0528)
 b0 = 2
 A = -3
@@ -278,11 +286,11 @@ ggplot(simdata1, aes(DAI, nYSB, color = Treatment)) +
   geom_smooth() + 
   facet_wrap(~Location) +
   labs(title = "Simulated moth counts for 5 locations",
-       xlab = "Days after installation (DAI)",
-       ylab = "Number of moths per trap per day")
+       x = "Days after installation (DAI)",
+       y = "Number of moths per trap")
 
 ```
-```{r fit1, eval =F}
+```{r fit1, eval =F, echo=F}
 prior1 <- prior(normal(0,2), nlpar = "b0") +
   prior(normal(0, 2), lb = 0, nlpar = "A") + 
   prior(normal(0, 0.5), lb = 0, nlpar = "B") +
@@ -343,13 +351,16 @@ ggplot(TR1) +
   geom_ribbon(aes(DAI, ymin = lowerCI, ymax = upperCI), alpha = 0.3) +
   geom_line(data = simdata1, aes(DAI, TR), color = "purple", linewidth = 1.2) +
   geom_point(data = simdata1, aes(DAI, TR), color = "purple", size = 1.2) +
-  labs(title = "Predicted and true TR curve")
+  labs(title = "Predicted and true TR curve", 
+       subtitle = "(Purple line is true curve)",
+       x = "Days after installation (DAI)",
+       y = "Trapping reduction (TR)")
 
 ```
 
 ### Intercept RE, no GP
 
-This simulation study now includes the intercept RE, allowing for different background moth pressures at each location:
+This simulation study now includes the intercept RE, allowing for different background moth pressures at each location, but all location still share a common $\beta(t)$.
 
 $$
 y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
@@ -357,7 +368,7 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + \m
 \beta_{1,t} = A \left(1 - \frac{1}{(1 + e^{-B(t-M)})}\right) \\
 $$
 
-```{r simdata2}
+```{r simdata2, echo=F}
 set.seed(0528)
 b0mean = 2
 b0sd = 0.8
@@ -379,11 +390,11 @@ ggplot(simdata2, aes(DAI, nYSB, color = Treatment)) +
   geom_smooth() + 
   facet_wrap(~Location)  +
   labs(title = "Simulated moth counts for 5 locations",
-       xlab = "Days after installation (DAI)",
-       ylab = "Number of moths per trap per day")
+       x = "Days after installation (DAI)",
+       y = "Number of moths per trap")
 
 ```
-```{r fit2, eval =F}
+```{r fit2, eval =F, echo=F}
 prior2 <- prior(normal(0,2), nlpar = "b0") +
   prior(normal(0, 2), lb = 0, nlpar = "A") + 
   prior(normal(0, 0.5), lb = 0, nlpar = "B") +
@@ -463,13 +474,16 @@ ggplot(TRdf) +
   geom_ribbon(aes(DAI, ymin = lowerCI, ymax = upperCI), alpha = 0.3) +
   geom_line(data = simdata2, aes(DAI, TR), color = "purple", linewidth = 1.2) +
   geom_point(data = simdata2, aes(DAI, TR), color = "purple", size = 1.2) +
-  labs(title = "Predicted and true TR curve") 
+  labs(title = "Predicted and true TR curve", 
+       subtitle = "(Purple line is true curve)",
+       x = "Days after installation (DAI)",
+       y = "Trapping reduction (TR)")
 
 ```
 
 ### Intercept RE, A RE, no GP
 
-This simulation study now adds the random effects to the left asymptote of the logistic curve, the $A$ parameter, allowing for different max trapping reduction (min $\beta_1$ values) at each location:
+This simulation now adds random effects to the left asymptote of the logistic curve, the $A$ parameter, allowing for different max trapping reduction (min $\beta_1$ values) at each location. *For this model, we will now have different trapping reduction (TR) curves for each location.*
 
 $$
 y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
@@ -477,7 +491,7 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1,k}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + 
 \beta_{1,k}(t) = A_k \left(1 - \frac{1}{(1 + e^{-B(t-M)})}\right) \\
 $$
 
-```{r simdata3}
+```{r simdata3, echo=F}
 set.seed(0528)
 b0mean = 2
 b0sd = 0.8
@@ -503,11 +517,11 @@ ggplot(simdata3, aes(DAI, nYSB, color = Treatment)) +
   geom_smooth() + 
   facet_wrap(~Location) +
   labs(title = "Simulated moth counts for 5 locations",
-       xlab = "Days after installation (DAI)",
-       ylab = "Number of moths per trap per day")
+       x = "Days after installation (DAI)",
+       y = "Number of moths per trap")
 
 ```
-```{r fit3, eval =F}
+```{r fit3, eval =F, echo = F}
 prior3 <- prior(normal(0,2), nlpar = "b0") +
   prior(normal(0, 2), lb = 0, nlpar = "A") + 
   prior(normal(0, 0.5), lb = 0, nlpar = "B") +
@@ -589,7 +603,10 @@ ggplot(TRdf) +
   geom_ribbon(aes(DAI, ymin = lowerCI, ymax = upperCI), alpha = 0.3) +
   geom_line(data = simdata3, aes(DAI, TR), color = "purple", linewidth = 1.2) +
   geom_point(data = simdata3, aes(DAI, TR), color = "purple", size = 1.2) +
-  labs(title = "Predicted and true TR curve") + 
+  labs(title = "Predicted and true TR curves",
+       subtitle = "(Purple lines are the true curves- note the different y-intercepts)",
+       x = "Days after installation (DAI)",
+       y = "Trapping reduction (TR)")+ 
   facet_wrap(~Location)
 
 ```
@@ -610,7 +627,7 @@ ggplot(predsDF) +
 
 ### Intercept RE, A RE, WITH GP (same for all loc)
 
-Now we add the Gaussian Process to the model, explicitly allowing for the correlated change in background moth pressure over time. However, we start with using the same GP for all locations:
+Now we add the Gaussian Process to the model, explicitly allowing for the correlated change in background moth pressure over time. This allows for peaks and dramatic changes in a moth population over time, which mimics what is observed. We start with using the same GP for all locations.
 
 $$
 y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
@@ -620,7 +637,7 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1,k}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + 
 \sigma_{lm} = \tau \cdot e^{-\frac{|d_l - d_m|^2}{l^2}}
 $$
 
-```{r simdata4}
+```{r simdata4, echo= F}
 # simulate the GP:
 x = DAIsampled # runif(100)
 d = abs(outer(x, x, "-")) # compute distance matrix, d_{ij} = |x_i - x_j|
@@ -673,11 +690,11 @@ ggplot(simdata4, aes(DAI, nYSB, color = Treatment)) +
   geom_smooth() + 
   facet_wrap(~Location, scales = "free") +
   labs(title = "Simulated moth counts for 5 locations",
-       xlab = "Days after installation (DAI)",
-       ylab = "Number of moths per trap per day")
+       x = "Days after installation (DAI)",
+       y = "Number of moths per trap")
 
 ```
-```{r fit4, eval =F}
+```{r fit4, eval =F, echo= F}
 # https://bookdown.org/content/4857/adventures-in-covariance.html#continuous-categories-and-the-gaussian-process
 prior4 <- prior(normal(0,2), nlpar = "b0") +
   prior(normal(0, 2), lb = 0, nlpar = "A") + 
@@ -704,6 +721,9 @@ fit4 <- brm(bf(nYSB ~  b0 - (A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) )))) * num
               chains = nCores, cores = nCores) 
 saveRDS(fit4, "output/fit4.RDS")
 ```
+
+The model still does a good job estimating the parameters.
+
 ```{r summary4, echo= F}
 fit4 <- readRDS("output/fit4.RDS")
 # summary(fit4)
@@ -771,7 +791,10 @@ ggplot(TRdf) +
   geom_ribbon(aes(DAI, ymin = lowerCI, ymax = upperCI), alpha = 0.3) +
   geom_line(data = simdata4, aes(DAI, TR), color = "purple", linewidth = 1.2) +
   geom_point(data = simdata4, aes(DAI, TR), color = "purple", size = 1.2) +
-  labs(title = "Predicted and true TR curve") +
+  labs(title = "Predicted and true TR curves",
+       subtitle = "(Purple lines are the true curves- note the different y-intercepts)",
+       x = "Days after installation (DAI)",
+       y = "Trapping reduction (TR)")+ 
   facet_wrap(~Location)
 
 ```
@@ -797,7 +820,7 @@ ggplot(predsDF) +
 
 Starting here, I include 9 locations for each simulation as I found more locations were required for the model to estimate the parameters.
 
-This model has different GP's or each location (as in Sections \@ref(glmm-gp) and \@ref(fit-glmm-gpR)):
+This model has different GP's or each location (as in Sections \@ref(glmm-gp) and \@ref(fit-glmm-gpR)). Allowing for a differen GP for each location leads to more variety in the moth populations across the locations and more closely mimics what is observed in the field.
 
 $$
 y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
@@ -806,7 +829,8 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1,k}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + 
 \mathbf{GP_k} \sim MVN(0, \boldsymbol\Sigma_k) \\
 \sigma_{k,lm} = \tau_k \cdot e^{-\frac{|d_l - d_m|^2}{l_k^2}}
 $$
-```{r simdata5}
+
+```{r simdata5, echo = F}
 Location = c("A", "B", "C", "D", "E", "F", "G", "H", "I")
 Trap = 1:4
 nLocs = length(Location)
@@ -872,11 +896,11 @@ ggplot(simdata5, aes(DAI, nYSB, color = Treatment)) +
   geom_smooth() + 
   facet_wrap(~Location, scales = "free") +
   labs(title = "Simulated moth counts for 9 locations",
-       xlab = "Days after installation (DAI)",
-       ylab = "Number of moths per trap per day")
+       x = "Days after installation (DAI)",
+       y = "Number of moths per trap")
 
 ```
-```{r fit5, eval =F}
+```{r fit5, eval =F, echo = F}
 # https://bookdown.org/content/4857/adventures-in-covariance.html#continuous-categories-and-the-gaussian-process
 prior5 <- prior(normal(0,2), nlpar = "b0") +
   prior(normal(0, 2), lb = 0, nlpar = "A") + 
@@ -974,7 +998,10 @@ ggplot(TRdf) +
   geom_ribbon(aes(DAI, ymin = lowerCI, ymax = upperCI), alpha = 0.3) +
   geom_line(data = simdata5, aes(DAI, TR), color = "purple", linewidth = 1.2) +
   geom_point(data = simdata5, aes(DAI, TR), color = "purple", size = 1.2) +
-  labs(title = "Predicted and true TR curve") +
+  labs(title = "Predicted and true TR curves",
+       subtitle = "(Purple lines are the true curves- note the different y-intercepts)",
+       x = "Days after installation (DAI)",
+       y = "Trapping reduction (TR)")+ 
   facet_wrap(~Location)
 
 ```
@@ -998,7 +1025,7 @@ ggplot(predsDF) +
 
 ### Intercept, A, B, M RE, with GP (DIFF for each loc)
 
-In this most complex model, I make $B$ and $M$ random effects in the logistic curve, in addition to the $A$ parameter:
+In this most complex model, I make $B$ and $M$ random effects in the logistic curve, in addition to the $A$ parameter. This allows for the TR curve to vary in multiple ways among the locations.
 
 $$
 y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
@@ -1008,7 +1035,7 @@ log(\lambda_{ikt} ) = \beta_0 + \beta_{1,k}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + 
 \sigma_{k,lm} = \tau_k \cdot e^{-\frac{|d_l - d_m|^2}{l_k^2}}
 $$
 
-```{r simdata6}
+```{r simdata6, echo = F}
 set.seed(600)
 Location = c("A", "B", "C", "D", "E", "F", "G", "H", "I")
 nLocs = length(Location)
@@ -1081,11 +1108,11 @@ ggplot(simdata6, aes(DAI, nYSB, color = Treatment)) +
   geom_smooth() + 
   facet_wrap(~Location, scales = "free") +
   labs(title = "Simulated moth counts for 9 locations",
-       xlab = "Days after installation (DAI)",
-       ylab = "Number of moths per trap per day")
+       x = "Days after installation (DAI)",
+       y = "Number of moths per trap")
 
 ```
-```{r fit6, eval =F}
+```{r fit6, eval =F, echo = F}
 # https://bookdown.org/content/4857/adventures-in-covariance.html#continuous-categories-and-the-gaussian-process
 prior6 <- prior(normal(0,2), nlpar = "b0") +
   prior(normal(0, 2), lb = 0, nlpar = "A") + 
@@ -1113,7 +1140,7 @@ fit6 <- brm(bf(nYSB ~  b0 - (A * (1 - (1 / (1 + exp(-1 * B * (DAI - M) ))))) * n
               chains = nCores, cores = nCores) 
 saveRDS(fit6, "output/fit6.RDS")
 ```
-```{r summary6, include = F}
+```{r summary6, include=F, echo = F}
 fit6 <- readRDS("output/fit6.RDS")
 # summary(fit6)
 # plot(fit6)
@@ -1204,13 +1231,17 @@ ggplot(predsDF) +
   facet_wrap(~Location, scales = "free_y")
 ```
 
+This model did not fit the data well. Priors may need to be tweaked, or more locations may be required to estimate all of the parameters well. 
+
 ## Case study
 
-Too many divergent warnings with model with intercept, A, B, M RE, with GP (DIFF for each loc). (M was multimodal)
+Too many divergent warnings with the most complex model, i.e., the model with intercept, A, B, M RE, with GP (DIFF for each loc). (M was multi-modal in that model fit.)
 
-Use constant B, M instead.
+Use constant B, M model instead.
 
-```{r fitR, eval =F}
+The model fits the data well, is interpretable, and converges well.
+
+```{r fitR, eval=F, echo = F}
 # https://bookdown.org/content/4857/adventures-in-covariance.html#continuous-categories-and-the-gaussian-process
 prior6 <- prior(normal(0,2), nlpar = "b0") +
   prior(normal(0, 2), lb = 0, nlpar = "A") + 
@@ -1239,6 +1270,7 @@ fitR <- brm(bf(nYSB ~  b0 -
               chains = nCores, cores = nCores) 
 saveRDS(fitR, "output/fitR.RDS")
 ```
+
 ```{r summaryR, include = F, echo= F}
 fitR <- readRDS("output/fitR.RDS")
 summary(fitR)
@@ -1323,10 +1355,10 @@ predsDF <- bind_cols(datR,
 ggplot(predsDF) +
   geom_line(aes(DAI, exp(preds), color = Treatment)) +
   geom_ribbon(aes(DAI, ymin = exp(lowerCI), ymax = exp(upperCI), fill = Treatment), alpha = 0.3) +
-  geom_point(data = mean_cts, aes(DAI, mean_mothsperday, color = Treatment)) +
+  geom_point(data = datR, aes(DAI, mothsperday, color = Treatment)) +
   facet_wrap(~Location, scales = "free_y") +
   labs(title = "Predicted moth counts for each location",
        subtitle = "Lines are predictions; points are the data",
        x = "Days after installation (DAI)",
-       y = "Moth counts")
+       y = "Moth counts per day")
 ```
