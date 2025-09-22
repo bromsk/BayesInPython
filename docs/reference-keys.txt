@@ -112,3 +112,4 @@ intercept-a-re-with-gp-diff-for-each-loc
 intercept-a-b-m-re-with-gp-diff-for-each-loc
 case-study
 tab:summary6
+simulation-studies

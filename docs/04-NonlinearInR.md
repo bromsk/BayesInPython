@@ -4,7 +4,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Nonlinear Bayesian Models in R {#NonlinearR}
+# Nonlinear Bayesian models in R {#NonlinearR}
 
 As mentioned in Section \@ref(CaseStudy), the treatment group for these data is a pheromone dispenser. Eventually, given enough time, the dispenser has to run out of pheromone and the moth counts in the treatment and control groups are expected to have the same expected counts for a given location. In other words, Trapping reduction goes from a max value to 0 over time. Mathematically, $\beta_1 \to 0$ as $t \to \infty$. The timeline for this to happen may or may not happen during the field season, but we want to be sure to include this potential dynamic in the model to statistically test whether the loss of performance is observed or not.
 
@@ -22,7 +22,7 @@ This chapter has similar setup code to Chapter \@ref(GLMMsR). Check the [script]
 
 
 
-## Generalized Logistic Curve
+## Generalized logistic curve
 
 The regression coefficient, $\beta_1$ is now a function of time, $\beta_1 = \beta_1(t)$:
 
@@ -123,7 +123,7 @@ $l_k$ is the length-scale associated with location $k$, which helps determine th
 
 For now, we assume that each location shares all of the same nonlinear, logistic parameters except for $A$, the maximum trapping reduction level. We also set $v=1$ in the logistic curve.
 
-## Fitting models with the brms package
+## Simulation studies
 
 Before fitting the above model to our data, we continue to slowly build up our model and test it by fitting the model to simulated data.
 
@@ -131,107 +131,237 @@ Setting priors in a nonlinear model is non-trivial! Make sure the ranges of your
 
 
 
-### No RE, no GP
+<!-- ### No RE, no GP -->
 
-The first nonlinear model that I fit has no random effects and no Gaussian Process:
+<!-- The first nonlinear model that I fit has no random effects and no Gaussian Process: -->
 
-$$
-y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
-log(\lambda_{ikt} ) = \beta_0 + \beta_{1}(t) x_{Trt,i} + \mbox{ln} \left(DaysOfCatch_i\right) \\
-\beta_{1,t} = A \left(1 - \frac{1}{(1 + e^{-B(t-M)})}\right) \\
-$$
+<!-- $$ -->
+<!-- y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\ -->
+<!-- log(\lambda_{ikt} ) = \beta_0 + \beta_{1}(t) x_{Trt,i} + \mbox{ln} \left(DaysOfCatch_i\right) \\ -->
+<!-- \beta_{1,t} = A \left(1 - \frac{1}{(1 + e^{-B(t-M)})}\right) \\ -->
+<!-- $$ -->
 
-In this model, each location has the same maximum trapping reduction (TR), and experiences the same loss in TR over the season, i.e., all locations share a common $\beta(t)$. Each location has similar moth counts as well.
+<!-- In this model, each location has the same maximum trapping reduction (TR), and experiences the same loss in TR over the season, i.e., all locations share a common $\beta(t)$. Each location has similar moth counts as well. -->
 
-<img src="04-NonlinearInR_files/figure-html/simdata1-1.png" width="100%" />
+<!-- ```{r simdata1, echo=F} -->
+<!-- set.seed(0528) -->
+<!-- b0 = 2 -->
+<!-- A = -3 -->
+<!-- B = 0.1 -->
+<!-- M = 50 -->
+<!-- b1 = A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) ))) -->
 
+<!-- simdata1 <- simdataBase %>% -->
+<!--   mutate(b1 = A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) ))), -->
+<!--          TR = 100 * (1 - exp(b1)), -->
+<!--          muTmp = exp(b0 + b1*numTrt), -->
+<!--          nYSB = rnbinom(n=nrow(simdataBase), mu = muTmp, size = shape_param)) -->
 
-The model estimates are very close to the true parameter values. We do not expect the parameters to match exactly due to the simulated noise in the data, but with many different simulated data sets, we expected the average of the estimated values to converge to the true values.
+<!-- ggplot(simdata1, aes(DAI, nYSB, color = Treatment)) + -->
+<!--   geom_point() + -->
+<!--   geom_smooth() +  -->
+<!--   facet_wrap(~Location) + -->
+<!--   labs(title = "Simulated moth counts for 5 locations", -->
+<!--        x = "Days after installation (DAI)", -->
+<!--        y = "Number of moths per trap") -->
 
+<!-- ``` -->
+<!-- ```{r fit1, eval =F, echo=F} -->
+<!-- prior1 <- prior(normal(0,2), nlpar = "b0") + -->
+<!--   prior(normal(0, 2), lb = 0, nlpar = "A") +  -->
+<!--   prior(normal(0, 0.5), lb = 0, nlpar = "B") + -->
+<!--   prior(uniform(0, 120), lb = 0, ub = 120, nlpar = "M") + -->
+<!--   prior(cauchy(0,1), lb = 0, class = "shape") -->
 
-Table: (\#tab:summary1)Model estimates of the fixed effects parameters.
+<!-- fit1 <- brm(bf(nYSB ~ b0 - (A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) )))) * numTrt + -->
+<!--                 log(DaysOfCatch), # offset() is implicit in nonlinear formula -->
+<!--               b0 + A + B + M ~ 1, -->
+<!--               nl = TRUE),  -->
+<!--               control = list(adapt_delta = 0.9), -->
+<!--               data = simdata1,  -->
+<!--               family = negbinomial, -->
+<!--               prior = prior1, -->
+<!--               warmup = 1000, iter = 2000,  -->
+<!--               seed = 5000, -->
+<!--               chains = nCores, cores = nCores)  -->
+<!-- saveRDS(fit1, "output/fit1.RDS") -->
+<!-- ``` -->
 
-|             | Estimate| Est.Error| l-95% CI| u-95% CI| Rhat| Bulk_ESS| Tail_ESS|
-|:------------|--------:|---------:|--------:|--------:|----:|--------:|--------:|
-|b0_Intercept |     1.98|      0.03|     1.92|     2.04|    1|  4151.18|  3618.37|
-|A_Intercept  |     2.73|      0.20|     2.37|     3.17|    1|  2746.68|  2771.02|
-|B_Intercept  |     0.12|      0.02|     0.08|     0.17|    1|  2741.00|  3352.33|
-|M_Intercept  |    53.18|      2.22|    48.41|    57.13|    1|  2631.54|  2855.89|
+<!-- The model estimates are very close to the true parameter values. We do not expect the parameters to match exactly due to the simulated noise in the data, but with many different simulated data sets, we expected the average of the estimated values to converge to the true values. -->
 
+<!-- ```{r summary1, tab.cap = "Model estimates of the fixed effects parameters.", echo = F} -->
+<!-- fit1 <- readRDS("output/fit1.RDS") -->
+<!-- # plot(fit1) -->
+<!-- # prior_summary(fit1) -->
 
+<!-- kable(round(summary(fit1)$fixed, 2)) -->
+<!-- kable(round(summary(fit1)$spec_pars, 2)) -->
+<!-- kable(data.frame(Parameter = c("b0", "A", "B", "M", "shape"), -->
+<!--            Values = c(b0, -1*A, B, M, shape_param)), caption = "True parameter values.") -->
 
-Table: (\#tab:summary1)Model estimates of the fixed effects parameters.
+<!-- ``` -->
+<!-- ```{r output1, echo = F} -->
+<!-- # Calc TR -->
+<!-- modtranformed <- ggs(fit1)  -->
+<!-- # str(modtranformed) -->
+<!-- A1 <- modtranformed %>%  -->
+<!--   filter(Parameter == c("b_A_Intercept"),  -->
+<!--          Iteration > 500) # remove burn-in -->
+<!-- B1 <- modtranformed %>%  -->
+<!--   filter(Parameter == c("b_B_Intercept"), -->
+<!--          Iteration > 500) # remove burn-in -->
+<!-- M1 <- modtranformed %>%  -->
+<!--   filter(Parameter == c("b_M_Intercept"), -->
+<!--          Iteration > 500) # remove burn-in -->
+<!-- DAImatrix = matrix(DAI, nrow = nrow(A1), ncol = length(DAI), byrow = T) -->
+<!-- tmp = apply(DAImatrix, 2, function(x) x - M1$value) # nIter x nDAI -->
+<!-- beta1 = apply(tmp, 2, function(x) -1 * A1$value * (1 - 1 / (1 + exp(-1 * B1$value * x )))) -->
+<!-- TR = 100 * (1 - exp(beta1)) -->
 
-|      | Estimate| Est.Error| l-95% CI| u-95% CI| Rhat| Bulk_ESS| Tail_ESS|
-|:-----|--------:|---------:|--------:|--------:|----:|--------:|--------:|
-|shape |     5.48|      0.65|     4.35|     6.89|    1|  4519.58|  4149.31|
+<!-- TR1 <- data.frame(TR = round(apply(TR, 2, median), 1),  -->
+<!--            lowerCI = round(apply(TR, 2, quantile, 0.025), 1),  -->
+<!--           upperCI = round(apply(TR, 2, quantile, 0.975), 1), -->
+<!--           DAI = DAI) -->
+<!-- ggplot(TR1) + -->
+<!--   geom_line(aes(DAI, TR), linewidth = 1.2) + -->
+<!--   geom_ribbon(aes(DAI, ymin = lowerCI, ymax = upperCI), alpha = 0.3) + -->
+<!--   geom_line(data = simdata1, aes(DAI, TR), color = "purple", linewidth = 1.2) + -->
+<!--   geom_point(data = simdata1, aes(DAI, TR), color = "purple", size = 1.2) + -->
+<!--   labs(title = "Predicted and true TR curve",  -->
+<!--        subtitle = "(Purple line is true curve)", -->
+<!--        x = "Days after installation (DAI)", -->
+<!--        y = "Trapping reduction (TR)") -->
 
+<!-- ``` -->
 
+<!-- ### Intercept RE, no GP -->
 
-Table: (\#tab:summary1)True parameter values.
+<!-- This simulation study now includes the intercept RE, allowing for different background moth pressures at each location, but all location still share a common $\beta(t)$. -->
 
-|Parameter | Values|
-|:---------|------:|
-|b0        |    2.0|
-|A         |    3.0|
-|B         |    0.1|
-|M         |   50.0|
-|shape     |    5.0|
-<img src="04-NonlinearInR_files/figure-html/output1-1.png" width="100%" />
+<!-- $$ -->
+<!-- y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\ -->
+<!-- log(\lambda_{ikt} ) = \beta_0 + \beta_{1}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + \mbox{ln} \left(DaysOfCatch_i\right) \\ -->
+<!-- \beta_{1,t} = A \left(1 - \frac{1}{(1 + e^{-B(t-M)})}\right) \\ -->
+<!-- $$ -->
 
-### Intercept RE, no GP
+<!-- ```{r simdata2, echo=F} -->
+<!-- set.seed(0528) -->
+<!-- b0mean = 2 -->
+<!-- b0sd = 0.8 -->
+<!-- b0 = rnorm(n = nLocs, b0mean, sd = b0sd) # now have 5 intercepts for 5 loc's -->
+<!-- A = -3 -->
+<!-- B = 0.1 -->
+<!-- M = 50 -->
+<!-- b1 = A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) ))) -->
 
-This simulation study now includes the intercept RE, allowing for different background moth pressures at each location, but all location still share a common $\beta(t)$.
+<!-- simdata2 = simdataBase %>% -->
+<!--   left_join(data.frame(b0, Location)) -->
+<!-- simdata2 %<>% -->
+<!--   mutate(b1 = A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) ))), -->
+<!--          TR = 100 * (1 - exp(b1)), -->
+<!--          muTmp = exp(b0 + b1*numTrt), -->
+<!--          nYSB = rnbinom(n=nrow(simdataBase), mu = muTmp, size = 5)) -->
+<!-- ggplot(simdata2, aes(DAI, nYSB, color = Treatment)) + -->
+<!--   geom_point() + -->
+<!--   geom_smooth() +  -->
+<!--   facet_wrap(~Location)  + -->
+<!--   labs(title = "Simulated moth counts for 5 locations", -->
+<!--        x = "Days after installation (DAI)", -->
+<!--        y = "Number of moths per trap") -->
 
-$$
-y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
-log(\lambda_{ikt} ) = \beta_0 + \beta_{1}(t) x_{Trt,i} + \gamma_{0k} x_{ik} + \mbox{ln} \left(DaysOfCatch_i\right) \\
-\beta_{1,t} = A \left(1 - \frac{1}{(1 + e^{-B(t-M)})}\right) \\
-$$
+<!-- ``` -->
+<!-- ```{r fit2, eval =F, echo=F} -->
+<!-- prior2 <- prior(normal(0,2), nlpar = "b0") + -->
+<!--   prior(normal(0, 2), lb = 0, nlpar = "A") +  -->
+<!--   prior(normal(0, 0.5), lb = 0, nlpar = "B") + -->
+<!--   prior(uniform(0, 120), lb = 0, ub = 120, nlpar = "M") -->
 
-<img src="04-NonlinearInR_files/figure-html/simdata2-1.png" width="100%" />
+<!-- fit2 <- brm(bf(nYSB ~ b0 - (A * (1 - 1 / (1 + exp(-1 * B * (DAI - M) )))) * numTrt +                 log(DaysOfCatch), # offset() is implicit in nonlinear formula -->
+<!--               b0 ~ 1 + (1|Location), -->
+<!--               A + B + M ~ 1, -->
+<!--               nl = TRUE),  -->
+<!--               control = list(adapt_delta = 0.9), -->
+<!--               data = simdata2,  -->
+<!--               family = negbinomial, -->
+<!--               prior = prior2, -->
+<!--               warmup = 1000, iter = 2000,  -->
+<!--               seed = 5000, -->
+<!--               chains = nCores, cores = nCores)  -->
+<!-- saveRDS(fit2, "output/fit2.RDS") -->
+<!-- ``` -->
 
+<!-- Again, the model estimates are close to the true parameter values. -->
 
-Again, the model estimates are close to the true parameter values.
+<!-- ```{r summary2, echo = F} -->
+<!-- fit2 <- readRDS("output/fit2.RDS") -->
+<!-- # some plots to help assess model fit: -->
+<!-- # plot(fit2) -->
+<!-- # conditional_effects(fit2, "DAI:numTrt") -->
+<!-- # # #  -->
+<!-- # conditions <- data.frame(Location = unique(simdata2$Location)) -->
+<!-- # rownames(conditions) <- unique(simdata2$Location) -->
+<!-- # me_loss <- conditional_effects( -->
+<!-- #   fit2, conditions = conditions, -->
+<!-- #   re_formula = NULL, method = "predict" -->
+<!-- # ) -->
+<!-- # plot(me_loss, ncol = 5, points = TRUE) -->
 
+<!-- kable(round(summary(fit2)$fixed, 2)) -->
+<!-- kable(round(summary(fit2)$random$Location, 2)) -->
+<!-- kable(round(summary(fit2)$spec_pars, 2)) -->
+<!-- kable(data.frame(Parameter = c("b0 mean", "A", "B", "M", "b0 SD", "shape"), -->
+<!--            Values = c(b0mean,-1*A, B, M,  b0sd, shape_param)), caption = "True parameter values.") -->
 
-|             | Estimate| Est.Error| l-95% CI| u-95% CI| Rhat| Bulk_ESS| Tail_ESS|
-|:------------|--------:|---------:|--------:|--------:|----:|--------:|--------:|
-|b0_Intercept |     1.95|      0.37|     1.12|     2.62|    1|  1208.28|   936.02|
-|A_Intercept  |     3.33|      0.36|     2.74|     4.13|    1|  2537.64|  2437.49|
-|B_Intercept  |     0.08|      0.01|     0.06|     0.11|    1|  2387.35|  2859.84|
-|M_Intercept  |    45.97|      3.56|    38.07|    52.12|    1|  2354.74|  2246.43|
+<!-- ``` -->
 
+<!-- ```{r output2, echo= F} -->
+<!-- # Calc TR -->
+<!-- modtranformed <- ggs(fit2)  -->
+<!-- # get b0 estimates for each location: -->
+<!-- meanb0est <- modtranformed %>% -->
+<!--   filter(Parameter == "b_b0_Intercept") %>% -->
+<!--   summarize(med = median(value)) -->
+<!-- # modtranformed %>% -->
+<!-- #   filter(grepl("r_", Parameter)) %>% -->
+<!-- #   group_by(Parameter) %>% -->
+<!-- #   summarize(med = median(value) + meanb0est$med) -->
+<!-- # round(b0, 2) -->
+<!-- # str(modtranformed) -->
+<!-- estA <- modtranformed %>%  -->
+<!--   filter(Parameter == c("b_A_Intercept"),  -->
+<!--          Iteration > 500) # remove burn-in -->
+<!-- estB <- modtranformed %>%  -->
+<!--   filter(Parameter == c("b_B_Intercept"), -->
+<!--          Iteration > 500) # remove burn-in -->
+<!-- estM <- modtranformed %>%  -->
+<!--   filter(Parameter == c("b_M_Intercept"), -->
+<!--          Iteration > 500) # remove burn-in -->
+<!-- DAImatrix = matrix(DAI, nrow = nrow(estA), ncol = length(DAI), byrow = T) -->
+<!-- tmp = apply(DAImatrix, 2, function(x) x - estM$value) # nIter x nDAI -->
+<!-- beta1 = apply(tmp, 2, function(x) -1 * estA$value * (1 - 1 / (1 + exp(-1 * estB$value * x )))) -->
+<!-- TR = 100 * (1 - exp(beta1)) -->
 
+<!-- TRdf <- data.frame(TR = round(apply(TR, 2, median), 1),  -->
+<!--            lowerCI = round(apply(TR, 2, quantile, 0.025), 1),  -->
+<!--           upperCI = round(apply(TR, 2, quantile, 0.975), 1), -->
+<!--           DAI = DAI) -->
+<!-- ggplot(TRdf) + -->
+<!--   geom_line(aes(DAI, TR), linewidth = 1.2) + -->
+<!--   geom_ribbon(aes(DAI, ymin = lowerCI, ymax = upperCI), alpha = 0.3) + -->
+<!--   geom_line(data = simdata2, aes(DAI, TR), color = "purple", linewidth = 1.2) + -->
+<!--   geom_point(data = simdata2, aes(DAI, TR), color = "purple", size = 1.2) + -->
+<!--   labs(title = "Predicted and true TR curve",  -->
+<!--        subtitle = "(Purple line is true curve)", -->
+<!--        x = "Days after installation (DAI)", -->
+<!--        y = "Trapping reduction (TR)") -->
 
-|                 | Estimate| Est.Error| l-95% CI| u-95% CI| Rhat| Bulk_ESS| Tail_ESS|
-|:----------------|--------:|---------:|--------:|--------:|----:|--------:|--------:|
-|sd(b0_Intercept) |     0.77|      0.43|     0.34|     2.02|    1|   987.54|   751.96|
-
-
-
-|      | Estimate| Est.Error| l-95% CI| u-95% CI| Rhat| Bulk_ESS| Tail_ESS|
-|:-----|--------:|---------:|--------:|--------:|----:|--------:|--------:|
-|shape |     5.25|      0.61|     4.18|     6.52|    1|  3583.03|  2191.34|
-
-
-
-Table: (\#tab:summary2)True parameter values.
-
-|Parameter | Values|
-|:---------|------:|
-|b0 mean   |    2.0|
-|A         |    3.0|
-|B         |    0.1|
-|M         |   50.0|
-|b0 SD     |    0.8|
-|shape     |    5.0|
-
-<img src="04-NonlinearInR_files/figure-html/output2-1.png" width="100%" />
+<!-- ``` -->
 
 ### Intercept RE, A RE, no GP
 
-This simulation now adds random effects to the left asymptote of the logistic curve, the $A$ parameter, allowing for different max trapping reduction (min $\beta_1$ values) at each location. *For this model, we will now have different trapping reduction (TR) curves for each location.*
+This model includes a random effect on the intercept, which allows for different background moth pressures at each location. (Notice how much the y-axis varies from location to location.)
+
+The Random effect on the $A$ parameter allows for different max trapping reduction (i.e., different maximum product performance) at each location. *Therefore, we have slightly different trapping reduction (TR) curves for each location.*
 
 $$
 y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
@@ -280,7 +410,11 @@ Table: (\#tab:summary3)True parameter values.
 
 ### Intercept RE, A RE, WITH GP (same for all loc)
 
-Now we add the Gaussian Process to the model, explicitly allowing for the correlated change in background moth pressure over time. This allows for peaks and dramatic changes in a moth population over time, which mimics what is observed. We start with using the same GP for all locations.
+This model includes a random effect on the intercept, which allows for different background moth pressures at each location. (Notice how much the y-axis varies from location to location.)
+
+The Random effect on the $A$ parameter allows for different max trapping reduction (i.e., different maximum product performance) at each location.
+
+The Gaussian Process allows for correlated change in background moth pressure over time. This allows for peaks and dramatic changes in a moth population over time, which mimics what is observed. We start with using the same GP for all locations.
 
 $$
 y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
@@ -348,7 +482,7 @@ Table: (\#tab:summary4)True parameter values.
 
 Starting here, I include 9 locations for each simulation as I found more locations were required for the model to estimate the parameters.
 
-This model has different GP's or each location (as in Sections \@ref(glmm-gp) and \@ref(fit-glmm-gpR)). Allowing for a differen GP for each location leads to more variety in the moth populations across the locations and more closely mimics what is observed in the field.
+This model has *different* GP's or each location (as in Sections \@ref(glmm-gp) and \@ref(fit-glmm-gpR)). Allowing for a different GP for each location leads to more variety in the moth populations across the locations and may more closely mimic what is observed in the field.
 
 $$
 y_{ijt} \sim NegBinom(\lambda_{ijt}, \theta) \\
