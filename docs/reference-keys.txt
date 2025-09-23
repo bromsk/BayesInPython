@@ -113,3 +113,10 @@ intercept-a-b-m-re-with-gp-diff-for-each-loc
 case-study
 tab:summary6
 simulation-studies
+trial-locations
+comparing-model-results
+glmms-re-for-location-date
+trial-locations-1
+predictions-2
+predictions-3
+predictions-4

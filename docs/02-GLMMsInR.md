@@ -40,8 +40,8 @@ getTR <- function (mod, coefs = -1) {
   b1 = summary(mod)$coef[coefs,1]
   seb1 = summary(mod)$coef[coefs,2]
   (TR = round(100 * (1- exp(b1)),1))
-  (higher = round(100 * (1 - exp(b1 - 1.96*seb1)),1))
-  (lower = round(100 * (1 - exp(b1 + 1.96*seb1)),1)) 
+  (higher = round(100 * (1 - exp(b1 - 2*seb1)),1))
+  (lower = round(100 * (1 - exp(b1 + 2*seb1)),1)) 
   data.frame(#Treatment = names(TR),
              TR = as.numeric(TR), 
              lowerCI = as.numeric(lower),
@@ -325,7 +325,7 @@ ggplot(datR,
 <p class="caption">(\#fig:plotMoths)Moth counts by location.</p>
 </div>
 
-### Trap locations
+### Trial locations
 
 Trial locations in relation to each other. Some trial locations are closer to each other than others.
 
@@ -347,31 +347,11 @@ ggmap(basemap) +
 <p class="caption">(\#fig:LocsFig)Trial locations.</p>
 </div>
 
-Within each location, the treatment traps have a slightly different alignment:
+There are 4 traps per treatment at each location.
+
+<!-- Within each location, the treatment traps have a slightly different alignment: -->
 
 
-``` r
-coords <- datR %>%
-  dplyr::select(Location, Treatment, TrapID, Latitude, Longitude) %>%
-  unique()
-ggplot(coords,
-       aes(Longitude, Latitude, color = Treatment)) +
-  geom_point() +
-  facet_wrap(~Location, scales = "free") +
-  theme(aspect.ratio=1, 
-        axis.text.x=element_blank(),
-        axis.text.y=element_blank()) +
-  ggrepel::geom_text_repel(aes(label = TrapID), color = "black", size = 3) +
-  scale_x_continuous(expand = c(0.3, 0)) + 
-  scale_y_continuous(expand = c(0.3, 0)) + 
-  scale_color_manual(values = mycolors) +
-  labs(title = "Trap coordinates for each location")
-```
-
-<div class="figure">
-<img src="02-GLMMsInR_files/figure-html/TrapsPlotted-1.png" alt="Trap coordinates for each location." width="100%" />
-<p class="caption">(\#fig:TrapsPlotted)Trap coordinates for each location.</p>
-</div>
 
 
 ## Fitted GLM models {#fit-glmR}
@@ -459,8 +439,8 @@ tmp = predict(mod1p, se = T, type = "link",
 # str(tmp)
 preds1p <- data.frame(datR, 
                       preds = tmp$fit,
-                      lowerCI = tmp$fit + 1.96*tmp$se.fit,
-                      upperCI = tmp$fit - 1.96*tmp$se.fit)
+                      lowerCI = tmp$fit + 2*tmp$se.fit,
+                      upperCI = tmp$fit - 2*tmp$se.fit)
 preds1p %<>%
   mutate(preds = exp(preds),
          lowerCI = exp(lowerCI),
@@ -486,46 +466,10 @@ For the negative binomial (NB) model, our confidence intervals are a little wide
 mod1nb <- glm.nb(nYSB ~ Treatment + 
              offset(log(DaysOfCatch)),
              data = datR)
-summary(mod1nb)
-```
-
-```
-## 
-## Call:
-## glm.nb(formula = nYSB ~ Treatment + offset(log(DaysOfCatch)), 
-##     data = datR, init.theta = 0.6559820251, link = log)
-## 
-## Coefficients:
-##              Estimate Std. Error z value Pr(>|z|)    
-## (Intercept)   1.40225    0.06790   20.65   <2e-16 ***
-## TreatmentTrt -2.16364    0.09893  -21.87   <2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for Negative Binomial(0.656) family taken to be 1)
-## 
-##     Null deviance: 1184.50  on 671  degrees of freedom
-## Residual deviance:  766.68  on 670  degrees of freedom
-## AIC: 4883.5
-## 
-## Number of Fisher Scoring iterations: 1
-## 
-## 
-##               Theta:  0.6560 
-##           Std. Err.:  0.0352 
-## 
-##  2 x log-likelihood:  -4877.5410
+# summary(mod1nb)
 ```
 
 #### Predictions
-
-
-``` r
-## obtain TR estimate for comparison later (custom function in Setup code)
-TR_1nb <- getTR(mod1nb)
-kable(TR_1nb)  %>%
-  kable_styling(full_width = F)
-```
 
 <table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>(\#tab:TR1nb)(\#tab:TR1nb)Trapping reduction estimate for the negative binomial GLM model.</caption>
@@ -539,30 +483,11 @@ kable(TR_1nb)  %>%
 <tbody>
   <tr>
    <td style="text-align:right;"> 88.5 </td>
-   <td style="text-align:right;"> 86.1 </td>
-   <td style="text-align:right;"> 90.5 </td>
+   <td style="text-align:right;"> 86 </td>
+   <td style="text-align:right;"> 90.6 </td>
   </tr>
 </tbody>
 </table>
-
-
-``` r
-## code to predict moth counts from model:
-tmp = predict(mod1nb, se = T, type = "link",
-              newdata= datR  %>% mutate(DaysOfCatch = 1))
-# str(tmp)
-preds1nb <- data.frame(datR, 
-                      preds = tmp$fit,
-                      lowerCI = tmp$fit - 2*tmp$se.fit,
-                      upperCI = tmp$fit + 2*tmp$se.fit)
-preds1nb %<>%
-  mutate(preds = exp(preds),
-         lowerCI = exp(lowerCI),
-         upperCI = exp(upperCI))
-
-p1nb_glm = predplot(preds1nb, "Neg. binomial GLM predictions")
-print(p1nb_glm)
-```
 
 <div class="figure">
 <img src="02-GLMMsInR_files/figure-html/p1nb-glmFig-1.png" alt="Negative bimomial GLM predictions." width="100%" />
@@ -707,148 +632,22 @@ We also want to acknowledge that the treatment effect may vary from location to 
 
 See Section \@ref(glmm) for the associated mathematical models.
 
-### GLMM Poisson fit
+<!-- ### GLMM Poisson fit -->
+
+
+
+### GLMM neg binom fit
 
 A couple of notes here. R always gets mad when you ask for SE's for predictions from a GLMM. Technically, you need to run simulations to get them and then they still come with an asterisk related to their reliability. (This is a reason to use the Bayesian model-- credible intervals are never based on approximations!)
 
-
-
-
-``` r
-mod2p <- glmer(nYSB ~ Treatment + (1 + Treatment|Location), 
-             offset = log(DaysOfCatch),
-             family = poisson,
-             data = datR)
-# summary(mod2p)$varcor # to get SD instead of var of RE's
-# summary(mod2p)$coef
-summary(mod2p)
-```
-
-```
-## Generalized linear mixed model fit by maximum likelihood (Laplace
-##   Approximation) [glmerMod]
-##  Family: poisson  ( log )
-## Formula: nYSB ~ Treatment + (1 + Treatment | Location)
-##    Data: datR
-##  Offset: log(DaysOfCatch)
-## 
-##       AIC       BIC    logLik -2*log(L)  df.resid 
-##   14070.5   14093.1   -7030.3   14060.5       667 
-## 
-## Scaled residuals: 
-##    Min     1Q Median     3Q    Max 
-## -9.969 -1.689 -0.584  0.768 33.638 
-## 
-## Random effects:
-##  Groups   Name         Variance Std.Dev. Corr 
-##  Location (Intercept)  1.4407   1.2003        
-##           TreatmentTrt 0.4075   0.6384   -0.75
-## Number of obs: 672, groups:  Location, 10
-## 
-## Fixed effects:
-##              Estimate Std. Error z value Pr(>|z|)    
-## (Intercept)    0.8159     0.3798   2.148   0.0317 *  
-## TreatmentTrt  -1.8900     0.2052  -9.209   <2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Correlation of Fixed Effects:
-##             (Intr)
-## TreatmntTrt -0.743
-```
-
-``` r
-TR_2p <- getTR(mod2p)
-kable(TR_2p)  %>%
-  kable_styling(full_width = F)
-```
-
-<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
-<caption>(\#tab:pois2)(\#tab:pois2)Trapping reduction estimate for the Poisson GLMM model.</caption>
- <thead>
-  <tr>
-   <th style="text-align:right;"> TR </th>
-   <th style="text-align:right;"> lowerCI </th>
-   <th style="text-align:right;"> upperCI </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:right;"> 84.9 </td>
-   <td style="text-align:right;"> 77.4 </td>
-   <td style="text-align:right;"> 89.9 </td>
-  </tr>
-</tbody>
-</table>
-
-When we plot our predictions, we see that we now have better estimates for the overall mean at each location, and we see how much they vary from location to location, but there is a strong temporal pattern at each location that we are missing in the model.
-
-
-
-``` r
-tmp = predict(mod2p, se = T, type = "link",
-              newdata=datR %>% mutate(DaysOfCatch = 1))
-# str(tmp)
-preds2p <- data.frame(datR %>% mutate(DaysOfCatch = 1), 
-                      preds = tmp$fit,
-                      lowerCI = tmp$fit + 2*tmp$se.fit,
-                      upperCI = tmp$fit - 2*tmp$se.fit)
-preds2p %<>%
-  mutate(preds = exp(preds),
-         lowerCI = exp(lowerCI),
-         upperCI = exp(upperCI))
-# str(predsp2)
-
-p2p_glmm = predplot(preds2p, "Poisson GLMM predictions")
-print(p2p_glmm)
-```
-
-<img src="02-GLMMsInR_files/figure-html/p2p-glmmFig-1.png" width="100%" />
-
-### GLMM neg binom fit
+Only the negative binomial (and not the Poisson) model are fit going forward.
 
 
 ``` r
 mod2nb <- glmer.nb(nYSB ~ Treatment + (1 + Treatment|Location), 
              offset = log(DaysOfCatch),
              data = datR)
-summary(mod2nb)
-```
-
-```
-## Generalized linear mixed model fit by maximum likelihood (Laplace
-##   Approximation) [glmerMod]
-##  Family: Negative Binomial(1.5338)  ( log )
-## Formula: nYSB ~ Treatment + (1 + Treatment | Location)
-##    Data: datR
-##  Offset: log(DaysOfCatch)
-## 
-##       AIC       BIC    logLik -2*log(L)  df.resid 
-##    4399.3    4426.3   -2193.6    4387.3       666 
-## 
-## Scaled residuals: 
-##     Min      1Q  Median      3Q     Max 
-## -1.1392 -0.7363 -0.2834  0.3435  7.8739 
-## 
-## Random effects:
-##  Groups   Name         Variance Std.Dev. Corr 
-##  Location (Intercept)  1.4075   1.1864        
-##           TreatmentTrt 0.3602   0.6001   -0.76
-## Number of obs: 672, groups:  Location, 10
-## 
-## Fixed effects:
-##              Estimate Std. Error z value Pr(>|z|)    
-## (Intercept)    0.8258     0.3781   2.184    0.029 *  
-## TreatmentTrt  -1.8986     0.2033  -9.340   <2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Correlation of Fixed Effects:
-##             (Intr)
-## TreatmntTrt -0.735
-```
-
-``` r
+# summary(mod2nb)
 TR_2nb <- getTR(mod2nb)
 kable(TR_2nb, caption = "Trapping reduction estimate for the Poisson GLMM model.")  %>%
   kable_styling(full_width = F)
@@ -866,11 +665,13 @@ kable(TR_2nb, caption = "Trapping reduction estimate for the Poisson GLMM model.
 <tbody>
   <tr>
    <td style="text-align:right;"> 85 </td>
-   <td style="text-align:right;"> 77.7 </td>
-   <td style="text-align:right;"> 89.9 </td>
+   <td style="text-align:right;"> 77.5 </td>
+   <td style="text-align:right;"> 90 </td>
   </tr>
 </tbody>
 </table>
+
+When we plot our predictions, we see that we now have better estimates for the overall mean at each location, and we see how much they vary from location to location, but there is a strong temporal pattern at each location that we are missing in the model.
 
 
 ``` r
@@ -892,8 +693,8 @@ print(p2nb_glmm)
 ```
 
 <div class="figure">
-<img src="02-GLMMsInR_files/figure-html/p2nb-glmmFig-1.png" alt="NB GLMM moth count predictions." width="100%" />
-<p class="caption">(\#fig:p2nb-glmmFig)NB GLMM moth count predictions.</p>
+<img src="02-GLMMsInR_files/figure-html/p2nb-glmmFig, echo-F-1.png" alt="NB GLMM moth count predictions." width="100%" />
+<p class="caption">(\#fig:p2nb-glmmFig, echo-F)NB GLMM moth count predictions.</p>
 </div>
 
 
@@ -949,7 +750,7 @@ Table: (\#tab:compareShape2nb)Shape parameter estimate from the Bayesian GLMM
 |:-----|--------:|---------:|--------:|--------:|
 |shape |    1.533|     0.098|    1.349|     1.73|
 
-<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:compareShape2nb)(\#tab:compareShape2nb)Shape parameter estimate from the frequentist GLMM</caption>
  <thead>
   <tr>
@@ -997,18 +798,6 @@ kable(bayesTR_2nb, caption = "Trapping reduction estimate for the negative binom
 </tbody>
 </table>
 
-
-``` r
-## plot predictions:
-predsbrm2nb <- fitted(brm2nb,
-                       scale = "linear",
-                        newdata = datR  %>% mutate(DaysOfCatch = 1))   
-
-bayes_p2nb = brmspredplot(cbind(datR, exp(predsbrm2nb)), 
-                          plottitle = "Bayes NB GLMM predictions")
-print(bayes_p2nb)
-```
-
 <div class="figure">
 <img src="02-GLMMsInR_files/figure-html/pBayes2nb-Fig-1.png" alt="Bayesian negative binomial GLM predictions." width="100%" />
 <p class="caption">(\#fig:pBayes2nb-Fig)Bayesian negative binomial GLM predictions.</p>
@@ -1021,7 +810,7 @@ Again, the figure looks almost identical to the the frequent predictions (Figure
 
 In this version of the model, we acknowledge that sampling on different days of the season adds to the variability of the moth counts, and that counts from the same sampling date are more similar than for a different date. In this model, however,  the correlation between sampling dates is ignored.
 
-This model is included here because it is important to think about whether you have nested or crossed random effects (if applicable). Here, we are assuming crossed random effects because Java island is fairly homogeneous in terms of weather and ecosystem so it may make sense for all samples from one date to be grouped together. However, one could also argue for nested RE's for this case study. 
+This model is included here because it is important to think about whether you have nested or crossed random effects (if applicable) because the options may lead to _very_ different estimates of your uncertainty. Here, we are assuming crossed random effects because Java island is fairly homogeneous in terms of weather and ecosystem so it may make sense for all samples from one date to be grouped together. However, one could also argue for nested RE's for this case study. 
 
 This model allows us to include sampling date in our model as a random effect and still fit the model quickly in a frequentist framework. 
 
@@ -1031,62 +820,12 @@ The predictions now mimic the spatial patterns we see over time.
 
 See Section \@ref(glmm-dates) for the associated mathematical models.
 
-### Crossed Poisson GLMM fit
+<!-- ### Crossed Poisson GLMM fit -->
 
-Summary output not shown for increased readability.
-
-
-``` r
-mod3p <- glmer(nYSB ~ Treatment  +
-                 (1 + Treatment|Location) + 
-                 (1|SamplingDateC), 
-             offset = log(DaysOfCatch),
-             family = poisson,
-             data = datR)
-# summary(mod3p)
-TR_3p <- getTR(mod3p)
-kable(TR_3p)  %>%
-  kable_styling(full_width = F)
-```
-
-<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
-<caption>(\#tab:pois3)(\#tab:pois3)Trapping reduction estimate for the Crossed Poisson GLMM model.</caption>
- <thead>
-  <tr>
-   <th style="text-align:right;"> TR </th>
-   <th style="text-align:right;"> lowerCI </th>
-   <th style="text-align:right;"> upperCI </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:right;"> 81.3 </td>
-   <td style="text-align:right;"> 72.7 </td>
-   <td style="text-align:right;"> 87.2 </td>
-  </tr>
-</tbody>
-</table>
+<!-- Summary output not shown for increased readability. -->
 
 
-``` r
-tmp = predict(mod3p, se = T, type = "link",
-              newdata = datR %>% mutate(DaysOfCatch = 1))
-# str(tmp)
-preds3p <- data.frame(datR %>% mutate(DaysOfCatch = 1), 
-                      preds = tmp$fit,
-                      lowerCI = tmp$fit + 2*tmp$se.fit,
-                      upperCI = tmp$fit - 2*tmp$se.fit)
-preds3p %<>%
-  mutate(preds = exp(preds),
-         lowerCI = exp(lowerCI),
-         upperCI = exp(upperCI))
-# str(predsp3)
 
-p3p_glmm = predplot(preds3p, "Poisson crossed GLMM predictions")
-print(p3p_glmm)
-```
-
-<img src="02-GLMMsInR_files/figure-html/p3p-glmmFig-1.png" width="100%" />
 
 ### Crossed NB GLMM fit
 
@@ -1122,25 +861,6 @@ kable(TR_3nb)  %>%
   </tr>
 </tbody>
 </table>
-
-``` r
-tmp = predict(mod3nb, se = T, type = "link",
-              newdata=datR %>% mutate(DaysOfCatch = 1))
-# str(tmp)
-preds3nb <- data.frame(datR %>% mutate(DaysOfCatch = 1), 
-                       preds = tmp$fit,
-                       lowerCI = tmp$fit + 2*tmp$se.fit,
-                       upperCI = tmp$fit - 2*tmp$se.fit)
-preds3nb %<>%
-  mutate(preds = exp(preds),
-         lowerCI = exp(lowerCI),
-         upperCI = exp(upperCI))
-# str(predsnb2)
-
-p3nb_glmm = predplot(preds3nb, "NB crossed GLMM predictions")
-print(p3nb_glmm)
-```
-
 <img src="02-GLMMsInR_files/figure-html/p3nb-glmmFig-1.png" width="100%" />
 
 ### Crossed Bayes GLMM fit
@@ -1163,10 +883,6 @@ brm3nb <- brm(formula = nYSB ~ Treatment + offset(log(DaysOfCatch)) +
 saveRDS(brm3nb, "output/brm3nb.RDS")
 ```
 
-``` r
-brm3nb <- readRDS("output/brm3nb.RDS")
-# summary(brm3nb)
-```
 
 Again, the parameter estimates from the Bayesian and frequentist frameworks vary slightly.
 
@@ -1193,7 +909,7 @@ Table: (\#tab:compareShape3nb)Shape parameter estimate from the Bayesian framewo
 |:-----|--------:|---------:|--------:|--------:|
 |shape |    2.577|     0.218|    2.174|    3.033|
 
-<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:compareShape3nb)(\#tab:compareShape3nb)Shape parameter estimate from the frequentist framework.</caption>
  <thead>
   <tr>
@@ -1207,21 +923,6 @@ Table: (\#tab:compareShape3nb)Shape parameter estimate from the Bayesian framewo
 </tbody>
 </table>
 
-
-
-``` r
-# CALC TR:
-modtranformed <- ggs(brm3nb) # transform MCMC output into a table
-beta1 <- modtranformed %>% 
-  filter(Parameter == "b_TreatmentTrt", # our beta1
-         Iteration > 500) # remove burn-in
-TR = 100 * (1 - exp(beta1$value))
-bayesTR_3nb <- data.frame(TR = round(median(TR), 1), 
-           lowerCI = round(quantile(TR, 0.025), 1),
-          upperCI = round(quantile(TR, 0.975), 1))   
-kable(bayesTR_3nb)  %>%
-  kable_styling(full_width = F)
-```
 
 <table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>(\#tab:TRBayes3nb)(\#tab:TRBayes3nb)Trapping reduction estimate for the negative binomial GLMM model.</caption>
@@ -1242,18 +943,6 @@ kable(bayesTR_3nb)  %>%
   </tr>
 </tbody>
 </table>
-
-
-``` r
-# plot predictions:
-predsbrm <- fitted(brm3nb,
-                   scale = "linear",
-                   newdata = datR  %>% mutate(DaysOfCatch = 1))
-
-bayes_p3nb = brmspredplot(cbind(datR, exp(predsbrm)), 
-                          "Bayes crossed GLMM predictions")
-print(bayes_p3nb)
-```
 
 <div class="figure">
 <img src="02-GLMMsInR_files/figure-html/pBayes3nb-Fig-1.png" alt="Bayesian crossed NB GLMM predictions." width="100%" />
@@ -1312,136 +1001,19 @@ saveRDS(brm4nb, "output/brm4nb.RDS")
 
 
 
-``` r
-brm4nb <- readRDS("output/brm4nb.RDS")
-# summary(brm4nb)
-# bayes_R2(brm4nb) # 0.824
-
-prior_summary(brm4nb)
-```
-
-```
-##                 prior     class                coef    group resp dpar nlpar lb
-##           normal(0,2)         b                                                
-##           normal(0,2)         b        TreatmentTrt                            
-##           normal(0,2) Intercept                                                
-##  lkj_corr_cholesky(1)         L                                                
-##  lkj_corr_cholesky(1)         L                     Location                   
-##                (flat)    lscale                                               0
-##           cauchy(0,1)    lscale  gpDATILocationLoc1                           0
-##           cauchy(0,1)    lscale gpDATILocationLoc10                           0
-##           cauchy(0,1)    lscale  gpDATILocationLoc2                           0
-##           cauchy(0,1)    lscale  gpDATILocationLoc3                           0
-##           cauchy(0,1)    lscale  gpDATILocationLoc4                           0
-##           cauchy(0,1)    lscale  gpDATILocationLoc5                           0
-##           cauchy(0,1)    lscale  gpDATILocationLoc6                           0
-##           cauchy(0,1)    lscale  gpDATILocationLoc7                           0
-##           cauchy(0,1)    lscale  gpDATILocationLoc8                           0
-##           cauchy(0,1)    lscale  gpDATILocationLoc9                           0
-##           cauchy(0,1)        sd                                               0
-##           cauchy(0,1)        sd                     Location                  0
-##           cauchy(0,1)        sd           Intercept Location                  0
-##           cauchy(0,1)        sd        TreatmentTrt Location                  0
-##           normal(0,2)      sdgp                                               0
-##           normal(0,2)      sdgp  gpDATILocationLoc1                           0
-##           normal(0,2)      sdgp gpDATILocationLoc10                           0
-##           normal(0,2)      sdgp  gpDATILocationLoc2                           0
-##           normal(0,2)      sdgp  gpDATILocationLoc3                           0
-##           normal(0,2)      sdgp  gpDATILocationLoc4                           0
-##           normal(0,2)      sdgp  gpDATILocationLoc5                           0
-##           normal(0,2)      sdgp  gpDATILocationLoc6                           0
-##           normal(0,2)      sdgp  gpDATILocationLoc7                           0
-##           normal(0,2)      sdgp  gpDATILocationLoc8                           0
-##           normal(0,2)      sdgp  gpDATILocationLoc9                           0
-##           cauchy(0,1)     shape                                               0
-##  ub       source
-##             user
-##     (vectorized)
-##             user
-##          default
-##     (vectorized)
-##          default
-##             user
-##             user
-##             user
-##             user
-##             user
-##             user
-##             user
-##             user
-##             user
-##             user
-##             user
-##     (vectorized)
-##     (vectorized)
-##     (vectorized)
-##             user
-##     (vectorized)
-##     (vectorized)
-##     (vectorized)
-##     (vectorized)
-##     (vectorized)
-##     (vectorized)
-##     (vectorized)
-##     (vectorized)
-##     (vectorized)
-##     (vectorized)
-##             user
-```
-
-``` r
-# prior_summary(brm4nb, all = FALSE)
-# 
-```
-
-
-``` r
-# Calc TR:
-modtranformed <- ggs(brm4nb) # transform MCMC output into a table
-beta1 <- modtranformed %>% 
-  filter(Parameter == "b_TreatmentTrt", # our beta1
-         Iteration > 500) # remove burn-in
-TR = 100 * (1 - exp(beta1$value))
-bayesTR_4nb <- data.frame(TR = round(median(TR), 1), 
-           lowerCI = round(quantile(TR, 0.025), 1),
-          upperCI = round(quantile(TR, 0.975), 1))   
-row.names(bayesTR_4nb) = NULL
-kable(bayesTR_4nb)
-```
-
 
 
 |   TR| lowerCI| upperCI|
 |----:|-------:|-------:|
 | 83.7|    73.8|    89.7|
 
-
-``` r
-# plot predictions:
-# library(tidybayes) # add_predicted_draws()
-predsbrm <- fitted(brm4nb,
-                   scale = "linear",
-                   newdata = datR  %>% mutate(DaysOfCatch = 1))
-# dim(exp(predsbrm))
-# head(predsbrm)
-# I used linear scale (link response) in the fitted values and then exponeniate
-# because it intuitively is easier to think about moths per day (i.e., response scale),
-# but I want the resolution that is had at the linear scale.
-# (If I chose response scale, Id' get lots of 0's which aren't informative. 
-# Give it a try!)
-
-bayes_p4nb = brmspredplot(cbind(datR, exp(predsbrm)), 
-                          "Bayes NB GP GLMM predictions")
-print(bayes_p4nb)
-```
-
 <img src="02-GLMMsInR_files/figure-html/pBayes4nb-Fig-1.png" width="100%" />
 
-## Summary of estimates
+## Comparing model results
 
 ### Compare TR estimates {#compareTR}
 
-Here, the trapping reduction estimates from all of the models are compared. As expected, the median TR estimates are very close from model to model, but the uncertainty in that estimate increase (i.e., the confidence/credible intervals get wider) when we properly account for the correlations in our data.
+Here, the trapping reduction estimates from all of the models are compared. As expected, the median TR estimates are very close from model to model, but the uncertainty in that estimate increases (i.e., the confidence/credible intervals get wider) when we properly account for the correlations in our data.
 
 <table class="table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:compareTR)(\#tab:compareTR)Comparison of derived TR estimates from each model fit.</caption>
@@ -1543,98 +1115,11 @@ Here, the trapping reduction estimates from all of the models are compared. As e
 </tbody>
 </table>
 
-### Compare coefficients
+<!-- ### Compare coefficients -->
 
-Because TR is a non-linear function of $\beta_1$, the differences in the model output get slightly distorted from the transformation. Thereofre, the $\beta_1$ coefficients are displayed as well:
+<!-- Because TR is a non-linear function of $\beta_1$, the differences in the model output get slightly distorted from the transformation. Thereofre, the $\beta_1$ coefficients are displayed as well: -->
 
-<table class="table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:compareBetas)(\#tab:compareBetas)Comparison of regression coefficient estimates from each model fit.</caption>
- <thead>
-  <tr>
-   <th style="text-align:left;"> Framework </th>
-   <th style="text-align:left;"> Distribution </th>
-   <th style="text-align:left;"> Model_name </th>
-   <th style="text-align:right;"> Estimate </th>
-   <th style="text-align:right;"> SE </th>
-  </tr>
- </thead>
-<tbody>
-  <tr grouplength="3"><td colspan="5" style="border-bottom: 1px solid;"><strong>GLM</strong></td></tr>
-<tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Frequentist </td>
-   <td style="text-align:left;"> Poisson </td>
-   <td style="text-align:left;"> GLM </td>
-   <td style="text-align:right;"> -2.17 </td>
-   <td style="text-align:right;"> 0.027 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Frequentist </td>
-   <td style="text-align:left;"> Neg Binomial </td>
-   <td style="text-align:left;"> GLM </td>
-   <td style="text-align:right;"> -2.16 </td>
-   <td style="text-align:right;"> 0.099 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bayesian </td>
-   <td style="text-align:left;"> Neg Binomial </td>
-   <td style="text-align:left;"> GLM </td>
-   <td style="text-align:right;"> -2.16 </td>
-   <td style="text-align:right;"> 0.100 </td>
-  </tr>
-  <tr grouplength="3"><td colspan="5" style="border-bottom: 1px solid;"><strong>GLMM (Location)</strong></td></tr>
-<tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Frequentist </td>
-   <td style="text-align:left;"> Poisson </td>
-   <td style="text-align:left;"> GLMM (Location) </td>
-   <td style="text-align:right;"> -1.89 </td>
-   <td style="text-align:right;"> 0.205 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Frequentist </td>
-   <td style="text-align:left;"> Neg Binomial </td>
-   <td style="text-align:left;"> GLMM (Location) </td>
-   <td style="text-align:right;"> -1.90 </td>
-   <td style="text-align:right;"> 0.203 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bayesian </td>
-   <td style="text-align:left;"> Neg Binomial </td>
-   <td style="text-align:left;"> GLMM (Location) </td>
-   <td style="text-align:right;"> -1.88 </td>
-   <td style="text-align:right;"> 0.229 </td>
-  </tr>
-  <tr grouplength="3"><td colspan="5" style="border-bottom: 1px solid;"><strong>GLMM (Location, Date)</strong></td></tr>
-<tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Frequentist </td>
-   <td style="text-align:left;"> Poisson </td>
-   <td style="text-align:left;"> GLMM (Location, nested Date) </td>
-   <td style="text-align:right;"> -1.68 </td>
-   <td style="text-align:right;"> 0.193 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Frequentist </td>
-   <td style="text-align:left;"> Neg Binomial </td>
-   <td style="text-align:left;"> GLMM (Location, nested Date) </td>
-   <td style="text-align:right;"> -1.77 </td>
-   <td style="text-align:right;"> 0.195 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bayesian </td>
-   <td style="text-align:left;"> Neg Binomial </td>
-   <td style="text-align:left;"> GLMM (Location, nested Date) </td>
-   <td style="text-align:right;"> -1.75 </td>
-   <td style="text-align:right;"> 0.229 </td>
-  </tr>
-  <tr grouplength="1"><td colspan="5" style="border-bottom: 1px solid;"><strong>GLMM (Location, GP)</strong></td></tr>
-<tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bayesian </td>
-   <td style="text-align:left;"> Neg Binomial </td>
-   <td style="text-align:left;"> GLMM (Location, Gaussian Process Date) </td>
-   <td style="text-align:right;"> -1.81 </td>
-   <td style="text-align:right;"> 0.234 </td>
-  </tr>
-</tbody>
-</table>
+
 
 
 ### Plot comparisons
@@ -1651,7 +1136,7 @@ cowplot::plot_grid(p1p_glm + theme(legend.position="none"),
 
 <img src="02-GLMMsInR_files/figure-html/all_plots1-1.png" width="100%" />
 
-Side-by-side comparison of the frequentist vs Bayes negative binomial GLM predictions.
+Side-by-side comparison of the frequentist vs Bayes negative binomial GLM predictions. They are almost identical, as expected.
 
 
 ``` r
@@ -1663,61 +1148,29 @@ cowplot::plot_grid(p1nb_glm + theme(legend.position="none"),
 
 #### GLMM's (Location RE)
 
-Side-by-side comparison of the frequentist Poisson vs negative  binomial GLMM (Location RE) predictions.
+<!-- Side-by-side comparison of the frequentist Poisson vs negative  binomial GLMM (Location RE) predictions. -->
 
 
-``` r
-cowplot::plot_grid(p2p_glmm + theme(legend.position="none"), 
-                   p2nb_glmm + theme(legend.position="none"))
-```
 
-<img src="02-GLMMsInR_files/figure-html/all_plots2-1.png" width="100%" />
-
-Side-by-side comparison of the frequentist vs Bayes negative binomial GLMM (Location RE) predictions.
-
-
-``` r
-cowplot::plot_grid(p2nb_glmm + theme(legend.position="none"),
-                   bayes_p2nb + theme(legend.position="none"))
-```
+Side-by-side comparison of the frequentist vs Bayes negative binomial GLMM (Location RE) predictions. Again, they are almost identical, as expected.
 
 <img src="02-GLMMsInR_files/figure-html/all_plots2b-1.png" width="100%" />
 
 
-#### GLMM's (Location RE, nested Date)
+#### GLMM's (RE for location, date)
 
-Note: These models are a great fit to the data that we have! But, they are overly confident and will not be good at predicting at new locations and new sampling dates.
-
-Side-by-side comparison of the frequentist Poisson vs negative  binomial GLMM (Location RE) predictions.
+<!-- Side-by-side comparison of the frequentist Poisson vs negative  binomial GLMM (Location RE) predictions. Same patterns but notice how the y-axis varies between plots. -->
 
 
-``` r
-cowplot::plot_grid(p3p_glmm + theme(legend.position="none"), 
-                   p3nb_glmm + theme(legend.position="none"))
-```
-
-<img src="02-GLMMsInR_files/figure-html/all_plots3-1.png" width="100%" />
 
 Side-by-side comparison of the frequentist vs Bayes negative binomial GLMM (Location RE) predictions.
-
-
-``` r
-cowplot::plot_grid(p3nb_glmm + theme(legend.position="none"),
-                   bayes_p3nb + theme(legend.position="none"))
-```
 
 <img src="02-GLMMsInR_files/figure-html/all_plots3b-1.png" width="100%" />
 
 
 #### GLMM's: nested Date vs Gaussian Process Date
 
-Once we properly account for the correlations in our sampling dates, we have much more uncertainty in our overall TR predictions (see table above) , and the predicted counts are "smoothed" over time for some of the locations.
-
-
-``` r
-cowplot::plot_grid(bayes_p3nb + theme(legend.position="none"),
-                   bayes_p4nb + theme(legend.position="none"))
-```
+Once we properly account for the correlations in our sampling dates, we have a reasonable uncertainty in our overall TR predictions and the predicted counts are "smoothed" over time for some of the locations.
 
 <img src="02-GLMMsInR_files/figure-html/all_plots4-1.png" width="100%" />
 

@@ -211,7 +211,7 @@ $$
 
 where, in addition to the variables and parameters defined previously, we have
 
-$k = 1,..., K=10$ represents the locations, 
+<!-- $k = 1,..., K=10$ represents the locations,  -->
 
 $j = 1, ..., J = 62$ represents the unique sampling dates,
 
@@ -219,15 +219,15 @@ $y_{ikj}$ is moth count $i$ from location $k$ on date $j$,
 
 $\lambda_{ikj}$ is the expected moth count for sample $i$  from location $k$ on date $j$,
 
-$\beta_0$ provides the expected moth count for the control field for a new location,
+<!-- $\beta_0$ provides the expected moth count for the control field for a new location, -->
 
-$\beta_1$ provides the expected difference in moth counts between the control group and the treatment group for a new location, 
+<!-- $\beta_1$ provides the expected difference in moth counts between the control group and the treatment group for a new location,  -->
 
-$\gamma_{0k}$ is the random intercept associated with location $k$, which leads to different background moth pressures at each location,
+<!-- $\gamma_{0k}$ is the random intercept associated with location $k$, which leads to different background moth pressures at each location, -->
 
-$\gamma_{1k}$ is the random slope associated with location $k$, which leads to a different treatment effect at each location, 
+<!-- $\gamma_{1k}$ is the random slope associated with location $k$, which leads to a different treatment effect at each location,  -->
 
-$x_{ik}$ is an indicator variable that equals 1 if moth count $i$ is associated with location $k$ and 0 otherwise,
+<!-- $x_{ik}$ is an indicator variable that equals 1 if moth count $i$ is associated with location $k$ and 0 otherwise, -->
 
 $\gamma_{00j}$ is the random intercept associated with date $j$, which leads to different background moth pressures for each date, and 
 
@@ -301,7 +301,8 @@ l_k \sim HalfCauchy(0, 1) \\
 \theta \sim HalfCauchy(0,1) \\
 $$
 
-where, in addition to the variables and parameters defined previously, we have
+where, 
+<!-- in addition to the variables and parameters defined previously, we have -->
 
 $k = 1,..., K=10$ represents the locations, 
 

@@ -14,7 +14,7 @@ Python is a lot more complicated than R!
 
 2. Decide how you want to interact with Python. Yes, you can technically use the terminal and use Python directly, but a GUI is preferable so that it is easier to run the code, add comments, view the output, etc. This is even more true for Python than it is for R. 
 
-Originally, I downloaded Jupyter Notebook directly, but I didn't like the way things loaded. So, I downloaded "Anaconda" and then accessed Jupyter from there. However, I still don't love Jupyter-- the notebooks don't optimize the screen's size like RStudio does. In RStudio, I love having my code on one side of the screen, and my outputs on the other. Screens are wide, not long. 
+Originally, I downloaded Jupyter Notebook directly, but I didn't like the way things loaded. So, I downloaded Anaconda and then accessed Jupyter from there. However, I  don't love Jupyter-- the notebooks don't optimize the screen's size like RStudio does. In RStudio, I love having my code on one side of the screen, and my outputs on the other. Screens are wide, not long. 
 
 Soon, I came across the "reticulate" package, which allows for Python coding in an Rmarkdown script! So far, awesome and it is how I run the all the analyses. Here, I switch between R and Python code chunks, but the package also allows objects written in one language to be used within both languages. Pretty cool. It's not for production-level code, but seems perfect for R users switching to Python. 
 
@@ -44,8 +44,9 @@ Python libraries or packages are called __modules__. To use them with `reticulat
 As in the R chapters, all modules (i.e., packages) are loaded and the data are uploaded and manipulated at the start of the script. The "Getting started with Python" section above goes into details on the rhyme and reason for some of these code chunks.
 
 Because I am newer to Python, the required modules are often included in the code chunks as well as a reminder of what modules are used for what functions. They are included in the setup to ensure that there are no issues upon loading.
+
 ```{r knitrStart, include=F, cache = F, message=F, warning=FALSE, results = "hide"}
-knitr::opts_chunk$set(cache = T, message = F, warning = F, 
+knitr::opts_chunk$set(cache = F, message = F, warning = F, 
   out.width = '100%')
 ```
 ```{r reticulate, include=TRUE, cache = F, message=F, warning=FALSE, results = "hide"}
@@ -151,9 +152,9 @@ def getTR(mod):
     b1 = mod.params.iloc[1]
     seb1 = mod.bse.iloc[1]
     
-    outTR = {'TR': [round(100 * 1 - math.exp(b1))], 
-    'lowerCI': [round(100 * 1 - math.exp(b1 + 1.96*seb1))],
-    'upperCI': [round(100 * 1 - math.exp(b1 - 1.96*seb1))]}
+    outTR = {'TR': [round(100 * (1 - math.exp(b1)),1)], 
+    'lowerCI': [round(100 * (1 - math.exp(b1 + 1.96*seb1)),1)],
+    'upperCI': [round(100 * (1 - math.exp(b1 - 1.96*seb1)),1)]}
     df = pd.DataFrame(outTR)
     return df
 
@@ -302,7 +303,7 @@ pmoths.draw(True)
 
 ```
 
-### Trap locations
+### Trial locations
 
 Trial locations in relation to each other. Some trial locations are closer to each other than others.
 
@@ -325,11 +326,13 @@ image.save('output/trial_locs.png')
 knitr::include_graphics("output/trial_locs.png")
 ```
 
+There are 4 traps per treatment at each location.
+
 <!-- ![Trial locations](output/trial_locs.png "Trial locations.") -->
 
-Within each location, the treatment traps have a slightly different alignment. The R version of this figure naturally renders in an easier to read fashion.
+<!-- Within each location, the treatment traps have a slightly different alignment. The R version of this figure naturally renders in an easier to read fashion. -->
 
-```{python plotTrapLocsPy}
+```{python plotTrapLocsPy, echo = F, eval=F}
 coords = datP[['Location', 'Treatment', 'TrapID', 'Latitude', 'Longitude']].drop_duplicates()
 # coords.describe(include = 'all')
 
@@ -347,7 +350,7 @@ pcoords = (ggplot(datP, aes(x = 'Longitude', y='Latitude', color = 'Treatment'))
 pcoords.save("output/traplocs.png")
 ```
 
-```{r, fig.cap = "Example trial locations."}
+```{r, fig.cap = "Example trial locations.", echo = F, eval=F}
 knitr::include_graphics("output/traplocs.png")
 ```
 
@@ -380,20 +383,28 @@ mod1p = sm.GLM(y, X,
               family = sm.families.Poisson())
 results1p = mod1p.fit()
 print(results1p.summary())
+```
 
+#### Predictions
 
+See Section \@ref(defineTR) for definition of trapping reduction (TR).
+
+```{python TR1py}
 ## obtain TR estimate for comparison later (custom function in Setup code)
 TR_1p = getTR(results1p)
 print(TR_1p)
 ```
 
+For a check of model fit, I compare predicted moths per day to the observed moths per day.
+
 Note: when I predict for new data, I set $DaysOfCatch = 1$, and then I compare to the moths per day variable ($mothsperday = nYSB / DaysOfCatch$). I want to exclude any patterns related to the varying time intervals.
 
 ```{python p1p-glmFigPy, fig.cap = "Poisson GLM predictions (Python)."}
+
 # predict from poisson regression:
 preds1p = results1p.get_prediction(X, which = 'linear')
 preds1pDFtmp = preds1p.summary_frame() #summary_frame() returns a pandas DF
-preds1pDFtmp.describe()
+# preds1pDFtmp.describe()
 
 preds1pDF = datP
 preds1pDF['exp_values'] = preds1pDFtmp['predicted'].apply(math.exp)
@@ -412,9 +423,11 @@ freqplot1p = (ggplot(preds1pDF,
         scale_color_manual(values = mycolors) +
         scale_fill_manual(values = mycolors) +
         labs(title = "Poisson GLM predictions",
-             subtitle = "Lines are predictions, points are the data"))
-freqplot1p.draw(True)
+             subtitle = "Lines are predictions, points are the data",
+             x = "Days after installation (DAI)",
+             y = "Moth counts per day"))
 # freqplot1p.save(filename='freqplot1p.png', path='output/')
+freqplot1p.draw(True)
 
 ```
 
@@ -424,7 +437,7 @@ The model is such a bad fit to the data, it is hard to even tell what is going o
 
 For the negative binomial (NB) model, our confidence intervals are a little wider, but we are still ignoring all the correlations in our data. And the plot of the predictions again indicates the lack of fit (Figure \@ref(fig:p1nb-glmFigPy)).
 
-```{python nb1py}
+```{python nb1py, results='hide', message=F, warning=F}
 
 from scipy.stats import nbinom
 
@@ -432,25 +445,27 @@ form = """ nYSB ~ Treatment"""
 y, X = dmatrices(form, datP, return_type = 'dataframe')
 mod1nb = sm.NegativeBinomial(y,X, offset=np.log(datP["DaysOfCatch"]))
 results1nb = mod1nb.fit()
-print(results1nb.summary())
+# print(results1nb.summary())
+```
 
+#### Predictions
+
+```{python TRnb1py, echo = F}
 ## obtain TR estimate for comparison later (custom function in Setup code)
 TR_1nb = getTR(results1nb)
 print(TR_1nb)
 ```
 
-```{python p1nb-glmFigPy, fig.cap = "Negative binomial GLM predictions (Python)."}
+```{python p1nb-glmFigPy, echo=F, fig.cap = "Negative binomial GLM predictions (Python)."}
 ## code to predict moth counts from model:
 preds1nb = results1nb.get_prediction(X, which = 'linear')
 preds1nbDFtmp = preds1nb.summary_frame()
-preds1nbDFtmp.describe()
+# preds1nbDFtmp.describe()
 
 preds1nbDF = datP
 preds1nbDF['exp_values'] = preds1nbDFtmp['predicted'].apply(math.exp)
 preds1nbDF['lowerCI'] = preds1nbDFtmp['ci_lower'].apply(math.exp)
 preds1nbDF['upperCI'] = preds1nbDFtmp['ci_upper'].apply(math.exp)
-
-
 
 
 ## plot predicted and actual:
@@ -464,7 +479,9 @@ freqplot1nb = (ggplot(preds1nbDF, aes(x = 'DATI', y='exp_values', color = 'Treat
         scale_color_manual(values = mycolors) +
         scale_fill_manual(values = mycolors) +
         labs(title = "Negative binomial GLM predictions",
-             subtitle = "Lines are predictions, points are the data"))
+             subtitle = "Lines are predictions, points are the data",
+             x = "Days after installation (DAI)",
+             y = "Moth counts per day"))
 
 freqplot1nb.draw(True)
 freqplot1nb.save(filename="freqplot1nb.png", path = "./output/")
@@ -522,8 +539,29 @@ with open(filename, 'rb') as file:
 
 # summary stats
 print(az.summary(idata_bmb1nb))
+```
+
+The Bayesian parameter estimates match very closely to the frequentist estimates (copied here from Section \@ref(nb1Py)). Note that the shape parameter is called `alpha` in the `bambi` module.
+
+```{r compareCoef1nb, echo = F}
+# az.summary(idata_bmb1nb)[, 1:4]
+kable(round(az.summary(idata_bmb1nb)[, 1:4], 3), caption = "Coefficient estimates from the Bayesian framework, fit using the brms package.")
+kable(round(summary(mod1nb)$coef, 3), caption = "Coefficient estimates from the frequentist framework, fit using glm.nb().")
+```
+```{r compareShape1nb, echo = F}
+kable(round(summary(brm1nb)$spec_pars[,1:4], 3), caption = "Shape parameter estimate from the Bayesian framework.")
+kable(round(summary(mod1nb)$theta, 3), caption = "Shape parameter estimate from the frequentist framework.")
+```
 
 
+
+The matching parameter estimates are expected, but reassuring that we have built the correct foundation for the more complicated models to come.
+
+One difference however is that the frequentist model gives only a point estimate for the shape parameter while the Bayesian model gives us a distribution and therefore 95% credible intervals for the parameter.
+
+#### Predictions
+
+```{python nbBambi1TR}
 # CALC TR:
 b1 = idata_bmb1nb.posterior["Treatment"].stack(sample=("chain", "draw")).to_dataframe(name = "Trt")
 
@@ -539,11 +577,11 @@ bmbPreds1nb = datP.copy() ## IMPORTANT DIFF FROM R!!!
 bmbPreds1nb["DaysOfCatch"] = 1
 predictions1nb = model_bmb1nb.predict(idata_bmb1nb, data=bmbPreds1nb, kind = "response_params", inplace = False)
 post1nb = predictions1nb.posterior
-post1nb
+# post1nb
 bmbPreds1nb["preds"] = post1nb.mean(dim=["chain", "draw"])["mu"].values
 bmbPreds1nb["lowerCI"] = post1nb.quantile(dim=["chain", "draw"], q = 0.025)["mu"].values
 bmbPreds1nb["upperCI"] = post1nb.quantile(dim=["chain", "draw"], q = 0.975)["mu"].values
-bmbPreds1nb.describe()
+# bmbPreds1nb.describe()
 
 plot1nb = (ggplot(bmbPreds1nb, 
                 aes(x = 'DATI', y='preds', color = 'Treatment')) +
@@ -555,22 +593,22 @@ plot1nb = (ggplot(bmbPreds1nb,
         facet_wrap(['Location'], scales = "free_y") +
         scale_color_manual(values = mycolors) +
         scale_fill_manual(values = mycolors) +
-        labs(title = "Bayes neg binom GLM",
-             subtitle = "Lines are predictions, points are the data"))
+        labs(title = "Bayes (bambi) NB GLM predictions",
+             subtitle = "Lines are predictions, points are the data",
+             x = "Days after installation",
+             y = "Moth counts per day"))
+# plot1nb.save(filename='plot1nb.png', path='output/')
 # plot1nb.draw(True)
 plot1nb.show()
-# plot1nb.save(filename='plot1nb.png', path='output/')
 
 ```
 
-The Bayesian parameter estimates match very closely to the frequentist estimates. This is expected, but reassuring that we have built the correct foundation for the more complicated models to come. The first summary output is from the Bayesian model; the second is from the frequentist fit. (Note that in the fequentitst fit, they summarize the inverse shape parameter compared to the bambi fit.)
-
-Comparisons of TR predictions and predicted moth count values can be found at the end of the page.
+The figure looks almost identical to the the frequent predictions (Figure 3.4). Comparisons of all TR estimates, coefficient estimates, and predicted moth counts can be found at the end of the page (Section 3.7.1).
 
 
 ### Bayesian (PyMC) models-- Python
 
-For most needs, the `bambi` module should suffice. However, when I want to build my complicated non-linear function with multi-dimensional Gaussian Processes, I am going to need a more foundational module-- PyMC. Therefore, I  also build the models using this module. Learning PyMC will also help with extracting derived parameters and predictions, etc. from bambi.
+For most needs, the `bambi` module should suffice. However, when building complicated non-linear functions with multi-dimensional Gaussian Processes, I may need a more foundational module-- PyMC. Therefore, I  also build the models using this module. Learning PyMC will also help with extracting derived parameters and predictions, etc. from bambi.
 
 ```{python nbPyMC1, eval = F}
 # NB Bayes:
