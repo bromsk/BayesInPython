@@ -120,3 +120,5 @@ trial-locations-1
 predictions-2
 predictions-3
 predictions-4
+tab:compareCoef1nbBambi
+predictions-5

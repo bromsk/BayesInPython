@@ -291,7 +291,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">4.2</span> Setup<a href="GLMMsPython.html#setup" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>As in the R chapters, all modules (i.e., packages) are loaded and the data are uploaded and manipulated at the start of the script. The “Getting started with Python” section above goes into details on the rhyme and reason for some of these code chunks.</p>
 <p>Because I am newer to Python, the required modules are often included in the code chunks as well as a reminder of what modules are used for what functions. They are included in the setup to ensure that there are no issues upon loading.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="GLMMsPython.html#cb1-1" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">cache =</span> T, <span class="at">message =</span> F, <span class="at">warning =</span> F, </span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="GLMMsPython.html#cb1-1" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">cache =</span> F, <span class="at">message =</span> F, <span class="at">warning =</span> F, </span>
 <span id="cb1-2"><a href="GLMMsPython.html#cb1-2" tabindex="-1"></a>  <span class="at">out.width =</span> <span class="st">&#39;100%&#39;</span>)</span>
 <span id="cb1-3"><a href="GLMMsPython.html#cb1-3" tabindex="-1"></a><span class="fu">library</span>(kableExtra) <span class="co"># to make a pretty table</span></span>
 <span id="cb1-4"><a href="GLMMsPython.html#cb1-4" tabindex="-1"></a><span class="fu">library</span>(tidyverse) <span class="co"># %&gt;% function, and others</span></span>
@@ -308,7 +308,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb2-4"><a href="GLMMsPython.html#cb2-4" tabindex="-1"></a><span class="co"># virtualenv_create(&quot;r-reticulate-BayesInPython&quot;)</span></span>
 <span id="cb2-5"><a href="GLMMsPython.html#cb2-5" tabindex="-1"></a><span class="co"># </span></span>
 <span id="cb2-6"><a href="GLMMsPython.html#cb2-6" tabindex="-1"></a><span class="co"># # install a module</span></span>
-<span id="cb2-7"><a href="GLMMsPython.html#cb2-7" tabindex="-1"></a><span class="co"># virtualenv_install(&quot;r-reticulate-BayesInPython&quot;, &quot;pandas&quot;)</span></span>
+<span id="cb2-7"><a href="GLMMsPython.html#cb2-7" tabindex="-1"></a><span class="fu">virtualenv_install</span>(<span class="st">&quot;r-reticulate-BayesInPython&quot;</span>, <span class="st">&quot;tabulate&quot;</span>)</span>
 <span id="cb2-8"><a href="GLMMsPython.html#cb2-8" tabindex="-1"></a><span class="co"># </span></span>
 <span id="cb2-9"><a href="GLMMsPython.html#cb2-9" tabindex="-1"></a><span class="co"># indicate that we want to use a specific virtualenv</span></span>
 <span id="cb2-10"><a href="GLMMsPython.html#cb2-10" tabindex="-1"></a><span class="co"># use_virtualenv(&quot;r-reticulate-BayesInPython&quot;)</span></span>
@@ -327,7 +327,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb3-2"><a href="GLMMsPython.html#cb3-2" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="GLMMsPython.html#cb3-3" tabindex="-1"></a><span class="co"># code chunk is here for easy retrieval</span></span>
 <span id="cb3-4"><a href="GLMMsPython.html#cb3-4" tabindex="-1"></a><span class="co"># replace module name as needed.</span></span>
-<span id="cb3-5"><a href="GLMMsPython.html#cb3-5" tabindex="-1"></a><span class="op">!</span>pip install staticmap</span>
+<span id="cb3-5"><a href="GLMMsPython.html#cb3-5" tabindex="-1"></a><span class="op">!</span>pip install prettytable</span>
 <span id="cb3-6"><a href="GLMMsPython.html#cb3-6" tabindex="-1"></a></span>
 <span id="cb3-7"><a href="GLMMsPython.html#cb3-7" tabindex="-1"></a><span class="co"># installing googlemaps needs a modification to the command above:</span></span>
 <span id="cb3-8"><a href="GLMMsPython.html#cb3-8" tabindex="-1"></a><span class="co"># !pip install  --use-pep517 googlemaps</span></span>
@@ -365,8 +365,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb4-26"><a href="GLMMsPython.html#cb4-26" tabindex="-1"></a></span>
 <span id="cb4-27"><a href="GLMMsPython.html#cb4-27" tabindex="-1"></a><span class="im">import</span> pickle <span class="co"># to write, read python objects to file</span></span>
 <span id="cb4-28"><a href="GLMMsPython.html#cb4-28" tabindex="-1"></a></span>
-<span id="cb4-29"><a href="GLMMsPython.html#cb4-29" tabindex="-1"></a></span>
-<span id="cb4-30"><a href="GLMMsPython.html#cb4-30" tabindex="-1"></a>mycolors <span class="op">=</span> [<span class="st">&quot;#9E0142&quot;</span>, <span class="st">&quot;#66C2A5&quot;</span>] <span class="co"># color names from R script</span></span></code></pre></div>
+<span id="cb4-29"><a href="GLMMsPython.html#cb4-29" tabindex="-1"></a><span class="im">from</span> tabulate <span class="im">import</span> tabulate <span class="co"># for python tables in Rmd</span></span>
+<span id="cb4-30"><a href="GLMMsPython.html#cb4-30" tabindex="-1"></a></span>
+<span id="cb4-31"><a href="GLMMsPython.html#cb4-31" tabindex="-1"></a>mycolors <span class="op">=</span> [<span class="st">&quot;#9E0142&quot;</span>, <span class="st">&quot;#66C2A5&quot;</span>] <span class="co"># color names from R script</span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="GLMMsPython.html#cb5-1" tabindex="-1"></a><span class="co">## Define some functions to use in this script.</span></span>
 <span id="cb5-2"><a href="GLMMsPython.html#cb5-2" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="GLMMsPython.html#cb5-3" tabindex="-1"></a><span class="co"># calculate trapping reduction for frequentist model fits.</span></span>
@@ -850,8 +851,8 @@ Figure 4.1: Example trial locations.
 ## Model Family:                 Poisson   Df Model:                            1
 ## Link Function:                    Log   Scale:                          1.0000
 ## Method:                          IRLS   Log-Likelihood:                -14034.
-## Date:                Tue, 23 Sep 2025   Deviance:                       25678.
-## Time:                        10:43:50   Pearson chi2:                 4.24e+04
+## Date:                Wed, 24 Sep 2025   Deviance:                       25678.
+## Time:                        14:53:18   Pearson chi2:                 4.24e+04
 ## No. Iterations:                     6   Pseudo R-squ. (CS):              1.000
 ## Covariance Type:            nonrobust                                         
 ## ====================================================================================
@@ -909,13 +910,20 @@ Figure 4.2: Poisson GLM predictions (Python).
 <div id="nb1Py" class="section level3 hasAnchor" number="4.4.2">
 <h3><span class="header-section-number">4.4.2</span> Frequentist NB model<a href="GLMMsPython.html#nb1Py" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>For the negative binomial (NB) model, our confidence intervals are a little wider, but we are still ignoring all the correlations in our data. And the plot of the predictions again indicates the lack of fit (Figure <a href="GLMMsPython.html#fig:p1nb-glmFigPy">4.3</a>).</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="GLMMsPython.html#cb19-1" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> nbinom</span>
+<div class="sourceCode" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="GLMMsPython.html#cb19-1" tabindex="-1"></a><span class="co"># from scipy.stats import nbinom</span></span>
 <span id="cb19-2"><a href="GLMMsPython.html#cb19-2" tabindex="-1"></a></span>
 <span id="cb19-3"><a href="GLMMsPython.html#cb19-3" tabindex="-1"></a>form <span class="op">=</span> <span class="st">&quot;&quot;&quot; nYSB ~ Treatment&quot;&quot;&quot;</span></span>
 <span id="cb19-4"><a href="GLMMsPython.html#cb19-4" tabindex="-1"></a>y, X <span class="op">=</span> dmatrices(form, datP, return_type <span class="op">=</span> <span class="st">&#39;dataframe&#39;</span>)</span>
 <span id="cb19-5"><a href="GLMMsPython.html#cb19-5" tabindex="-1"></a>mod1nb <span class="op">=</span> sm.NegativeBinomial(y,X, offset<span class="op">=</span>np.log(datP[<span class="st">&quot;DaysOfCatch&quot;</span>]))</span>
 <span id="cb19-6"><a href="GLMMsPython.html#cb19-6" tabindex="-1"></a>results1nb <span class="op">=</span> mod1nb.fit()</span></code></pre></div>
-<div class="sourceCode" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="GLMMsPython.html#cb20-1" tabindex="-1"></a><span class="co"># print(results1nb.summary())</span></span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="GLMMsPython.html#cb20-1" tabindex="-1"></a><span class="co"># print(results1nb.summary())</span></span>
+<span id="cb20-2"><a href="GLMMsPython.html#cb20-2" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="GLMMsPython.html#cb20-3" tabindex="-1"></a><span class="co"># pretty DF to compare to bambi results</span></span>
+<span id="cb20-4"><a href="GLMMsPython.html#cb20-4" tabindex="-1"></a>est <span class="op">=</span> results1nb.params.to_frame(name <span class="op">=</span> <span class="st">&quot;Estimate&quot;</span>)</span>
+<span id="cb20-5"><a href="GLMMsPython.html#cb20-5" tabindex="-1"></a>se <span class="op">=</span> results1nb.bse.to_frame(name <span class="op">=</span> <span class="st">&quot;SE&quot;</span>)</span>
+<span id="cb20-6"><a href="GLMMsPython.html#cb20-6" tabindex="-1"></a>confint <span class="op">=</span> results1nb.conf_int()</span>
+<span id="cb20-7"><a href="GLMMsPython.html#cb20-7" tabindex="-1"></a>confint.columns <span class="op">=</span> [<span class="st">&quot;lowerCI&quot;</span>, <span class="st">&quot;upperCI&quot;</span>]</span>
+<span id="cb20-8"><a href="GLMMsPython.html#cb20-8" tabindex="-1"></a>nb1pyout <span class="op">=</span> <span class="bu">round</span>(pd.concat([est, se, confint], axis <span class="op">=</span> <span class="dv">1</span>), <span class="dv">3</span>)</span></code></pre></div>
 <div id="predictions-3" class="section level4 hasAnchor" number="4.4.2.1">
 <h4><span class="header-section-number">4.4.2.1</span> Predictions<a href="GLMMsPython.html#predictions-3" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <pre><code>##      TR  lowerCI  upperCI
@@ -977,115 +985,185 @@ Figure 4.3: Negative binomial GLM predictions (Python).
 ## alpha             8766.0    1.0  
 ## Intercept         9286.0    1.0  
 ## Treatment[Trt]   10039.0    1.0</code></pre>
-<p>The Bayesian parameter estimates match very closely to the frequentist estimates (copied here from Section 3.3.2):</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="GLMMsPython.html#cb26-1" tabindex="-1"></a>tmp1nb <span class="op">=</span> az.summary(idata_bmb1nb).iloc[:,<span class="dv">0</span>:<span class="dv">4</span>]</span></code></pre></div>
+<p>The Bayesian parameter estimates match very closely to the frequentist estimates (copied here from Section <a href="GLMMsPython.html#nb1Py">4.4.2</a>). Note that the shape parameter is called <code>alpha</code> in the <code>bambi</code> module.</p>
+<table>
+<caption><span id="tab:compareCoef1nbBambi">Table 4.1: </span>Coefficient estimates from the Bayesian framework, fit using the bambi module</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">hdi_3%</th>
+<th align="right">hdi_97%</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">alpha</td>
+<td align="right">0.656</td>
+<td align="right">0.035</td>
+<td align="right">0.588</td>
+<td align="right">0.721</td>
+</tr>
+<tr class="even">
+<td align="left">Intercept</td>
+<td align="right">1.402</td>
+<td align="right">0.067</td>
+<td align="right">1.276</td>
+<td align="right">1.530</td>
+</tr>
+<tr class="odd">
+<td align="left">Treatment[Trt]</td>
+<td align="right">-2.159</td>
+<td align="right">0.099</td>
+<td align="right">-2.343</td>
+<td align="right">-1.974</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption><span id="tab:compareCoef1nbBambi">Table 4.1: </span>Coefficient estimates from the frequentist framework, fit using sm.NegativeBinomial().</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Estimate</th>
+<th align="right">SE</th>
+<th align="right">lowerCI</th>
+<th align="right">upperCI</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Intercept</td>
+<td align="right">1.402</td>
+<td align="right">0.068</td>
+<td align="right">1.269</td>
+<td align="right">1.535</td>
+</tr>
+<tr class="even">
+<td align="left">Treatment[T.Trt]</td>
+<td align="right">-2.164</td>
+<td align="right">0.099</td>
+<td align="right">-2.358</td>
+<td align="right">-1.970</td>
+</tr>
+<tr class="odd">
+<td align="left">alpha</td>
+<td align="right">1.524</td>
+<td align="right">0.082</td>
+<td align="right">1.364</td>
+<td align="right">1.685</td>
+</tr>
+</tbody>
+</table>
 <p>The matching parameter estimates are expected, but reassuring that we have built the correct foundation for the more complicated models to come.</p>
-<p>One difference however is that the frequentist model gives only a point estimate for the shape parameter while the Bayesian model gives us a distribution and therefore 95% credible intervals for the parameter.</p>
 <div id="predictions-4" class="section level4 hasAnchor" number="4.4.3.1">
 <h4><span class="header-section-number">4.4.3.1</span> Predictions<a href="GLMMsPython.html#predictions-4" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<div class="sourceCode" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="GLMMsPython.html#cb26-1" tabindex="-1"></a><span class="co"># CALC TR:</span></span>
-<span id="cb26-2"><a href="GLMMsPython.html#cb26-2" tabindex="-1"></a>b1 <span class="op">=</span> idata_bmb1nb.posterior[<span class="st">&quot;Treatment&quot;</span>].stack(sample<span class="op">=</span>(<span class="st">&quot;chain&quot;</span>, <span class="st">&quot;draw&quot;</span>)).to_dataframe(name <span class="op">=</span> <span class="st">&quot;Trt&quot;</span>)</span>
-<span id="cb26-3"><a href="GLMMsPython.html#cb26-3" tabindex="-1"></a></span>
-<span id="cb26-4"><a href="GLMMsPython.html#cb26-4" tabindex="-1"></a>TR1nb <span class="op">=</span> <span class="dv">100</span> <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> np.exp(b1[<span class="st">&#39;Trt&#39;</span>]))</span>
-<span id="cb26-5"><a href="GLMMsPython.html#cb26-5" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">round</span>(TR1nb.quantile(q<span class="op">=</span>[<span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>])))</span></code></pre></div>
-<pre><code>## 0.025    86.0
-## 0.500    88.0
-## 0.975    90.0
-## Name: Trt, dtype: float64</code></pre>
-<div class="sourceCode" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="GLMMsPython.html#cb28-1" tabindex="-1"></a><span class="co"># Plot the predictions</span></span>
-<span id="cb28-2"><a href="GLMMsPython.html#cb28-2" tabindex="-1"></a><span class="co"># Make predictions of the mean without offset effect:</span></span>
-<span id="cb28-3"><a href="GLMMsPython.html#cb28-3" tabindex="-1"></a>bmbPreds1nb <span class="op">=</span> datP.copy() <span class="co">## IMPORTANT DIFF FROM R!!!</span></span>
-<span id="cb28-4"><a href="GLMMsPython.html#cb28-4" tabindex="-1"></a><span class="co">## if newdf = olddf, changes to newdf affect olddf!!!</span></span>
-<span id="cb28-5"><a href="GLMMsPython.html#cb28-5" tabindex="-1"></a>bmbPreds1nb[<span class="st">&quot;DaysOfCatch&quot;</span>] <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb28-6"><a href="GLMMsPython.html#cb28-6" tabindex="-1"></a>predictions1nb <span class="op">=</span> model_bmb1nb.predict(idata_bmb1nb, data<span class="op">=</span>bmbPreds1nb, kind <span class="op">=</span> <span class="st">&quot;response_params&quot;</span>, inplace <span class="op">=</span> <span class="va">False</span>)</span>
-<span id="cb28-7"><a href="GLMMsPython.html#cb28-7" tabindex="-1"></a>post1nb <span class="op">=</span> predictions1nb.posterior</span>
-<span id="cb28-8"><a href="GLMMsPython.html#cb28-8" tabindex="-1"></a><span class="co"># post1nb</span></span>
-<span id="cb28-9"><a href="GLMMsPython.html#cb28-9" tabindex="-1"></a>bmbPreds1nb[<span class="st">&quot;preds&quot;</span>] <span class="op">=</span> post1nb.mean(dim<span class="op">=</span>[<span class="st">&quot;chain&quot;</span>, <span class="st">&quot;draw&quot;</span>])[<span class="st">&quot;mu&quot;</span>].values</span>
-<span id="cb28-10"><a href="GLMMsPython.html#cb28-10" tabindex="-1"></a>bmbPreds1nb[<span class="st">&quot;lowerCI&quot;</span>] <span class="op">=</span> post1nb.quantile(dim<span class="op">=</span>[<span class="st">&quot;chain&quot;</span>, <span class="st">&quot;draw&quot;</span>], q <span class="op">=</span> <span class="fl">0.025</span>)[<span class="st">&quot;mu&quot;</span>].values</span>
-<span id="cb28-11"><a href="GLMMsPython.html#cb28-11" tabindex="-1"></a>bmbPreds1nb[<span class="st">&quot;upperCI&quot;</span>] <span class="op">=</span> post1nb.quantile(dim<span class="op">=</span>[<span class="st">&quot;chain&quot;</span>, <span class="st">&quot;draw&quot;</span>], q <span class="op">=</span> <span class="fl">0.975</span>)[<span class="st">&quot;mu&quot;</span>].values</span>
-<span id="cb28-12"><a href="GLMMsPython.html#cb28-12" tabindex="-1"></a><span class="co"># bmbPreds1nb.describe()</span></span>
-<span id="cb28-13"><a href="GLMMsPython.html#cb28-13" tabindex="-1"></a></span>
-<span id="cb28-14"><a href="GLMMsPython.html#cb28-14" tabindex="-1"></a>plot1nb <span class="op">=</span> (ggplot(bmbPreds1nb, </span>
-<span id="cb28-15"><a href="GLMMsPython.html#cb28-15" tabindex="-1"></a>                aes(x <span class="op">=</span> <span class="st">&#39;DATI&#39;</span>, y<span class="op">=</span><span class="st">&#39;preds&#39;</span>, color <span class="op">=</span> <span class="st">&#39;Treatment&#39;</span>)) <span class="op">+</span></span>
-<span id="cb28-16"><a href="GLMMsPython.html#cb28-16" tabindex="-1"></a>        geom_line() <span class="op">+</span></span>
-<span id="cb28-17"><a href="GLMMsPython.html#cb28-17" tabindex="-1"></a>        geom_ribbon(aes(ymin <span class="op">=</span> <span class="st">&#39;lowerCI&#39;</span>, ymax <span class="op">=</span> <span class="st">&#39;upperCI&#39;</span>, fill <span class="op">=</span> <span class="st">&#39;Treatment&#39;</span>),</span>
-<span id="cb28-18"><a href="GLMMsPython.html#cb28-18" tabindex="-1"></a>              alpha <span class="op">=</span> <span class="fl">0.3</span>) <span class="op">+</span></span>
-<span id="cb28-19"><a href="GLMMsPython.html#cb28-19" tabindex="-1"></a>        geom_point(aes(x<span class="op">=</span><span class="st">&#39;DATI&#39;</span>, y<span class="op">=</span><span class="st">&#39;mothsperday&#39;</span>, color <span class="op">=</span> <span class="st">&#39;Treatment&#39;</span>), </span>
-<span id="cb28-20"><a href="GLMMsPython.html#cb28-20" tabindex="-1"></a>            data <span class="op">=</span> mean_cts, size <span class="op">=</span> <span class="fl">1.1</span>) <span class="op">+</span></span>
-<span id="cb28-21"><a href="GLMMsPython.html#cb28-21" tabindex="-1"></a>        facet_wrap([<span class="st">&#39;Location&#39;</span>], scales <span class="op">=</span> <span class="st">&quot;free_y&quot;</span>) <span class="op">+</span></span>
-<span id="cb28-22"><a href="GLMMsPython.html#cb28-22" tabindex="-1"></a>        scale_color_manual(values <span class="op">=</span> mycolors) <span class="op">+</span></span>
-<span id="cb28-23"><a href="GLMMsPython.html#cb28-23" tabindex="-1"></a>        scale_fill_manual(values <span class="op">=</span> mycolors) <span class="op">+</span></span>
-<span id="cb28-24"><a href="GLMMsPython.html#cb28-24" tabindex="-1"></a>        labs(title <span class="op">=</span> <span class="st">&quot;Bayes (bambi) NB GLM predictions&quot;</span>,</span>
-<span id="cb28-25"><a href="GLMMsPython.html#cb28-25" tabindex="-1"></a>             subtitle <span class="op">=</span> <span class="st">&quot;Lines are predictions, points are the data&quot;</span>,</span>
-<span id="cb28-26"><a href="GLMMsPython.html#cb28-26" tabindex="-1"></a>             x <span class="op">=</span> <span class="st">&quot;Days after installation&quot;</span>,</span>
-<span id="cb28-27"><a href="GLMMsPython.html#cb28-27" tabindex="-1"></a>             y <span class="op">=</span> <span class="st">&quot;Moth counts per day&quot;</span>))</span>
-<span id="cb28-28"><a href="GLMMsPython.html#cb28-28" tabindex="-1"></a><span class="co"># plot1nb.save(filename=&#39;plot1nb.png&#39;, path=&#39;output/&#39;)</span></span>
-<span id="cb28-29"><a href="GLMMsPython.html#cb28-29" tabindex="-1"></a><span class="co"># plot1nb.draw(True)</span></span>
-<span id="cb28-30"><a href="GLMMsPython.html#cb28-30" tabindex="-1"></a>plot1nb.show()</span></code></pre></div>
-<p><img src="03-GLMMsInPython_files/figure-html/nbBambi1TR-5.png" width="100%" /></p>
-<p>The figure looks almost identical to the the frequent predictions (Figure 3.4). Comparisons of all TR estimates, coefficient estimates, and predicted moth counts can be found at the end of the page (Section 3.7.1).</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="GLMMsPython.html#cb27-1" tabindex="-1"></a><span class="co"># CALC TR:</span></span>
+<span id="cb27-2"><a href="GLMMsPython.html#cb27-2" tabindex="-1"></a>b1 <span class="op">=</span> idata_bmb1nb.posterior[<span class="st">&quot;Treatment&quot;</span>].stack(sample<span class="op">=</span>(<span class="st">&quot;chain&quot;</span>, <span class="st">&quot;draw&quot;</span>)).to_dataframe(name <span class="op">=</span> <span class="st">&quot;Trt&quot;</span>)</span>
+<span id="cb27-3"><a href="GLMMsPython.html#cb27-3" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="GLMMsPython.html#cb27-4" tabindex="-1"></a>tmpTR1nb <span class="op">=</span> <span class="dv">100</span> <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> np.exp(b1[<span class="st">&#39;Trt&#39;</span>]))</span>
+<span id="cb27-5"><a href="GLMMsPython.html#cb27-5" tabindex="-1"></a>TR1nb <span class="op">=</span> <span class="bu">round</span>(tmpTR1nb.quantile(q<span class="op">=</span>[<span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>])).to_frame().T</span>
+<span id="cb27-6"><a href="GLMMsPython.html#cb27-6" tabindex="-1"></a>tabulate(TR1nb, tablefmt<span class="op">=</span><span class="st">&quot;grid&quot;</span>, headers <span class="op">=</span> [<span class="st">&quot;TR&quot;</span>, <span class="st">&quot;lowerCI&quot;</span>, <span class="st">&quot;upperCI&quot;</span>])</span></code></pre></div>
+<pre><code>## &#39;+-----+------+-----------+-----------+\n|     |   TR |   lowerCI |   upperCI |\n+=====+======+===========+===========+\n| Trt |   86 |        88 |        90 |\n+-----+------+-----------+-----------+&#39;</code></pre>
+<div class="sourceCode" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="GLMMsPython.html#cb29-1" tabindex="-1"></a><span class="co"># Plot the predictions</span></span>
+<span id="cb29-2"><a href="GLMMsPython.html#cb29-2" tabindex="-1"></a><span class="co"># Make predictions of the mean without offset effect:</span></span>
+<span id="cb29-3"><a href="GLMMsPython.html#cb29-3" tabindex="-1"></a>bmbPreds1nb <span class="op">=</span> datP.copy() <span class="co">## IMPORTANT DIFF FROM R!!!</span></span>
+<span id="cb29-4"><a href="GLMMsPython.html#cb29-4" tabindex="-1"></a><span class="co">## if newdf = olddf, changes to newdf affect olddf!!!</span></span>
+<span id="cb29-5"><a href="GLMMsPython.html#cb29-5" tabindex="-1"></a>bmbPreds1nb[<span class="st">&quot;DaysOfCatch&quot;</span>] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb29-6"><a href="GLMMsPython.html#cb29-6" tabindex="-1"></a>predictions1nb <span class="op">=</span> model_bmb1nb.predict(idata_bmb1nb, data<span class="op">=</span>bmbPreds1nb, kind <span class="op">=</span> <span class="st">&quot;response_params&quot;</span>, inplace <span class="op">=</span> <span class="va">False</span>)</span>
+<span id="cb29-7"><a href="GLMMsPython.html#cb29-7" tabindex="-1"></a>post1nb <span class="op">=</span> predictions1nb.posterior</span>
+<span id="cb29-8"><a href="GLMMsPython.html#cb29-8" tabindex="-1"></a><span class="co"># post1nb</span></span>
+<span id="cb29-9"><a href="GLMMsPython.html#cb29-9" tabindex="-1"></a>bmbPreds1nb[<span class="st">&quot;preds&quot;</span>] <span class="op">=</span> post1nb.mean(dim<span class="op">=</span>[<span class="st">&quot;chain&quot;</span>, <span class="st">&quot;draw&quot;</span>])[<span class="st">&quot;mu&quot;</span>].values</span>
+<span id="cb29-10"><a href="GLMMsPython.html#cb29-10" tabindex="-1"></a>bmbPreds1nb[<span class="st">&quot;lowerCI&quot;</span>] <span class="op">=</span> post1nb.quantile(dim<span class="op">=</span>[<span class="st">&quot;chain&quot;</span>, <span class="st">&quot;draw&quot;</span>], q <span class="op">=</span> <span class="fl">0.025</span>)[<span class="st">&quot;mu&quot;</span>].values</span>
+<span id="cb29-11"><a href="GLMMsPython.html#cb29-11" tabindex="-1"></a>bmbPreds1nb[<span class="st">&quot;upperCI&quot;</span>] <span class="op">=</span> post1nb.quantile(dim<span class="op">=</span>[<span class="st">&quot;chain&quot;</span>, <span class="st">&quot;draw&quot;</span>], q <span class="op">=</span> <span class="fl">0.975</span>)[<span class="st">&quot;mu&quot;</span>].values</span>
+<span id="cb29-12"><a href="GLMMsPython.html#cb29-12" tabindex="-1"></a><span class="co"># bmbPreds1nb.describe()</span></span>
+<span id="cb29-13"><a href="GLMMsPython.html#cb29-13" tabindex="-1"></a></span>
+<span id="cb29-14"><a href="GLMMsPython.html#cb29-14" tabindex="-1"></a>plot1nb <span class="op">=</span> (ggplot(bmbPreds1nb, </span>
+<span id="cb29-15"><a href="GLMMsPython.html#cb29-15" tabindex="-1"></a>                aes(x <span class="op">=</span> <span class="st">&#39;DATI&#39;</span>, y<span class="op">=</span><span class="st">&#39;preds&#39;</span>, color <span class="op">=</span> <span class="st">&#39;Treatment&#39;</span>)) <span class="op">+</span></span>
+<span id="cb29-16"><a href="GLMMsPython.html#cb29-16" tabindex="-1"></a>        geom_line() <span class="op">+</span></span>
+<span id="cb29-17"><a href="GLMMsPython.html#cb29-17" tabindex="-1"></a>        geom_ribbon(aes(ymin <span class="op">=</span> <span class="st">&#39;lowerCI&#39;</span>, ymax <span class="op">=</span> <span class="st">&#39;upperCI&#39;</span>, fill <span class="op">=</span> <span class="st">&#39;Treatment&#39;</span>),</span>
+<span id="cb29-18"><a href="GLMMsPython.html#cb29-18" tabindex="-1"></a>              alpha <span class="op">=</span> <span class="fl">0.3</span>) <span class="op">+</span></span>
+<span id="cb29-19"><a href="GLMMsPython.html#cb29-19" tabindex="-1"></a>        geom_point(aes(x<span class="op">=</span><span class="st">&#39;DATI&#39;</span>, y<span class="op">=</span><span class="st">&#39;mothsperday&#39;</span>, color <span class="op">=</span> <span class="st">&#39;Treatment&#39;</span>), </span>
+<span id="cb29-20"><a href="GLMMsPython.html#cb29-20" tabindex="-1"></a>            data <span class="op">=</span> mean_cts, size <span class="op">=</span> <span class="fl">1.1</span>) <span class="op">+</span></span>
+<span id="cb29-21"><a href="GLMMsPython.html#cb29-21" tabindex="-1"></a>        facet_wrap([<span class="st">&#39;Location&#39;</span>], scales <span class="op">=</span> <span class="st">&quot;free_y&quot;</span>) <span class="op">+</span></span>
+<span id="cb29-22"><a href="GLMMsPython.html#cb29-22" tabindex="-1"></a>        scale_color_manual(values <span class="op">=</span> mycolors) <span class="op">+</span></span>
+<span id="cb29-23"><a href="GLMMsPython.html#cb29-23" tabindex="-1"></a>        scale_fill_manual(values <span class="op">=</span> mycolors) <span class="op">+</span></span>
+<span id="cb29-24"><a href="GLMMsPython.html#cb29-24" tabindex="-1"></a>        labs(title <span class="op">=</span> <span class="st">&quot;Bayes (bambi) NB GLM predictions&quot;</span>,</span>
+<span id="cb29-25"><a href="GLMMsPython.html#cb29-25" tabindex="-1"></a>             subtitle <span class="op">=</span> <span class="st">&quot;Lines are predictions, points are the data&quot;</span>,</span>
+<span id="cb29-26"><a href="GLMMsPython.html#cb29-26" tabindex="-1"></a>             x <span class="op">=</span> <span class="st">&quot;Days after installation&quot;</span>,</span>
+<span id="cb29-27"><a href="GLMMsPython.html#cb29-27" tabindex="-1"></a>             y <span class="op">=</span> <span class="st">&quot;Moth counts per day&quot;</span>))</span>
+<span id="cb29-28"><a href="GLMMsPython.html#cb29-28" tabindex="-1"></a><span class="co"># plot1nb.save(filename=&#39;plot1nb.png&#39;, path=&#39;output/&#39;)</span></span>
+<span id="cb29-29"><a href="GLMMsPython.html#cb29-29" tabindex="-1"></a><span class="co"># plot1nb.draw(True)</span></span>
+<span id="cb29-30"><a href="GLMMsPython.html#cb29-30" tabindex="-1"></a>plot1nb.show()</span></code></pre></div>
+<p><img src="03-GLMMsInPython_files/figure-html/nbBambi1TR-1.png" width="100%" /></p>
+<p>The figure looks almost identical to the the frequent predictions (Figure <a href="#p1nb-glmFigPy"><strong>??</strong></a>).</p>
 </div>
 </div>
 <div id="bayesian-pymc-models-python" class="section level3 hasAnchor" number="4.4.4">
 <h3><span class="header-section-number">4.4.4</span> Bayesian (PyMC) models– Python<a href="GLMMsPython.html#bayesian-pymc-models-python" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>For most needs, the <code>bambi</code> module should suffice. However, when building complicated non-linear functions with multi-dimensional Gaussian Processes, I may need a more foundational module– PyMC. Therefore, I also build the models using this module. Learning PyMC will also help with extracting derived parameters and predictions, etc. from bambi.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="GLMMsPython.html#cb29-1" tabindex="-1"></a><span class="co"># NB Bayes:</span></span>
-<span id="cb29-2"><a href="GLMMsPython.html#cb29-2" tabindex="-1"></a><span class="co">#https://discourse.pymc.io/t/biased-results-from-poisson-regression-model/4349/5</span></span>
-<span id="cb29-3"><a href="GLMMsPython.html#cb29-3" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb29-4"><a href="GLMMsPython.html#cb29-4" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb29-5"><a href="GLMMsPython.html#cb29-5" tabindex="-1"></a></span>
-<span id="cb29-6"><a href="GLMMsPython.html#cb29-6" tabindex="-1"></a><span class="im">from</span> formulae <span class="im">import</span> design_matrices</span>
-<span id="cb29-7"><a href="GLMMsPython.html#cb29-7" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
-<span id="cb29-8"><a href="GLMMsPython.html#cb29-8" tabindex="-1"></a><span class="co"># Create the design matrix using formulae</span></span>
-<span id="cb29-9"><a href="GLMMsPython.html#cb29-9" tabindex="-1"></a><span class="co"># Wrapping the variable in &#39;C()&#39; enforces categorical values, with the first entry as the reference</span></span>
-<span id="cb29-10"><a href="GLMMsPython.html#cb29-10" tabindex="-1"></a>dm <span class="op">=</span> design_matrices(<span class="st">&#39;nYSB ~ C(Treatment)&#39;</span>, data<span class="op">=</span>datP, na_action<span class="op">=</span><span class="st">&#39;error&#39;</span>)</span>
-<span id="cb29-11"><a href="GLMMsPython.html#cb29-11" tabindex="-1"></a><span class="co"># print(dm.common.as_dataframe().head())</span></span>
-<span id="cb29-12"><a href="GLMMsPython.html#cb29-12" tabindex="-1"></a></span>
-<span id="cb29-13"><a href="GLMMsPython.html#cb29-13" tabindex="-1"></a><span class="co"># Expand out into X and y</span></span>
-<span id="cb29-14"><a href="GLMMsPython.html#cb29-14" tabindex="-1"></a>X <span class="op">=</span> dm.common.as_dataframe()</span>
-<span id="cb29-15"><a href="GLMMsPython.html#cb29-15" tabindex="-1"></a>y <span class="op">=</span> dm.response.as_dataframe().squeeze() <span class="co"># This ensures y is 1-dimensional. </span></span>
-<span id="cb29-16"><a href="GLMMsPython.html#cb29-16" tabindex="-1"></a></span>
-<span id="cb29-17"><a href="GLMMsPython.html#cb29-17" tabindex="-1"></a>DaysOfCatch <span class="op">=</span> datP[<span class="st">&#39;DaysOfCatch&#39;</span>]</span>
-<span id="cb29-18"><a href="GLMMsPython.html#cb29-18" tabindex="-1"></a></span>
-<span id="cb29-19"><a href="GLMMsPython.html#cb29-19" tabindex="-1"></a><span class="co"># Create labelled coords which help the model keep track of everything(i.e., use factor names)</span></span>
-<span id="cb29-20"><a href="GLMMsPython.html#cb29-20" tabindex="-1"></a>c <span class="op">=</span> {<span class="st">&#39;predictors&#39;</span>: X.columns, <span class="co"># Model now aware of number of and labels of predictors</span></span>
-<span id="cb29-21"><a href="GLMMsPython.html#cb29-21" tabindex="-1"></a>     <span class="st">&#39;N&#39;</span>: <span class="bu">range</span>(<span class="bu">len</span>(y))} <span class="co"># and number of observations</span></span>
-<span id="cb29-22"><a href="GLMMsPython.html#cb29-22" tabindex="-1"></a></span>
-<span id="cb29-23"><a href="GLMMsPython.html#cb29-23" tabindex="-1"></a><span class="cf">with</span> pm.Model(coords <span class="op">=</span> c) <span class="im">as</span> model_pymc1nb:</span>
-<span id="cb29-24"><a href="GLMMsPython.html#cb29-24" tabindex="-1"></a>    <span class="co"># Set the data, and convert to NumPy arrays (to use matrix multiplication</span></span>
-<span id="cb29-25"><a href="GLMMsPython.html#cb29-25" tabindex="-1"></a>    Xdata <span class="op">=</span> pm.Data(<span class="st">&#39;Xdata&#39;</span>, X.to_numpy())</span>
-<span id="cb29-26"><a href="GLMMsPython.html#cb29-26" tabindex="-1"></a>    Ydata <span class="op">=</span> pm.Data(<span class="st">&#39;Ydata&#39;</span>, y.to_numpy())</span>
-<span id="cb29-27"><a href="GLMMsPython.html#cb29-27" tabindex="-1"></a>    </span>
-<span id="cb29-28"><a href="GLMMsPython.html#cb29-28" tabindex="-1"></a>    <span class="co"># priors</span></span>
-<span id="cb29-29"><a href="GLMMsPython.html#cb29-29" tabindex="-1"></a>    <span class="co"># factor_coefs = pm.Normal(&#39;factor_coefs&#39;, mu=0, sigma=2, shape=len(X.columns))    </span></span>
-<span id="cb29-30"><a href="GLMMsPython.html#cb29-30" tabindex="-1"></a>    beta <span class="op">=</span> pm.Normal(<span class="st">&#39;beta&#39;</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="dv">2</span>, dims <span class="op">=</span> <span class="st">&#39;predictors&#39;</span>)</span>
-<span id="cb29-31"><a href="GLMMsPython.html#cb29-31" tabindex="-1"></a>    alpha <span class="op">=</span> pm.HalfCauchy(<span class="st">&#39;alpha&#39;</span>, beta <span class="op">=</span> <span class="dv">1</span>)</span>
-<span id="cb29-32"><a href="GLMMsPython.html#cb29-32" tabindex="-1"></a></span>
-<span id="cb29-33"><a href="GLMMsPython.html#cb29-33" tabindex="-1"></a>    <span class="co"># TR derived parameter:</span></span>
-<span id="cb29-34"><a href="GLMMsPython.html#cb29-34" tabindex="-1"></a>    TR <span class="op">=</span> pm.Deterministic(<span class="st">&#39;TR&#39;</span>, <span class="dv">100</span> <span class="op">-</span> <span class="dv">100</span> <span class="op">*</span> np.exp(beta[<span class="dv">1</span>]))</span>
-<span id="cb29-35"><a href="GLMMsPython.html#cb29-35" tabindex="-1"></a>    </span>
-<span id="cb29-36"><a href="GLMMsPython.html#cb29-36" tabindex="-1"></a>    <span class="co"># likelihood:</span></span>
-<span id="cb29-37"><a href="GLMMsPython.html#cb29-37" tabindex="-1"></a>    mu <span class="op">=</span> pm.math.exp(Xdata <span class="op">@</span> beta <span class="op">+</span> <span class="co"># pm.math.dot(X, factor_coefs) + #@ operator is for matrix multiplication </span></span>
-<span id="cb29-38"><a href="GLMMsPython.html#cb29-38" tabindex="-1"></a>                     np.log(DaysOfCatch)) </span>
-<span id="cb29-39"><a href="GLMMsPython.html#cb29-39" tabindex="-1"></a>    pm.NegativeBinomial(<span class="st">&#39;y&#39;</span>, mu<span class="op">=</span>mu, alpha <span class="op">=</span> alpha, observed<span class="op">=</span>Ydata)</span>
-<span id="cb29-40"><a href="GLMMsPython.html#cb29-40" tabindex="-1"></a>    </span>
-<span id="cb29-41"><a href="GLMMsPython.html#cb29-41" tabindex="-1"></a>    <span class="co"># Sample according to your specifications, but tune for longer and take fewer draws</span></span>
-<span id="cb29-42"><a href="GLMMsPython.html#cb29-42" tabindex="-1"></a>    pymc1nb <span class="op">=</span> pm.sample(draws<span class="op">=</span><span class="dv">1000</span>, tune<span class="op">=</span><span class="dv">3000</span>, cores<span class="op">=</span><span class="dv">4</span>, random_seed<span class="op">=</span><span class="dv">45</span>, step<span class="op">=</span>pm.NUTS())<span class="co">#Metropolis())</span></span>
-<span id="cb29-43"><a href="GLMMsPython.html#cb29-43" tabindex="-1"></a>    <span class="co"># pymc1nb is called &#39;trace&#39; in lots of the help files</span></span>
-<span id="cb29-44"><a href="GLMMsPython.html#cb29-44" tabindex="-1"></a></span>
-<span id="cb29-45"><a href="GLMMsPython.html#cb29-45" tabindex="-1"></a></span>
-<span id="cb29-46"><a href="GLMMsPython.html#cb29-46" tabindex="-1"></a><span class="im">import</span> pickle <span class="co"># to save PyMC object to file.</span></span>
-<span id="cb29-47"><a href="GLMMsPython.html#cb29-47" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">&#39;output/respymc1nb.pkl&#39;</span></span>
-<span id="cb29-48"><a href="GLMMsPython.html#cb29-48" tabindex="-1"></a><span class="co"># save bambi object to file.</span></span>
-<span id="cb29-49"><a href="GLMMsPython.html#cb29-49" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(filename, <span class="st">&#39;wb&#39;</span>) <span class="im">as</span> <span class="bu">file</span>:</span>
-<span id="cb29-50"><a href="GLMMsPython.html#cb29-50" tabindex="-1"></a>    pickle.dump(pymc1nb, <span class="bu">file</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb30"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="GLMMsPython.html#cb30-1" tabindex="-1"></a><span class="co"># Load the object from the file</span></span>
-<span id="cb30-2"><a href="GLMMsPython.html#cb30-2" tabindex="-1"></a><span class="im">import</span> pickle</span>
-<span id="cb30-3"><a href="GLMMsPython.html#cb30-3" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">&#39;output/respymc1nb.pkl&#39;</span></span>
-<span id="cb30-4"><a href="GLMMsPython.html#cb30-4" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(filename, <span class="st">&#39;rb&#39;</span>) <span class="im">as</span> <span class="bu">file</span>:</span>
-<span id="cb30-5"><a href="GLMMsPython.html#cb30-5" tabindex="-1"></a>    pymc1nb <span class="op">=</span> pickle.load(<span class="bu">file</span>)</span>
-<span id="cb30-6"><a href="GLMMsPython.html#cb30-6" tabindex="-1"></a></span>
-<span id="cb30-7"><a href="GLMMsPython.html#cb30-7" tabindex="-1"></a><span class="co"># summary stats</span></span>
-<span id="cb30-8"><a href="GLMMsPython.html#cb30-8" tabindex="-1"></a><span class="bu">print</span>(az.summary(pymc1nb))</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="GLMMsPython.html#cb30-1" tabindex="-1"></a><span class="co"># NB Bayes:</span></span>
+<span id="cb30-2"><a href="GLMMsPython.html#cb30-2" tabindex="-1"></a><span class="co">#https://discourse.pymc.io/t/biased-results-from-poisson-regression-model/4349/5</span></span>
+<span id="cb30-3"><a href="GLMMsPython.html#cb30-3" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb30-4"><a href="GLMMsPython.html#cb30-4" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb30-5"><a href="GLMMsPython.html#cb30-5" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="GLMMsPython.html#cb30-6" tabindex="-1"></a><span class="im">from</span> formulae <span class="im">import</span> design_matrices</span>
+<span id="cb30-7"><a href="GLMMsPython.html#cb30-7" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
+<span id="cb30-8"><a href="GLMMsPython.html#cb30-8" tabindex="-1"></a><span class="co"># Create the design matrix using formulae</span></span>
+<span id="cb30-9"><a href="GLMMsPython.html#cb30-9" tabindex="-1"></a><span class="co"># Wrapping the variable in &#39;C()&#39; enforces categorical values, with the first entry as the reference</span></span>
+<span id="cb30-10"><a href="GLMMsPython.html#cb30-10" tabindex="-1"></a>dm <span class="op">=</span> design_matrices(<span class="st">&#39;nYSB ~ C(Treatment)&#39;</span>, data<span class="op">=</span>datP, na_action<span class="op">=</span><span class="st">&#39;error&#39;</span>)</span>
+<span id="cb30-11"><a href="GLMMsPython.html#cb30-11" tabindex="-1"></a><span class="co"># print(dm.common.as_dataframe().head())</span></span>
+<span id="cb30-12"><a href="GLMMsPython.html#cb30-12" tabindex="-1"></a></span>
+<span id="cb30-13"><a href="GLMMsPython.html#cb30-13" tabindex="-1"></a><span class="co"># Expand out into X and y</span></span>
+<span id="cb30-14"><a href="GLMMsPython.html#cb30-14" tabindex="-1"></a>X <span class="op">=</span> dm.common.as_dataframe()</span>
+<span id="cb30-15"><a href="GLMMsPython.html#cb30-15" tabindex="-1"></a>y <span class="op">=</span> dm.response.as_dataframe().squeeze() <span class="co"># This ensures y is 1-dimensional. </span></span>
+<span id="cb30-16"><a href="GLMMsPython.html#cb30-16" tabindex="-1"></a></span>
+<span id="cb30-17"><a href="GLMMsPython.html#cb30-17" tabindex="-1"></a>log_DaysOfCatch <span class="op">=</span> np.log(datP[<span class="st">&#39;DaysOfCatch&#39;</span>])</span>
+<span id="cb30-18"><a href="GLMMsPython.html#cb30-18" tabindex="-1"></a></span>
+<span id="cb30-19"><a href="GLMMsPython.html#cb30-19" tabindex="-1"></a><span class="co"># Create labelled coords which help the model keep track of everything(i.e., use factor names)</span></span>
+<span id="cb30-20"><a href="GLMMsPython.html#cb30-20" tabindex="-1"></a>c <span class="op">=</span> {<span class="st">&#39;predictors&#39;</span>: X.columns, <span class="co"># Model now aware of number of and labels of predictors</span></span>
+<span id="cb30-21"><a href="GLMMsPython.html#cb30-21" tabindex="-1"></a>     <span class="st">&#39;N&#39;</span>: <span class="bu">range</span>(<span class="bu">len</span>(y))} <span class="co"># and number of observations</span></span>
+<span id="cb30-22"><a href="GLMMsPython.html#cb30-22" tabindex="-1"></a>     <span class="co"># &#39;DaysOfCatch&#39;: np.log(datP[&#39;DaysOfCatch&#39;])} </span></span>
+<span id="cb30-23"><a href="GLMMsPython.html#cb30-23" tabindex="-1"></a></span>
+<span id="cb30-24"><a href="GLMMsPython.html#cb30-24" tabindex="-1"></a><span class="cf">with</span> pm.Model(coords <span class="op">=</span> c) <span class="im">as</span> model_pymc1nb:</span>
+<span id="cb30-25"><a href="GLMMsPython.html#cb30-25" tabindex="-1"></a>    <span class="co"># Set the data, and convert to NumPy arrays (to use matrix multiplication</span></span>
+<span id="cb30-26"><a href="GLMMsPython.html#cb30-26" tabindex="-1"></a>    Xdata <span class="op">=</span> pm.Data(<span class="st">&#39;Xdata&#39;</span>, X.to_numpy())</span>
+<span id="cb30-27"><a href="GLMMsPython.html#cb30-27" tabindex="-1"></a>    Ydata <span class="op">=</span> pm.Data(<span class="st">&#39;Ydata&#39;</span>, y.to_numpy())</span>
+<span id="cb30-28"><a href="GLMMsPython.html#cb30-28" tabindex="-1"></a>    </span>
+<span id="cb30-29"><a href="GLMMsPython.html#cb30-29" tabindex="-1"></a>    <span class="co"># priors</span></span>
+<span id="cb30-30"><a href="GLMMsPython.html#cb30-30" tabindex="-1"></a>    <span class="co"># factor_coefs = pm.Normal(&#39;factor_coefs&#39;, mu=0, sigma=2, shape=len(X.columns))    </span></span>
+<span id="cb30-31"><a href="GLMMsPython.html#cb30-31" tabindex="-1"></a>    beta <span class="op">=</span> pm.Normal(<span class="st">&#39;beta&#39;</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="dv">2</span>, dims <span class="op">=</span> <span class="st">&#39;predictors&#39;</span>)</span>
+<span id="cb30-32"><a href="GLMMsPython.html#cb30-32" tabindex="-1"></a>    alpha <span class="op">=</span> pm.HalfCauchy(<span class="st">&#39;alpha&#39;</span>, beta <span class="op">=</span> <span class="dv">1</span>)</span>
+<span id="cb30-33"><a href="GLMMsPython.html#cb30-33" tabindex="-1"></a></span>
+<span id="cb30-34"><a href="GLMMsPython.html#cb30-34" tabindex="-1"></a>    <span class="co"># TR derived parameter:</span></span>
+<span id="cb30-35"><a href="GLMMsPython.html#cb30-35" tabindex="-1"></a>    TR <span class="op">=</span> pm.Deterministic(<span class="st">&#39;TR&#39;</span>, <span class="dv">100</span> <span class="op">-</span> <span class="dv">100</span> <span class="op">*</span> np.exp(beta[<span class="dv">1</span>]))</span>
+<span id="cb30-36"><a href="GLMMsPython.html#cb30-36" tabindex="-1"></a>    </span>
+<span id="cb30-37"><a href="GLMMsPython.html#cb30-37" tabindex="-1"></a>    <span class="co"># likelihood:</span></span>
+<span id="cb30-38"><a href="GLMMsPython.html#cb30-38" tabindex="-1"></a>    mu <span class="op">=</span> pm.math.exp(Xdata <span class="op">@</span> beta <span class="op">+</span> <span class="co"># #@ operator is for matrix multiplication </span></span>
+<span id="cb30-39"><a href="GLMMsPython.html#cb30-39" tabindex="-1"></a>                     log_DaysOfCatch)</span>
+<span id="cb30-40"><a href="GLMMsPython.html#cb30-40" tabindex="-1"></a>    pm.NegativeBinomial(<span class="st">&#39;y&#39;</span>, mu<span class="op">=</span>mu, alpha <span class="op">=</span> alpha, observed<span class="op">=</span>Ydata)</span></code></pre></div>
+<pre><code>## y</code></pre>
+<div class="sourceCode" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="GLMMsPython.html#cb32-1" tabindex="-1"></a><span class="cf">with</span> model_pymc1nb:</span>
+<span id="cb32-2"><a href="GLMMsPython.html#cb32-2" tabindex="-1"></a>    <span class="co"># Sample according to your specifications, but tune for longer and take fewer draws</span></span>
+<span id="cb32-3"><a href="GLMMsPython.html#cb32-3" tabindex="-1"></a>    idata_pymc1nb <span class="op">=</span> pm.sample(draws<span class="op">=</span><span class="dv">1000</span>, tune<span class="op">=</span><span class="dv">3000</span>, cores<span class="op">=</span><span class="dv">4</span>, random_seed<span class="op">=</span><span class="dv">45</span>, step<span class="op">=</span>pm.NUTS())<span class="co">#Metropolis())</span></span>
+<span id="cb32-4"><a href="GLMMsPython.html#cb32-4" tabindex="-1"></a>    <span class="co"># pymc1nb is called &#39;trace&#39; in lots of the help files</span></span>
+<span id="cb32-5"><a href="GLMMsPython.html#cb32-5" tabindex="-1"></a></span>
+<span id="cb32-6"><a href="GLMMsPython.html#cb32-6" tabindex="-1"></a></span>
+<span id="cb32-7"><a href="GLMMsPython.html#cb32-7" tabindex="-1"></a><span class="im">import</span> pickle <span class="co"># to save PyMC object to file.</span></span>
+<span id="cb32-8"><a href="GLMMsPython.html#cb32-8" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">&#39;output/idata_pymc1nb.pkl&#39;</span></span>
+<span id="cb32-9"><a href="GLMMsPython.html#cb32-9" tabindex="-1"></a><span class="co"># save bambi object to file.</span></span>
+<span id="cb32-10"><a href="GLMMsPython.html#cb32-10" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(filename, <span class="st">&#39;wb&#39;</span>) <span class="im">as</span> <span class="bu">file</span>:</span>
+<span id="cb32-11"><a href="GLMMsPython.html#cb32-11" tabindex="-1"></a>    pickle.dump(idata_pymc1nb, <span class="bu">file</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="GLMMsPython.html#cb33-1" tabindex="-1"></a><span class="co"># Load the object from the file</span></span>
+<span id="cb33-2"><a href="GLMMsPython.html#cb33-2" tabindex="-1"></a><span class="im">import</span> pickle</span>
+<span id="cb33-3"><a href="GLMMsPython.html#cb33-3" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">&#39;output/idata_pymc1nb.pkl&#39;</span></span>
+<span id="cb33-4"><a href="GLMMsPython.html#cb33-4" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(filename, <span class="st">&#39;rb&#39;</span>) <span class="im">as</span> <span class="bu">file</span>:</span>
+<span id="cb33-5"><a href="GLMMsPython.html#cb33-5" tabindex="-1"></a>    idata_pymc1nb <span class="op">=</span> pickle.load(<span class="bu">file</span>)</span>
+<span id="cb33-6"><a href="GLMMsPython.html#cb33-6" tabindex="-1"></a></span>
+<span id="cb33-7"><a href="GLMMsPython.html#cb33-7" tabindex="-1"></a><span class="co"># summary stats</span></span>
+<span id="cb33-8"><a href="GLMMsPython.html#cb33-8" tabindex="-1"></a><span class="bu">print</span>(az.summary(idata_pymc1nb))</span></code></pre></div>
 <pre><code>##                            mean     sd  hdi_3%  hdi_97%  mcse_mean  mcse_sd  \
 ## beta[Intercept]           1.402  0.067   1.279    1.532      0.001    0.001   
 ## beta[C(Treatment)[Trt]]  -2.160  0.099  -2.348   -1.981      0.002    0.001   
@@ -1097,14 +1175,130 @@ Figure 4.3: Negative binomial GLM predictions (Python).
 ## beta[C(Treatment)[Trt]]    2184.0    2559.0    1.0  
 ## alpha                      3165.0    2350.0    1.0  
 ## TR                         2184.0    2559.0    1.0</code></pre>
-<div class="sourceCode" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="GLMMsPython.html#cb32-1" tabindex="-1"></a><span class="co"># CALC TR!</span></span>
-<span id="cb32-2"><a href="GLMMsPython.html#cb32-2" tabindex="-1"></a><span class="bu">print</span>(az.summary(pymc1nb, var_names<span class="op">=</span>[<span class="st">&#39;TR&#39;</span>]))</span></code></pre></div>
-<pre><code>##       mean     sd  hdi_3%  hdi_97%  mcse_mean  mcse_sd  ess_bulk  ess_tail  \
-## TR  88.406  1.141  86.308   90.527      0.024    0.017    2184.0    2559.0   
-## 
-##     r_hat  
-## TR    1.0</code></pre>
-<div class="sourceCode" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="GLMMsPython.html#cb34-1" tabindex="-1"></a><span class="co"># outTR1nb = round(TR1nb.quantile(q=[0.025, 0.5, 0.975]).to_pandas())</span></span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb35-1"><a href="GLMMsPython.html#cb35-1" tabindex="-1"></a>tmp1nbPyMC <span class="op">=</span> az.summary(idata_pymc1nb).iloc[<span class="dv">0</span>:<span class="dv">3</span>,<span class="dv">0</span>:<span class="dv">4</span>]</span></code></pre></div>
+<table>
+<caption><span id="tab:compareCoef1nb">Table 4.2: </span>Coefficient estimates from the Bayesian framework, fit using the PyMC module</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">hdi_3%</th>
+<th align="right">hdi_97%</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">beta[Intercept]</td>
+<td align="right">1.402</td>
+<td align="right">0.067</td>
+<td align="right">1.279</td>
+<td align="right">1.532</td>
+</tr>
+<tr class="even">
+<td align="left">beta[C(Treatment)[Trt]]</td>
+<td align="right">-2.160</td>
+<td align="right">0.099</td>
+<td align="right">-2.348</td>
+<td align="right">-1.981</td>
+</tr>
+<tr class="odd">
+<td align="left">alpha</td>
+<td align="right">0.655</td>
+<td align="right">0.035</td>
+<td align="right">0.591</td>
+<td align="right">0.720</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption><span id="tab:compareCoef1nb">Table 4.2: </span>Coefficient estimates from the frequentist framework, fit using sm.NegativeBinomial().</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Estimate</th>
+<th align="right">SE</th>
+<th align="right">lowerCI</th>
+<th align="right">upperCI</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Intercept</td>
+<td align="right">1.402</td>
+<td align="right">0.068</td>
+<td align="right">1.269</td>
+<td align="right">1.535</td>
+</tr>
+<tr class="even">
+<td align="left">Treatment[T.Trt]</td>
+<td align="right">-2.164</td>
+<td align="right">0.099</td>
+<td align="right">-2.358</td>
+<td align="right">-1.970</td>
+</tr>
+<tr class="odd">
+<td align="left">alpha</td>
+<td align="right">1.524</td>
+<td align="right">0.082</td>
+<td align="right">1.364</td>
+<td align="right">1.685</td>
+</tr>
+</tbody>
+</table>
+<p>Here, PyMC computes the inverse of the shape function. In future runs, it will be renamed “inversealpha”, and an “alpha” will also be derived for direct comparison.</p>
+<div id="predictions-5" class="section level4 hasAnchor" number="4.4.4.1">
+<h4><span class="header-section-number">4.4.4.1</span> Predictions<a href="GLMMsPython.html#predictions-5" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div class="sourceCode" id="cb36"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb36-1"><a href="GLMMsPython.html#cb36-1" tabindex="-1"></a><span class="co"># CALC TR:</span></span>
+<span id="cb36-2"><a href="GLMMsPython.html#cb36-2" tabindex="-1"></a>tmpTR <span class="op">=</span> az.summary(idata_pymc1nb, var_names<span class="op">=</span>[<span class="st">&#39;TR&#39;</span>])</span>
+<span id="cb36-3"><a href="GLMMsPython.html#cb36-3" tabindex="-1"></a>tabulate(<span class="bu">round</span>(tmpTR.iloc[:,[<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">3</span>]], <span class="dv">1</span>), tablefmt<span class="op">=</span><span class="st">&quot;grid&quot;</span>, headers <span class="op">=</span> [<span class="st">&quot;TR&quot;</span>, <span class="st">&quot;lowerCI&quot;</span>, <span class="st">&quot;upperCI&quot;</span>])</span></code></pre></div>
+<pre><code>## &#39;+----+------+-----------+-----------+\n|    |   TR |   lowerCI |   upperCI |\n+====+======+===========+===========+\n| TR | 88.4 |      86.3 |      90.5 |\n+----+------+-----------+-----------+&#39;</code></pre>
+<div class="sourceCode" id="cb38"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb38-1"><a href="GLMMsPython.html#cb38-1" tabindex="-1"></a><span class="co"># create new predictions to plot:</span></span>
+<span id="cb38-2"><a href="GLMMsPython.html#cb38-2" tabindex="-1"></a>pymcPreds1nb <span class="op">=</span> datP.copy() </span>
+<span id="cb38-3"><a href="GLMMsPython.html#cb38-3" tabindex="-1"></a>pymcPreds1nb[<span class="st">&quot;DaysOfCatch&quot;</span>] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb38-4"><a href="GLMMsPython.html#cb38-4" tabindex="-1"></a>new_log_DaysOfCatch <span class="op">=</span> np.full(<span class="bu">len</span>(log_DaysOfCatch), np.log(pymcPreds1nb[<span class="st">&quot;DaysOfCatch&quot;</span>]))</span>
+<span id="cb38-5"><a href="GLMMsPython.html#cb38-5" tabindex="-1"></a>new_logDaysOfCatch_reshaped <span class="op">=</span> new_log_DaysOfCatch[:, np.newaxis]</span>
+<span id="cb38-6"><a href="GLMMsPython.html#cb38-6" tabindex="-1"></a>new_Xdata <span class="op">=</span> X.to_numpy()</span>
+<span id="cb38-7"><a href="GLMMsPython.html#cb38-7" tabindex="-1"></a>    </span>
+<span id="cb38-8"><a href="GLMMsPython.html#cb38-8" tabindex="-1"></a>post3d <span class="op">=</span>  idata_pymc1nb.posterior[<span class="st">&quot;beta&quot;</span>].to_numpy()</span>
+<span id="cb38-9"><a href="GLMMsPython.html#cb38-9" tabindex="-1"></a>posterior_betas <span class="op">=</span> post3d.reshape(<span class="op">-</span><span class="dv">1</span>, post3d.shape[<span class="dv">2</span>])</span>
+<span id="cb38-10"><a href="GLMMsPython.html#cb38-10" tabindex="-1"></a></span>
+<span id="cb38-11"><a href="GLMMsPython.html#cb38-11" tabindex="-1"></a>posterior_mu_samples <span class="op">=</span> np.exp(</span>
+<span id="cb38-12"><a href="GLMMsPython.html#cb38-12" tabindex="-1"></a>    new_Xdata <span class="op">@</span> posterior_betas.T <span class="op">+</span> new_logDaysOfCatch_reshaped</span>
+<span id="cb38-13"><a href="GLMMsPython.html#cb38-13" tabindex="-1"></a>)</span>
+<span id="cb38-14"><a href="GLMMsPython.html#cb38-14" tabindex="-1"></a></span>
+<span id="cb38-15"><a href="GLMMsPython.html#cb38-15" tabindex="-1"></a></span>
+<span id="cb38-16"><a href="GLMMsPython.html#cb38-16" tabindex="-1"></a><span class="co"># The posterior predictive mean is the mean of the posterior mu samples</span></span>
+<span id="cb38-17"><a href="GLMMsPython.html#cb38-17" tabindex="-1"></a>mean_predicted_response <span class="op">=</span> posterior_mu_samples.mean(axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb38-18"><a href="GLMMsPython.html#cb38-18" tabindex="-1"></a><span class="co"># You can also get other statistics, like a 95% credible interval</span></span>
+<span id="cb38-19"><a href="GLMMsPython.html#cb38-19" tabindex="-1"></a>hdi_predicted_response <span class="op">=</span> az.hdi(posterior_mu_samples.T)</span>
+<span id="cb38-20"><a href="GLMMsPython.html#cb38-20" tabindex="-1"></a></span>
+<span id="cb38-21"><a href="GLMMsPython.html#cb38-21" tabindex="-1"></a></span>
+<span id="cb38-22"><a href="GLMMsPython.html#cb38-22" tabindex="-1"></a><span class="co"># Display the results</span></span>
+<span id="cb38-23"><a href="GLMMsPython.html#cb38-23" tabindex="-1"></a>pymcPreds1nb[<span class="st">&quot;preds&quot;</span>] <span class="op">=</span> mean_predicted_response</span>
+<span id="cb38-24"><a href="GLMMsPython.html#cb38-24" tabindex="-1"></a>pymcPreds1nb[<span class="st">&quot;lowerCI&quot;</span>] <span class="op">=</span>  hdi_predicted_response[:, <span class="dv">0</span>]</span>
+<span id="cb38-25"><a href="GLMMsPython.html#cb38-25" tabindex="-1"></a>pymcPreds1nb[<span class="st">&quot;upperCI&quot;</span>] <span class="op">=</span>  hdi_predicted_response[:, <span class="dv">1</span>]</span>
+<span id="cb38-26"><a href="GLMMsPython.html#cb38-26" tabindex="-1"></a><span class="co"># pymcPreds1nb.describe()</span></span>
+<span id="cb38-27"><a href="GLMMsPython.html#cb38-27" tabindex="-1"></a></span>
+<span id="cb38-28"><a href="GLMMsPython.html#cb38-28" tabindex="-1"></a>plot1nbPyMC <span class="op">=</span> (ggplot(pymcPreds1nb, </span>
+<span id="cb38-29"><a href="GLMMsPython.html#cb38-29" tabindex="-1"></a>                aes(x <span class="op">=</span> <span class="st">&#39;DATI&#39;</span>, y<span class="op">=</span><span class="st">&#39;preds&#39;</span>, color <span class="op">=</span> <span class="st">&#39;Treatment&#39;</span>)) <span class="op">+</span></span>
+<span id="cb38-30"><a href="GLMMsPython.html#cb38-30" tabindex="-1"></a>        geom_line() <span class="op">+</span></span>
+<span id="cb38-31"><a href="GLMMsPython.html#cb38-31" tabindex="-1"></a>        geom_ribbon(aes(ymin <span class="op">=</span> <span class="st">&#39;lowerCI&#39;</span>, ymax <span class="op">=</span> <span class="st">&#39;upperCI&#39;</span>, fill <span class="op">=</span> <span class="st">&#39;Treatment&#39;</span>),</span>
+<span id="cb38-32"><a href="GLMMsPython.html#cb38-32" tabindex="-1"></a>              alpha <span class="op">=</span> <span class="fl">0.3</span>) <span class="op">+</span></span>
+<span id="cb38-33"><a href="GLMMsPython.html#cb38-33" tabindex="-1"></a>        geom_point(aes(x<span class="op">=</span><span class="st">&#39;DATI&#39;</span>, y<span class="op">=</span><span class="st">&#39;mothsperday&#39;</span>, color <span class="op">=</span> <span class="st">&#39;Treatment&#39;</span>), </span>
+<span id="cb38-34"><a href="GLMMsPython.html#cb38-34" tabindex="-1"></a>            data <span class="op">=</span> mean_cts, size <span class="op">=</span> <span class="fl">1.1</span>) <span class="op">+</span></span>
+<span id="cb38-35"><a href="GLMMsPython.html#cb38-35" tabindex="-1"></a>        facet_wrap([<span class="st">&#39;Location&#39;</span>], scales <span class="op">=</span> <span class="st">&quot;free_y&quot;</span>) <span class="op">+</span></span>
+<span id="cb38-36"><a href="GLMMsPython.html#cb38-36" tabindex="-1"></a>        scale_color_manual(values <span class="op">=</span> mycolors) <span class="op">+</span></span>
+<span id="cb38-37"><a href="GLMMsPython.html#cb38-37" tabindex="-1"></a>        scale_fill_manual(values <span class="op">=</span> mycolors) <span class="op">+</span></span>
+<span id="cb38-38"><a href="GLMMsPython.html#cb38-38" tabindex="-1"></a>        labs(title <span class="op">=</span> <span class="st">&quot;Bayes (PyMC) NB GLM predictions&quot;</span>,</span>
+<span id="cb38-39"><a href="GLMMsPython.html#cb38-39" tabindex="-1"></a>             subtitle <span class="op">=</span> <span class="st">&quot;Lines are predictions, points are the data&quot;</span>,</span>
+<span id="cb38-40"><a href="GLMMsPython.html#cb38-40" tabindex="-1"></a>             x <span class="op">=</span> <span class="st">&quot;Days after installation&quot;</span>,</span>
+<span id="cb38-41"><a href="GLMMsPython.html#cb38-41" tabindex="-1"></a>             y <span class="op">=</span> <span class="st">&quot;Moth counts per day&quot;</span>))</span>
+<span id="cb38-42"><a href="GLMMsPython.html#cb38-42" tabindex="-1"></a><span class="co"># plot1nb.save(filename=&#39;plot1nb.png&#39;, path=&#39;output/&#39;)</span></span>
+<span id="cb38-43"><a href="GLMMsPython.html#cb38-43" tabindex="-1"></a><span class="co"># plot1nb.draw(True)</span></span>
+<span id="cb38-44"><a href="GLMMsPython.html#cb38-44" tabindex="-1"></a>plot1nbPyMC.show()</span></code></pre></div>
+<p><img src="03-GLMMsInPython_files/figure-html/nbPyMC1TR-1.png" width="100%" /></p>
+</div>
 </div>
 </div>
 <div id="summary-of-estimates" class="section level2 hasAnchor" number="4.5">
@@ -1112,33 +1306,33 @@ Figure 4.3: Negative binomial GLM predictions (Python).
 <div id="compare-tr-estimates" class="section level3 hasAnchor" number="4.5.1">
 <h3><span class="header-section-number">4.5.1</span> Compare TR estimates<a href="GLMMsPython.html#compare-tr-estimates" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Here, the trapping reduction estimates from all of the models are compared. As expected, the median TR estimates are very close from model to model, but the uncertainty in that estimate increase (i.e., the confidence/credible intervals get wider) when we properly account for the correlations in our data.</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb35-1"><a href="GLMMsPython.html#cb35-1" tabindex="-1"></a>data <span class="op">=</span> np.array([<span class="bu">round</span>(TR_1nb.quantile(q<span class="op">=</span>[<span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>]))) </span>
-<span id="cb35-2"><a href="GLMMsPython.html#cb35-2" tabindex="-1"></a>                 <span class="co"># round(TR2nb.quantile(q=[0.025, 0.5, 0.975])), </span></span>
-<span id="cb35-3"><a href="GLMMsPython.html#cb35-3" tabindex="-1"></a>                 <span class="co"># round(TR3nb.quantile(q=[0.025, 0.5, 0.975])),</span></span>
-<span id="cb35-4"><a href="GLMMsPython.html#cb35-4" tabindex="-1"></a>                 <span class="co"># round(TR4nb.quantile(q=[0.025, 0.5, 0.975]))])</span></span>
-<span id="cb35-5"><a href="GLMMsPython.html#cb35-5" tabindex="-1"></a></span>
-<span id="cb35-6"><a href="GLMMsPython.html#cb35-6" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(data, columns <span class="op">=</span> [<span class="st">&quot;TR&quot;</span>, <span class="st">&quot;lowerCI&quot;</span>, <span class="st">&quot;upperCI&quot;</span>])</span>
-<span id="cb35-7"><a href="GLMMsPython.html#cb35-7" tabindex="-1"></a>df[<span class="st">&quot;Model_name&quot;</span>] <span class="op">=</span> [<span class="st">&quot;GLM&quot;</span>, <span class="st">&quot;GLMM (location)&quot;</span>, <span class="st">&quot;GLMM (location, date)&quot;</span>, <span class="st">&quot;GLMM (location) with GP&quot;</span>]</span>
-<span id="cb35-8"><a href="GLMMsPython.html#cb35-8" tabindex="-1"></a>df[<span class="st">&quot;Distribution&quot;</span>] <span class="op">=</span> [<span class="st">&quot;Neg Binomial&quot;</span>, <span class="st">&quot;Neg Binomial&quot;</span>, <span class="st">&quot;Neg Binomial&quot;</span>, <span class="st">&quot;Neg Binomial&quot;</span>]</span>
-<span id="cb35-9"><a href="GLMMsPython.html#cb35-9" tabindex="-1"></a>df[<span class="st">&quot;Framework&quot;</span>] <span class="op">=</span> [<span class="st">&quot;Bayesian&quot;</span>, <span class="st">&quot;Bayesian&quot;</span>, <span class="st">&quot;Bayesian&quot;</span>, <span class="st">&quot;Bayesian&quot;</span>]</span>
-<span id="cb35-10"><a href="GLMMsPython.html#cb35-10" tabindex="-1"></a><span class="bu">print</span>(df[[<span class="st">&quot;Framework&quot;</span>, <span class="st">&quot;Distribution&quot;</span>, <span class="st">&quot;Model_name&quot;</span>, <span class="st">&quot;TR&quot;</span>, <span class="st">&quot;lowerCI&quot;</span>, <span class="st">&quot;upperCI&quot;</span>]])</span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb39-1"><a href="GLMMsPython.html#cb39-1" tabindex="-1"></a>data <span class="op">=</span> np.array([<span class="bu">round</span>(TR_1nb.quantile(q<span class="op">=</span>[<span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>]))) </span>
+<span id="cb39-2"><a href="GLMMsPython.html#cb39-2" tabindex="-1"></a>                 <span class="co"># round(TR2nb.quantile(q=[0.025, 0.5, 0.975])), </span></span>
+<span id="cb39-3"><a href="GLMMsPython.html#cb39-3" tabindex="-1"></a>                 <span class="co"># round(TR3nb.quantile(q=[0.025, 0.5, 0.975])),</span></span>
+<span id="cb39-4"><a href="GLMMsPython.html#cb39-4" tabindex="-1"></a>                 <span class="co"># round(TR4nb.quantile(q=[0.025, 0.5, 0.975]))])</span></span>
+<span id="cb39-5"><a href="GLMMsPython.html#cb39-5" tabindex="-1"></a></span>
+<span id="cb39-6"><a href="GLMMsPython.html#cb39-6" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(data, columns <span class="op">=</span> [<span class="st">&quot;TR&quot;</span>, <span class="st">&quot;lowerCI&quot;</span>, <span class="st">&quot;upperCI&quot;</span>])</span>
+<span id="cb39-7"><a href="GLMMsPython.html#cb39-7" tabindex="-1"></a>df[<span class="st">&quot;Model_name&quot;</span>] <span class="op">=</span> [<span class="st">&quot;GLM&quot;</span>, <span class="st">&quot;GLMM (location)&quot;</span>, <span class="st">&quot;GLMM (location, date)&quot;</span>, <span class="st">&quot;GLMM (location) with GP&quot;</span>]</span>
+<span id="cb39-8"><a href="GLMMsPython.html#cb39-8" tabindex="-1"></a>df[<span class="st">&quot;Distribution&quot;</span>] <span class="op">=</span> [<span class="st">&quot;Neg Binomial&quot;</span>, <span class="st">&quot;Neg Binomial&quot;</span>, <span class="st">&quot;Neg Binomial&quot;</span>, <span class="st">&quot;Neg Binomial&quot;</span>]</span>
+<span id="cb39-9"><a href="GLMMsPython.html#cb39-9" tabindex="-1"></a>df[<span class="st">&quot;Framework&quot;</span>] <span class="op">=</span> [<span class="st">&quot;Bayesian&quot;</span>, <span class="st">&quot;Bayesian&quot;</span>, <span class="st">&quot;Bayesian&quot;</span>, <span class="st">&quot;Bayesian&quot;</span>]</span>
+<span id="cb39-10"><a href="GLMMsPython.html#cb39-10" tabindex="-1"></a><span class="bu">print</span>(df[[<span class="st">&quot;Framework&quot;</span>, <span class="st">&quot;Distribution&quot;</span>, <span class="st">&quot;Model_name&quot;</span>, <span class="st">&quot;TR&quot;</span>, <span class="st">&quot;lowerCI&quot;</span>, <span class="st">&quot;upperCI&quot;</span>]])</span></code></pre></div>
 </div>
 <div id="compare-coefficients" class="section level3 hasAnchor" number="4.5.2">
 <h3><span class="header-section-number">4.5.2</span> Compare coefficients<a href="GLMMsPython.html#compare-coefficients" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Because TR is a non-linear function of <span class="math inline">\(\beta_1\)</span>, the differences in the model output get slightly distorted from the transformation. Thereofre, the <span class="math inline">\(\beta_1\)</span> coefficients are displayed as well:</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb36-1"><a href="GLMMsPython.html#cb36-1" tabindex="-1"></a>dfB <span class="op">=</span> pd.concat([az.summary(idata_bmb1nb, var_names<span class="op">=</span>[<span class="st">&quot;Treatment&quot;</span>])[[<span class="st">&quot;mean&quot;</span>, <span class="st">&quot;sd&quot;</span>]],</span>
-<span id="cb36-2"><a href="GLMMsPython.html#cb36-2" tabindex="-1"></a>az.summary(idata_bmb2nb, var_names<span class="op">=</span>[<span class="st">&quot;Treatment&quot;</span>])[[<span class="st">&quot;mean&quot;</span>, <span class="st">&quot;sd&quot;</span>]]], ignore_index<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb36-3"><a href="GLMMsPython.html#cb36-3" tabindex="-1"></a></span>
-<span id="cb36-4"><a href="GLMMsPython.html#cb36-4" tabindex="-1"></a>dfB <span class="op">=</span> pd.concat([dfB,</span>
-<span id="cb36-5"><a href="GLMMsPython.html#cb36-5" tabindex="-1"></a>az.summary(idata_bmb3nb, var_names<span class="op">=</span>[<span class="st">&quot;Treatment&quot;</span>])[[<span class="st">&quot;mean&quot;</span>, <span class="st">&quot;sd&quot;</span>]]], ignore_index<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb36-6"><a href="GLMMsPython.html#cb36-6" tabindex="-1"></a>dfB <span class="op">=</span> pd.concat([dfB,</span>
-<span id="cb36-7"><a href="GLMMsPython.html#cb36-7" tabindex="-1"></a>az.summary(idata_bmb4nb, var_names<span class="op">=</span>[<span class="st">&quot;Treatment&quot;</span>])[[<span class="st">&quot;mean&quot;</span>, <span class="st">&quot;sd&quot;</span>]]], ignore_index<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb36-8"><a href="GLMMsPython.html#cb36-8" tabindex="-1"></a>dfB</span>
-<span id="cb36-9"><a href="GLMMsPython.html#cb36-9" tabindex="-1"></a></span>
-<span id="cb36-10"><a href="GLMMsPython.html#cb36-10" tabindex="-1"></a>dfB[<span class="st">&quot;Model_name&quot;</span>] <span class="op">=</span> [<span class="st">&quot;GLM&quot;</span>, <span class="st">&quot;GLMM (location)&quot;</span>, <span class="st">&quot;GLMM (location, date)&quot;</span>, <span class="st">&quot;GLMM (location) with GP&quot;</span>]</span>
-<span id="cb36-11"><a href="GLMMsPython.html#cb36-11" tabindex="-1"></a>dfB[<span class="st">&quot;Distribution&quot;</span>] <span class="op">=</span> [<span class="st">&quot;Neg Binomial&quot;</span>, <span class="st">&quot;Neg Binomial&quot;</span>, <span class="st">&quot;Neg Binomial&quot;</span>, <span class="st">&quot;Neg Binomial&quot;</span>]</span>
-<span id="cb36-12"><a href="GLMMsPython.html#cb36-12" tabindex="-1"></a>dfB[<span class="st">&quot;Framework&quot;</span>] <span class="op">=</span> [<span class="st">&quot;Bayesian&quot;</span>, <span class="st">&quot;Bayesian&quot;</span>, <span class="st">&quot;Bayesian&quot;</span>, <span class="st">&quot;Bayesian&quot;</span>]</span>
-<span id="cb36-13"><a href="GLMMsPython.html#cb36-13" tabindex="-1"></a><span class="bu">print</span>(dfB[[<span class="st">&quot;Framework&quot;</span>, <span class="st">&quot;Distribution&quot;</span>, <span class="st">&quot;Model_name&quot;</span>, <span class="st">&quot;mean&quot;</span>, <span class="st">&quot;sd&quot;</span>]])</span></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb40-1"><a href="GLMMsPython.html#cb40-1" tabindex="-1"></a>dfB <span class="op">=</span> pd.concat([az.summary(idata_bmb1nb, var_names<span class="op">=</span>[<span class="st">&quot;Treatment&quot;</span>])[[<span class="st">&quot;mean&quot;</span>, <span class="st">&quot;sd&quot;</span>]],</span>
+<span id="cb40-2"><a href="GLMMsPython.html#cb40-2" tabindex="-1"></a>az.summary(idata_bmb2nb, var_names<span class="op">=</span>[<span class="st">&quot;Treatment&quot;</span>])[[<span class="st">&quot;mean&quot;</span>, <span class="st">&quot;sd&quot;</span>]]], ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb40-3"><a href="GLMMsPython.html#cb40-3" tabindex="-1"></a></span>
+<span id="cb40-4"><a href="GLMMsPython.html#cb40-4" tabindex="-1"></a>dfB <span class="op">=</span> pd.concat([dfB,</span>
+<span id="cb40-5"><a href="GLMMsPython.html#cb40-5" tabindex="-1"></a>az.summary(idata_bmb3nb, var_names<span class="op">=</span>[<span class="st">&quot;Treatment&quot;</span>])[[<span class="st">&quot;mean&quot;</span>, <span class="st">&quot;sd&quot;</span>]]], ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb40-6"><a href="GLMMsPython.html#cb40-6" tabindex="-1"></a>dfB <span class="op">=</span> pd.concat([dfB,</span>
+<span id="cb40-7"><a href="GLMMsPython.html#cb40-7" tabindex="-1"></a>az.summary(idata_bmb4nb, var_names<span class="op">=</span>[<span class="st">&quot;Treatment&quot;</span>])[[<span class="st">&quot;mean&quot;</span>, <span class="st">&quot;sd&quot;</span>]]], ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb40-8"><a href="GLMMsPython.html#cb40-8" tabindex="-1"></a>dfB</span>
+<span id="cb40-9"><a href="GLMMsPython.html#cb40-9" tabindex="-1"></a></span>
+<span id="cb40-10"><a href="GLMMsPython.html#cb40-10" tabindex="-1"></a>dfB[<span class="st">&quot;Model_name&quot;</span>] <span class="op">=</span> [<span class="st">&quot;GLM&quot;</span>, <span class="st">&quot;GLMM (location)&quot;</span>, <span class="st">&quot;GLMM (location, date)&quot;</span>, <span class="st">&quot;GLMM (location) with GP&quot;</span>]</span>
+<span id="cb40-11"><a href="GLMMsPython.html#cb40-11" tabindex="-1"></a>dfB[<span class="st">&quot;Distribution&quot;</span>] <span class="op">=</span> [<span class="st">&quot;Neg Binomial&quot;</span>, <span class="st">&quot;Neg Binomial&quot;</span>, <span class="st">&quot;Neg Binomial&quot;</span>, <span class="st">&quot;Neg Binomial&quot;</span>]</span>
+<span id="cb40-12"><a href="GLMMsPython.html#cb40-12" tabindex="-1"></a>dfB[<span class="st">&quot;Framework&quot;</span>] <span class="op">=</span> [<span class="st">&quot;Bayesian&quot;</span>, <span class="st">&quot;Bayesian&quot;</span>, <span class="st">&quot;Bayesian&quot;</span>, <span class="st">&quot;Bayesian&quot;</span>]</span>
+<span id="cb40-13"><a href="GLMMsPython.html#cb40-13" tabindex="-1"></a><span class="bu">print</span>(dfB[[<span class="st">&quot;Framework&quot;</span>, <span class="st">&quot;Distribution&quot;</span>, <span class="st">&quot;Model_name&quot;</span>, <span class="st">&quot;mean&quot;</span>, <span class="st">&quot;sd&quot;</span>]])</span></code></pre></div>
 </div>
 <div id="plot-comparisons-1" class="section level3 hasAnchor" number="4.5.3">
 <h3><span class="header-section-number">4.5.3</span> Plot comparisons<a href="GLMMsPython.html#plot-comparisons-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>

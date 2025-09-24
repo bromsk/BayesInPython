@@ -48,7 +48,7 @@ Because I am newer to Python, the required modules are often included in the cod
 
 
 ``` r
-knitr::opts_chunk$set(cache = T, message = F, warning = F, 
+knitr::opts_chunk$set(cache = F, message = F, warning = F, 
   out.width = '100%')
 library(kableExtra) # to make a pretty table
 library(tidyverse) # %>% function, and others
@@ -68,7 +68,7 @@ use_virtualenv("r-reticulate-BayesInPython")
 # virtualenv_create("r-reticulate-BayesInPython")
 # 
 # # install a module
-# virtualenv_install("r-reticulate-BayesInPython", "pandas")
+virtualenv_install("r-reticulate-BayesInPython", "tabulate")
 # 
 # indicate that we want to use a specific virtualenv
 # use_virtualenv("r-reticulate-BayesInPython")
@@ -90,7 +90,7 @@ use_virtualenv("r-reticulate-BayesInPython")
 
 # code chunk is here for easy retrieval
 # replace module name as needed.
-!pip install staticmap
+!pip install prettytable
 
 # installing googlemaps needs a modification to the command above:
 # !pip install  --use-pep517 googlemaps
@@ -132,6 +132,7 @@ import pymc as pm
 
 import pickle # to write, read python objects to file
 
+from tabulate import tabulate # for python tables in Rmd
 
 mycolors = ["#9E0142", "#66C2A5"] # color names from R script
 ```
@@ -479,8 +480,8 @@ print(results1p.summary())
 ## Model Family:                 Poisson   Df Model:                            1
 ## Link Function:                    Log   Scale:                          1.0000
 ## Method:                          IRLS   Log-Likelihood:                -14034.
-## Date:                Tue, 23 Sep 2025   Deviance:                       25678.
-## Time:                        10:43:50   Pearson chi2:                 4.24e+04
+## Date:                Wed, 24 Sep 2025   Deviance:                       25678.
+## Time:                        14:53:18   Pearson chi2:                 4.24e+04
 ## No. Iterations:                     6   Pseudo R-squ. (CS):              1.000
 ## Covariance Type:            nonrobust                                         
 ## ====================================================================================
@@ -555,7 +556,7 @@ For the negative binomial (NB) model, our confidence intervals are a little wide
 
 
 ``` python
-from scipy.stats import nbinom
+# from scipy.stats import nbinom
 
 form = """ nYSB ~ Treatment"""
 y, X = dmatrices(form, datP, return_type = 'dataframe')
@@ -565,6 +566,14 @@ results1nb = mod1nb.fit()
 
 ``` python
 # print(results1nb.summary())
+
+# pretty DF to compare to bambi results
+est = results1nb.params.to_frame(name = "Estimate")
+se = results1nb.bse.to_frame(name = "SE")
+confint = results1nb.conf_int()
+confint.columns = ["lowerCI", "upperCI"]
+nb1pyout = round(pd.concat([est, se, confint], axis = 1), 3)
+
 ```
 
 #### Predictions
@@ -646,11 +655,33 @@ print(az.summary(idata_bmb1nb))
 ## Treatment[Trt]   10039.0    1.0
 ```
 
-The Bayesian parameter estimates match very closely to the frequentist estimates (copied here from Section 3.3.2):
+``` python
+tmp1nb = az.summary(idata_bmb1nb).iloc[:,0:4]
+```
+
+The Bayesian parameter estimates match very closely to the frequentist estimates (copied here from Section \@ref(nb1Py)). Note that the shape parameter is called `alpha` in the `bambi` module.
+
+
+Table: (\#tab:compareCoef1nbBambi)Coefficient estimates from the Bayesian framework, fit using the bambi module
+
+|               |   mean|    sd| hdi_3%| hdi_97%|
+|:--------------|------:|-----:|------:|-------:|
+|alpha          |  0.656| 0.035|  0.588|   0.721|
+|Intercept      |  1.402| 0.067|  1.276|   1.530|
+|Treatment[Trt] | -2.159| 0.099| -2.343|  -1.974|
+
+
+
+Table: (\#tab:compareCoef1nbBambi)Coefficient estimates from the frequentist framework, fit using sm.NegativeBinomial().
+
+|                 | Estimate|    SE| lowerCI| upperCI|
+|:----------------|--------:|-----:|-------:|-------:|
+|Intercept        |    1.402| 0.068|   1.269|   1.535|
+|Treatment[T.Trt] |   -2.164| 0.099|  -2.358|  -1.970|
+|alpha            |    1.524| 0.082|   1.364|   1.685|
+
 
 The matching parameter estimates are expected, but reassuring that we have built the correct foundation for the more complicated models to come.
-
-One difference however is that the frequentist model gives only a point estimate for the shape parameter while the Bayesian model gives us a distribution and therefore 95% credible intervals for the parameter.
 
 #### Predictions
 
@@ -659,15 +690,13 @@ One difference however is that the frequentist model gives only a point estimate
 # CALC TR:
 b1 = idata_bmb1nb.posterior["Treatment"].stack(sample=("chain", "draw")).to_dataframe(name = "Trt")
 
-TR1nb = 100 * (1 - np.exp(b1['Trt']))
-print(round(TR1nb.quantile(q=[0.025, 0.5, 0.975])))
+tmpTR1nb = 100 * (1 - np.exp(b1['Trt']))
+TR1nb = round(tmpTR1nb.quantile(q=[0.025, 0.5, 0.975])).to_frame().T
+tabulate(TR1nb, tablefmt="grid", headers = ["TR", "lowerCI", "upperCI"])
 ```
 
 ```
-## 0.025    86.0
-## 0.500    88.0
-## 0.975    90.0
-## Name: Trt, dtype: float64
+## '+-----+------+-----------+-----------+\n|     |   TR |   lowerCI |   upperCI |\n+=====+======+===========+===========+\n| Trt |   86 |        88 |        90 |\n+-----+------+-----------+-----------+'
 ```
 
 ``` python
@@ -703,9 +732,9 @@ plot1nb = (ggplot(bmbPreds1nb,
 plot1nb.show()
 ```
 
-<img src="03-GLMMsInPython_files/figure-html/nbBambi1TR-5.png" width="100%" />
+<img src="03-GLMMsInPython_files/figure-html/nbBambi1TR-1.png" width="100%" />
 
-The figure looks almost identical to the the frequent predictions (Figure 3.4). Comparisons of all TR estimates, coefficient estimates, and predicted moth counts can be found at the end of the page (Section 3.7.1).
+The figure looks almost identical to the the frequent predictions (Figure \@ref(p1nb-glmFigPy)).
 
 
 ### Bayesian (PyMC) models-- Python
@@ -730,11 +759,12 @@ dm = design_matrices('nYSB ~ C(Treatment)', data=datP, na_action='error')
 X = dm.common.as_dataframe()
 y = dm.response.as_dataframe().squeeze() # This ensures y is 1-dimensional. 
 
-DaysOfCatch = datP['DaysOfCatch']
+log_DaysOfCatch = np.log(datP['DaysOfCatch'])
 
 # Create labelled coords which help the model keep track of everything(i.e., use factor names)
 c = {'predictors': X.columns, # Model now aware of number of and labels of predictors
      'N': range(len(y))} # and number of observations
+     # 'DaysOfCatch': np.log(datP['DaysOfCatch'])} 
 
 with pm.Model(coords = c) as model_pymc1nb:
     # Set the data, and convert to NumPy arrays (to use matrix multiplication
@@ -750,32 +780,40 @@ with pm.Model(coords = c) as model_pymc1nb:
     TR = pm.Deterministic('TR', 100 - 100 * np.exp(beta[1]))
     
     # likelihood:
-    mu = pm.math.exp(Xdata @ beta + # pm.math.dot(X, factor_coefs) + #@ operator is for matrix multiplication 
-                     np.log(DaysOfCatch)) 
+    mu = pm.math.exp(Xdata @ beta + # #@ operator is for matrix multiplication 
+                     log_DaysOfCatch)
     pm.NegativeBinomial('y', mu=mu, alpha = alpha, observed=Ydata)
-    
+```
+
+```
+## y
+```
+
+
+``` python
+with model_pymc1nb:
     # Sample according to your specifications, but tune for longer and take fewer draws
-    pymc1nb = pm.sample(draws=1000, tune=3000, cores=4, random_seed=45, step=pm.NUTS())#Metropolis())
+    idata_pymc1nb = pm.sample(draws=1000, tune=3000, cores=4, random_seed=45, step=pm.NUTS())#Metropolis())
     # pymc1nb is called 'trace' in lots of the help files
 
 
 import pickle # to save PyMC object to file.
-filename = 'output/respymc1nb.pkl'
+filename = 'output/idata_pymc1nb.pkl'
 # save bambi object to file.
 with open(filename, 'wb') as file:
-    pickle.dump(pymc1nb, file)
+    pickle.dump(idata_pymc1nb, file)
 ```
 
 
 ``` python
 # Load the object from the file
 import pickle
-filename = 'output/respymc1nb.pkl'
+filename = 'output/idata_pymc1nb.pkl'
 with open(filename, 'rb') as file:
-    pymc1nb = pickle.load(file)
+    idata_pymc1nb = pickle.load(file)
 
 # summary stats
-print(az.summary(pymc1nb))
+print(az.summary(idata_pymc1nb))
 ```
 
 ```
@@ -793,21 +831,91 @@ print(az.summary(pymc1nb))
 ```
 
 ``` python
-# CALC TR!
-print(az.summary(pymc1nb, var_names=['TR']))
+tmp1nbPyMC = az.summary(idata_pymc1nb).iloc[0:3,0:4]
+```
+
+
+Table: (\#tab:compareCoef1nb)Coefficient estimates from the Bayesian framework, fit using the PyMC module
+
+|                        |   mean|    sd| hdi_3%| hdi_97%|
+|:-----------------------|------:|-----:|------:|-------:|
+|beta[Intercept]         |  1.402| 0.067|  1.279|   1.532|
+|beta[C(Treatment)[Trt]] | -2.160| 0.099| -2.348|  -1.981|
+|alpha                   |  0.655| 0.035|  0.591|   0.720|
+
+
+
+Table: (\#tab:compareCoef1nb)Coefficient estimates from the frequentist framework, fit using sm.NegativeBinomial().
+
+|                 | Estimate|    SE| lowerCI| upperCI|
+|:----------------|--------:|-----:|-------:|-------:|
+|Intercept        |    1.402| 0.068|   1.269|   1.535|
+|Treatment[T.Trt] |   -2.164| 0.099|  -2.358|  -1.970|
+|alpha            |    1.524| 0.082|   1.364|   1.685|
+
+Here, PyMC computes the inverse of the shape function. In future runs, it will be renamed "inversealpha", and an "alpha" will also be derived for direct comparison.
+
+#### Predictions
+
+
+``` python
+# CALC TR:
+tmpTR = az.summary(idata_pymc1nb, var_names=['TR'])
+tabulate(round(tmpTR.iloc[:,[0,2,3]], 1), tablefmt="grid", headers = ["TR", "lowerCI", "upperCI"])
 ```
 
 ```
-##       mean     sd  hdi_3%  hdi_97%  mcse_mean  mcse_sd  ess_bulk  ess_tail  \
-## TR  88.406  1.141  86.308   90.527      0.024    0.017    2184.0    2559.0   
-## 
-##     r_hat  
-## TR    1.0
+## '+----+------+-----------+-----------+\n|    |   TR |   lowerCI |   upperCI |\n+====+======+===========+===========+\n| TR | 88.4 |      86.3 |      90.5 |\n+----+------+-----------+-----------+'
 ```
 
 ``` python
-# outTR1nb = round(TR1nb.quantile(q=[0.025, 0.5, 0.975]).to_pandas())
+# create new predictions to plot:
+pymcPreds1nb = datP.copy() 
+pymcPreds1nb["DaysOfCatch"] = 1
+new_log_DaysOfCatch = np.full(len(log_DaysOfCatch), np.log(pymcPreds1nb["DaysOfCatch"]))
+new_logDaysOfCatch_reshaped = new_log_DaysOfCatch[:, np.newaxis]
+new_Xdata = X.to_numpy()
+    
+post3d =  idata_pymc1nb.posterior["beta"].to_numpy()
+posterior_betas = post3d.reshape(-1, post3d.shape[2])
+
+posterior_mu_samples = np.exp(
+    new_Xdata @ posterior_betas.T + new_logDaysOfCatch_reshaped
+)
+
+
+# The posterior predictive mean is the mean of the posterior mu samples
+mean_predicted_response = posterior_mu_samples.mean(axis=1)
+# You can also get other statistics, like a 95% credible interval
+hdi_predicted_response = az.hdi(posterior_mu_samples.T)
+
+
+# Display the results
+pymcPreds1nb["preds"] = mean_predicted_response
+pymcPreds1nb["lowerCI"] =  hdi_predicted_response[:, 0]
+pymcPreds1nb["upperCI"] =  hdi_predicted_response[:, 1]
+# pymcPreds1nb.describe()
+
+plot1nbPyMC = (ggplot(pymcPreds1nb, 
+                aes(x = 'DATI', y='preds', color = 'Treatment')) +
+        geom_line() +
+        geom_ribbon(aes(ymin = 'lowerCI', ymax = 'upperCI', fill = 'Treatment'),
+              alpha = 0.3) +
+        geom_point(aes(x='DATI', y='mothsperday', color = 'Treatment'), 
+            data = mean_cts, size = 1.1) +
+        facet_wrap(['Location'], scales = "free_y") +
+        scale_color_manual(values = mycolors) +
+        scale_fill_manual(values = mycolors) +
+        labs(title = "Bayes (PyMC) NB GLM predictions",
+             subtitle = "Lines are predictions, points are the data",
+             x = "Days after installation",
+             y = "Moth counts per day"))
+# plot1nb.save(filename='plot1nb.png', path='output/')
+# plot1nb.draw(True)
+plot1nbPyMC.show()
 ```
+
+<img src="03-GLMMsInPython_files/figure-html/nbPyMC1TR-1.png" width="100%" />
 
 
 ## Summary of estimates
